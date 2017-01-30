@@ -1,0 +1,95 @@
+<page footer="page" format="432x240" backcolor="#FFFFFF" style="font: arial;">
+    <div class="table-container">
+    	<table width="600px" border="0" cellspacing="0" cellpadding="0"  style="background-color:#fff;padding:40px 40px 0px 40px;">
+    		<tr>
+    		<td colspan="4">
+                    <h3>LISTADO DE MUESTRAS A REPETIR </h3>
+                </td>
+            </tr>
+            <tr>
+                <td  height="30px" bgcolor="#000000" style="width:200px;border: black 1px solid;color:#FFF;">
+                    Código del estudio:
+                </td>
+                <td style="width:200px;border: black 1px solid;">
+                    <?php echo $study; ?>
+                </td>
+
+                <td  height="30px" bgcolor="#000000" style="width:200px;border: black 1px solid;color:#F1DADA;">
+                    Analito
+                </td>
+                <td  height="30px" style="width:190px;border: black 1px solid;">
+                    <?php echo $analyte; ?>
+                </td>
+            </tr>
+    	</table>
+        <table width="600px" border="0" cellspacing="0" cellpadding="0"  style="background-color:#fff;padding:40px;">
+            <tr>
+                <td height="20" style="width:90px;text-align:center;border: black 1px solid;padding:4px;font-size:14px;font-weight:bold;">
+                    Identificación de la muestra
+                </td>
+                <td    height="20" style="width:100px;text-align:center;border: black 1px solid;padding: 4px;font-size:14px;font-weight:bold;">
+                    Código de error
+                </td>
+                <td    height="20" style="width:350px;text-align:center;border: black 1px solid;padding: 4px;font-size:14px;font-weight:bold;">
+                    Motivo
+                </td>
+                <td   height="20" style="width:200px;text-align:center;border: black 1px solid;padding: 4px;font-size:14px;font-weight:bold;">
+                    Tabla de resultados del lote
+                </td>
+
+            </tr>
+            <?php foreach ($list as $key => $value) : ?>
+            <tr>
+                <td    height="20" style="width:90px;text-align:left;border: black 1px solid;padding:4px;">
+                    <?php echo $value['sampleName']; ?>
+                </td>
+                <td    height="20" style="width:100px;text-align:center;border: black 1px solid;padding:4px;">
+                    <?php echo $value['codeError']; ?>
+                </td>
+                <td    height="20" style="width:350px;text-align:left;border: black 1px solid;padding:4px;">
+                    <?php echo htmlentities($value['messageError']); ?>
+                </td>
+                <td    height="20" style="width:200px;text-align:left;border: black 1px solid;padding:4px;">
+                    <?php echo substr($value['filename'], 0, -4); ?>
+                </td>
+
+            </tr>
+           		
+            
+            
+            <?php endforeach; ?>
+
+        </table>
+        <table width="600px" border="0" cellspacing="0" cellpadding="0"  style="background-color:#fff;padding:0px 40px 0px 40px;">
+
+		<tr>
+                <td align="right" width="300px" height="20" >
+                    Fecha y hora de impresión:
+                </td>
+                <td  align="left" width="300px" height="20">
+                    <?php echo date("d.m.Y H:i"); ?>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <page_footer>
+    
+  	</page_footer>
+</page>
+<?php
+$content = ob_get_clean();
+require_once dirname(__FILE__) . "/html2pdf/html2pdf.class.php";
+try
+{
+    $html2pdf = new HTML2PDF('P', array(432, 240), 'en', true, 'UTF-8', array(0, 0, 0, 0));
+    $html2pdf->setDefaultFont('Arial');
+    $html2pdf->pdf->SetProtection(array('print'), '', '');
+    $html2pdf->writeHTML($content);
+    $html2pdf->Output($filename . ".pdf", 'D');
+}
+catch (HTML2PDF_exception $e)
+{
+    echo $e;
+}
+exit;
+?>

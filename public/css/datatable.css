@@ -1,0 +1,328 @@
+/*
+    Created on : 18-dic-2013, 20:16:46
+    Author     : Maria Quiroz
+*/
+div#datatable 
+{
+	
+	height:800px;
+}
+#datatable span, a{ margin-right: 5px; }
+#datatable table{
+    width: 100%;
+    
+    outline: solid 1px #008B8B;
+    border-collapse: separate;
+    border-spacing: 2px;
+}
+#datatable table thead th{
+    border: 3px ridge #008B8B;
+    background-color: #008B8B;
+    color: #fff;
+    background-image: url('../img/asc.png');
+    background-position: right;
+    background-repeat: no-repeat;
+    font-family: Calibri;
+    font-size: 1.1em;
+}
+#datatable table tbody tr td{
+    border: 1px solid #008B8B;
+    vertical-align: top;
+    height: 35px;
+}
+#datatable table tbody tr .form-datatable-edit,
+#datatable table tbody tr .yui3-datatable-col-edit{
+    border: 0px none;
+    max-width: 50px;
+}
+
+#datatable table tbody tr .yui3-datatable-col-edit a{
+    float: left;
+}
+#datatable table tbody tr td input[type=submit]{
+    height: 16px;
+    width: 16px;
+    background:url(../img/save.png) no-repeat top left;
+    float: left;
+    border: 0 none;
+}
+#datatable table tbody tr .form-datatable-edit .form-datatable-new,
+#datatable table tbody tr .form-datatable-edit .form-datatable-add{
+    height: 16px;
+    width: 16px;
+    background:url(../img/add.png) no-repeat top left;
+    float: left;
+	cursor: pointer;
+}
+#datatable table tbody tr .form-datatable-edit .form-download-excel{
+    height: 16px;
+    width: 16px;
+    background:url(../img/xls.png) no-repeat top left;
+    float: left;
+}
+#datatable table tbody tr .yui3-datatable-col-edit .form-datatable-reject{
+    height: 16px;
+    width: 16px;
+    background:url(../img/reject.png) no-repeat top left;
+    float: left;
+}
+#datatable table tbody tr .yui3-datatable-col-edit .form-datatable-approve{
+    height: 16px;
+    width: 16px;
+    background:url(../img/approve.png) no-repeat top left;
+    float: left;
+}
+#datatable table tbody tr .form-datatable-edit .form-download-pdf{
+    height: 16px;
+    width: 16px;
+    background:url(../img/pdf.png) no-repeat top left;
+    float: left;
+}
+#datatable table tbody tr .yui3-datatable-col-edit .form-datatable-delete,
+#datatable table tbody tr .form-datatable-edit .form-datatable-remove{
+    height: 16px;
+    width: 16px;
+    background:url(../img/del.png) no-repeat top left;
+    float: left;
+}
+
+#datatable table tbody tr .yui3-datatable-col-edit .form-datatable-change{
+    height: 16px;
+    width: 16px;
+    background:url(../img/save.png) no-repeat top left;
+    float: left;
+}
+
+#datatable table tbody tr .yui3-datatable-col-edit .form-datatable-save{
+   height: 16px;
+   width: 16px;
+   background:url(../img/save.png) no-repeat top left;
+   float: left;
+   border: 0 none;
+}
+
+#datatable table tbody tr .yui3-datatable-col-edit .form-datatable-change{
+    height: 16px;
+    width: 16px;
+    background:url(../img/edit.png) no-repeat top left;
+    float: left;
+}
+#datatable table tbody tr .yui3-datatable-col-edit .form-datatable-nominal{
+    height: 16px;
+    width: 16px;
+    background:url(../img/no.png) no-repeat top left;
+    float: left;
+}
+#datatable table tbody tr .yui3-datatable-col-edit .form-datatable-batch{
+    height: 16px;
+    width: 16px;
+    background:url(../img/batch.png) no-repeat top left;
+    float: left;
+}
+#datatable table tbody tr .yui3-datatable-col-edit .form-datatable-lupa{
+    height: 16px;
+    width: 16px;
+    background:url(../img/prev.png) no-repeat top left;
+    float: left;
+}
+#datatable table tbody tr td input[type=text]{
+    height: 1.8em;
+    border: 1px solid #008B8B;
+    width: 99%;
+    font-family: Verdana;
+    font-size: 1em;
+    color: #0000CC;
+    padding-left: 2px;
+}
+#datatable table tbody tr td{  padding: 2px; vertical-align: middle; }
+#datatable table thead .yui3-datatable-col-edit{ display:none; }
+#datatable .yui3-datatable-message .yui3-datatable-filter,
+.form-datatable-select{
+    height: 35px;
+    border: 1px solid #008B8B;
+    width: 100%;
+    background-color: #FFFFCC;
+    font-family: Verdana;
+}
+#datatable table thead .yui3-datatable-col-unit,
+#datatable table thead .yui3-datatable-col-use,
+#datatable table thead .yui3-datatable-col-valid_flag,
+#datatable table thead .yui3-datatable-col-modify{
+    background-image:none;
+}
+#datatable .yui3-datatable-data tr .yui3-datatable-col-valid_flag{
+    text-align: center;
+    display: block;
+}
+#datatable .yui3-datatable-data .yui3-datatable-odd{ background-color: #D1EAF0; }
+#datatable .form-datatable-add-block .form-datatable-add{ display:block; }
+#datatable .form-datatable-add,
+#datatable .form-datatable-add-block .form-datatable-remove,
+#analyte,
+#analyte_is,
+#unit
+{ display:none; }
+.btn{
+    color: #000000;
+    display: inline-block;
+    padding: 4px 12px;
+    margin-bottom: 0;
+    font-size: 14px;
+    line-height: 20px;
+    text-align: center;
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
+    vertical-align: middle;
+    cursor: pointer;
+    background-color: #e6e6e6;
+    background-image: -moz-linear-gradient(top, #ffffff, #e6e6e6);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#e6e6e6));
+    background-image: -webkit-linear-gradient(top, #ffffff, #e6e6e6);
+    background-image: -o-linear-gradient(top, #ffffff, #e6e6e6);
+    background-image: linear-gradient(to bottom, #ffffff, #e6e6e6);
+    background-repeat: repeat-x;
+    border: 1px solid #cccccc;
+    border-color: #e6e6e6 #e6e6e6 #bfbfbf;
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+    border-bottom-color: #b3b3b3;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#ffe6e6e6', GradientType=0);
+    filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+    -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+    -moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);    
+}
+.btn:hover{
+    color: #333333;
+    text-decoration: none;
+    background-position: 0 -15px;
+    -webkit-transition: background-position 0.1s linear;
+    -moz-transition: background-position 0.1s linear;
+    -o-transition: background-position 0.1s linear;
+    transition: background-position 0.1s linear;
+}
+.btn-validate{
+    background: url(../img/validar.png) no-repeat left;
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    vertical-align: middle;
+}
+.btn-reject{
+    background: url(../img/reject.png) no-repeat left;
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    vertical-align: middle;
+}
+.btn-lock{
+    background: url(../img/lock.png) no-repeat left;
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    vertical-align: middle;
+}
+.btn-mail{
+    background: url(../img/mail.png) no-repeat left;
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    vertical-align: middle;
+}
+#datatable .btn{
+/*    height: 30px;*/
+}
+#errorBox label{
+    color: red;
+}
+#datatable table tbody tr td .error{ 
+    border: 1px solid red !important;
+    color: red !important;
+}
+#datatable table tbody tr td label[class=error]{ 
+    display: none !important; 
+}
+#errorBox ul{
+    margin: 20px 0;
+}
+#errorBox li{
+    padding-left: 1em; 
+    text-indent: -.7em;
+    color: red;
+}
+
+#create-study,
+#nominalconcentration-form,
+#unfilled,
+#reports,
+#parameter-index, 
+#user-admin,
+#batch-list,
+#edit-study,
+#study-index,
+#create-analyte{
+    margin-top: 80px;
+}
+
+#datatable{
+    width: 98%;
+    height: 85%;
+    outline: solid 1px #008B8B;
+    margin: 0 auto;
+    margin-top: 1em;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+.yui3-datatable-col-rule,
+.yui3-datatable-col-min_value,
+.yui3-datatable-col-max_value,
+.yui3-datatable-col-code_error,
+.yui3-datatable-col-status,
+.yui3-datatable-col-password,
+.yui3-datatable-col-profile,
+.yui3-datatable-col-username,
+.yui3-datatable-col-cs_number,
+.yui3-datatable-col-qc_number,
+.yui3-datatable-col-unit,
+.yui3-datatable-col-is,
+.yui3-datatable-col-use,
+.yui3-datatable-col-justification,
+.yui3-datatable-col-accepted_flag,
+.yui3-datatable-col-modify,
+.yui3-datatable-col-result,
+.yui3-datatable-col-validation_date,
+.yui3-datatable-col-valid_flag,
+.yui3-datatable-col-create_at
+.yui3-datatable-col-filename,
+.yui3-datatable-col-batch,
+.yui3-datatable-col-id{
+    text-align: center;
+}
+
+.yui3-datatable-col-profile .form-datatable-profile{
+    width: 100%; 
+}
+.yui3-datatable-col-edit{
+    width: 4em;
+}
+.yui3-datatable-col-username{
+    width: 10em;
+}
+.yui3-datatable-col-email{
+    width: 40em;
+}
+.yui3-datatable-col-name{
+    width: 50em;
+}
+.yui3-datatable-col-id{
+    width: 8em;
+}
+.yui3-datatable-col-created_at{
+    width: 190px;
+}
+
+#datatable.close table tbody tr td.form-datatable-edit{
+    display: none;
+}
