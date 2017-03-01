@@ -42,7 +42,7 @@ class StudyController extends BaseController
     public function indexAction()
     {
         $data     = array();
-        $elements = $this->getRepository()->findBy(array("status" => true));
+        $elements = $this->getRepository()->findBy(array("status" => true), array("pkStudy" => desc));
         $User     = $this->_getSession();
 
         foreach ($elements as $study)
