@@ -417,7 +417,7 @@ class ReportController extends BaseController
                 "fkAnalyte" => $request->getQuery('an'),
                 "fkStudy"   => $request->getQuery('id'),
                 "validFlag" => true
-            ));
+            ), array("fileName" => asc));
             $Analyte = $this->getRepository("\\Alae\\Entity\\Analyte")->find($request->getQuery('an'));
             $Study   = $this->getRepository("\\Alae\\Entity\\Study")->find($request->getQuery('id'));
 			$AnalyteName = $Analyte->getName();
