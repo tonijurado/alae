@@ -4,6 +4,7 @@ vendor/**
 
 # Local configs
 config/autoload/*.local.php
+module/Alae/config/vars.config.php
 
 # Binary gettext files
 *.mo
@@ -28,4 +29,3 @@ extras/documentation
 
 #MisFiles
 *.txt
-
