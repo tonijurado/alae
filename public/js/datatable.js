@@ -191,7 +191,7 @@ function excel(id)
             var name = "tabla_de_analitos";
             break;
         case 2:
-            var name = "estudios_registrados";
+            var name = "estudios_abiertos";
             break;
         case 3:
             var name = "parametros_del_sistema";
@@ -207,6 +207,9 @@ function excel(id)
             break;
         case 7:
             var name = "transacciones_del_sistema";
+            break;
+        case 8:
+            var name = "estudios_cerrados";
             break;
         default:
             var name = "listado";

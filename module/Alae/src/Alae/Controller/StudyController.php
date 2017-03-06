@@ -42,7 +42,7 @@ class StudyController extends BaseController
     public function indexAction()
     {
         $data     = array();
-        $elements = $this->getRepository()->findBy(array("status" => true), array("pkStudy" => desc));
+        $elements = $this->getRepository()->findBy(array("status" => true, "closeFlag" => 0), array("pkStudy" => desc));
         $User     = $this->_getSession();
 
         foreach ($elements as $study)
@@ -71,12 +71,52 @@ class StudyController extends BaseController
                 "date"        => $study->getCreatedAt(),
                 "analyte"     => $counterAnalyte,
                 "observation" => $study->getObservation(),
-                "closed"      => $study->getCloseFlag() ? "S" : "N",
                 "edit"        => $buttons
             );
         }
 
         $datatable = new Datatable($data, Datatable::DATATABLE_STUDY, $this->_getSession()->getFkProfile()->getName());
+        $viewModel = new ViewModel($datatable->getDatatable());
+        $viewModel->setVariable('user', $User);
+        return $viewModel;
+    }
+
+    public function indexCloseAction()
+    {
+        $data     = array();
+        $elements = $this->getRepository()->findBy(array("status" => true,"closeFlag" => 1), array("pkStudy" => desc));
+        $User     = $this->_getSession();
+
+        foreach ($elements as $study)
+        {
+            switch ($this->_getSession()->getFkProfile()->getName())
+            {
+                case "Administrador":
+                    $buttons = '<a href="' . \Alae\Service\Helper::getVarsConfig("base_url") . '/study/edit/' . $study->getPkStudy() . '"><span class="form-datatable-lupa"></span></a>';
+                    break;
+                case "Director Estudio":
+                    $buttons = '<a href="' . \Alae\Service\Helper::getVarsConfig("base_url") . '/study/edit/' . $study->getPkStudy() . '"><span class="form-datatable-lupa"></span></a>';
+                    break;
+                case "Laboratorio":
+                    //CASO UGC MOSTRAR BOTON DE VER
+                case "UGC":
+                    $buttons = '<a href="' . \Alae\Service\Helper::getVarsConfig("base_url") . '/study/edit/' . $study->getPkStudy() . '"><span class="form-datatable-lupa"></span></a>';
+                    break;
+            }
+
+            $counterAnalyte = $this->counterAnalyte($study->getPkStudy());
+            //MUESTRA LOS DATOS EN PANTALLA
+            $data[]         = array(
+                "code"        => $study->getCode(),
+                "description" => $study->getDescription(),
+                "date"        => $study->getCreatedAt(),
+                "analyte"     => $counterAnalyte,
+                "observation" => $study->getObservation(),
+                "edit"        => $buttons
+            );
+        }
+
+        $datatable = new Datatable($data, Datatable::DATATABLE_STUDY_CLOSE, $this->_getSession()->getFkProfile()->getName());
         $viewModel = new ViewModel($datatable->getDatatable());
         $viewModel->setVariable('user', $User);
         return $viewModel;

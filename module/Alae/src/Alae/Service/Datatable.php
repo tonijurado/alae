@@ -24,6 +24,7 @@ class Datatable
     const DATATABLE_BATCH        = 'batch';
     const DATATABLE_SAMPLE_BATCH = 'sample_batch';
     const DATATABLE_AUDIT_TRAIL  = 'audit';
+    const DATATABLE_STUDY_CLOSE  = 'studyclose';
 
     protected $_data;
     protected $_datatable;
@@ -68,7 +69,7 @@ class Datatable
     //CREA LAS COLUMNAS DEL GRID DE ESTUDIOS
     protected function getStudyColumns()
     {
-	$header = array("code", "description", "date", "analyte", "observation", "closed");
+	$header = array("code", "description", "date", "analyte", "observation");
 	$data = $this->getData();
 
 	return array(
@@ -79,13 +80,34 @@ class Datatable
 		array("key" => "date", "label" => "Fecha", "sortable" => true, "allowHTML" => true),
 		array("key" => "analyte", "label" => "Nº Analitos", "sortable" => true, "allowHTML" => true),
 		array("key" => "observation", "label" => "Observaciones", "sortable" => true, "allowHTML" => true),
-		array("key" => "closed", "label" => "Cerrado (S/N)", "sortable" => true, "allowHTML" => true),
 		array("key" => "edit", "allowHTML" => true)
 	    )),
 	    "editable" => 0,
 	    "header" => json_encode($header),
 	    "filters" => $this->getFilters($header)
 	);
+    }
+
+    //CREA LAS COLUMNAS DEL GRID DE ESTUDIOS CERRADOS
+    protected function getStudyCloseColumns()
+    {
+    $header = array("code", "description", "date", "analyte", "observation");
+    $data = $this->getData();
+
+    return array(
+        "data" => (!empty($data)) ? json_encode($data) : 0,
+        "columns" => json_encode(array(
+        array("key" => "code", "label" => "Código", "sortable" => true),
+        array("key" => "description", "label" => "Descripción", "sortable" => true, "allowHTML" => true),
+        array("key" => "date", "label" => "Fecha", "sortable" => true, "allowHTML" => true),
+        array("key" => "analyte", "label" => "Nº Analitos", "sortable" => true, "allowHTML" => true),
+        array("key" => "observation", "label" => "Observaciones", "sortable" => true, "allowHTML" => true),
+        array("key" => "edit", "allowHTML" => true)
+        )),
+        "editable" => 0,
+        "header" => json_encode($header),
+        "filters" => $this->getFilters($header)
+    );
     }
 
     //CREA LAS COLUMNAS DE LOS PARAMETROS
@@ -354,6 +376,9 @@ class Datatable
 	    case Datatable::DATATABLE_STUDY:
 		$response = $this->getStudyColumns();
 		break;
+        case Datatable::DATATABLE_STUDY_CLOSE:
+        $response = $this->getStudyCloseColumns();
+        break;
 	    case Datatable::DATATABLE_PARAMETER:
 		$response = $this->getParameterColumns();
 		break;
@@ -393,6 +418,9 @@ class Datatable
 	    case Datatable::DATATABLE_STUDY:
 		$elements = '<a href="' . $this->_base_url . '/study/create" class="form-datatable-new"></a><span class="form-download-excel" onclick="excel(2);"></span>';
 		break;
+        case Datatable::DATATABLE_STUDY_CLOSE:
+        $elements = '<span class="form-download-excel" onclick="excel(8);"></span>';
+        break;
 	    case Datatable::DATATABLE_PARAMETER:
 		$elements = '<span class="form-download-excel" onclick="excel(3);"></span><input value="" type="submit"/>';
 		break;
@@ -429,6 +457,9 @@ class Datatable
 	    case Datatable::DATATABLE_STUDY:
 		$elements = '<a href="' . $this->_base_url . '/study/create" class="form-datatable-new"></a><span class="form-download-excel" onclick="excel(2);"></span>';
 		break;
+        case Datatable::DATATABLE_STUDY_CLOSE:
+        $elements = '<span class="form-download-excel" onclick="excel(8);"></span>';
+        break;
             case Datatable::DATATABLE_ANASTUDY:
                 $elements = '<span class="form-datatable-new"></span>';
                 break;
@@ -453,6 +484,9 @@ class Datatable
 	    case Datatable::DATATABLE_STUDY:
 		$elements = '<span class="form-download-excel" onclick="excel(2);"></span>';
 		break;
+        case Datatable::DATATABLE_STUDY_CLOSE:
+        $elements = '<span class="form-download-excel" onclick="excel(8);"></span>';
+        break;
             case Datatable::DATATABLE_UNFILLED:
 		$elements = '<span class="form-download-excel" onclick="excel(5);"></span>';
 		break;
@@ -471,6 +505,9 @@ class Datatable
 	    case Datatable::DATATABLE_STUDY:
 		$elements = '<span class="form-download-excel" onclick="excel(2);"></span>';
 		break;
+        case Datatable::DATATABLE_STUDY_CLOSE:
+        $elements = '<span class="form-download-excel" onclick="excel(8);"></span>';
+        break;
             case Datatable::DATATABLE_UNFILLED:
 		$elements = '<span class="form-download-excel" onclick="excel(5);"></span>';
 		break;
