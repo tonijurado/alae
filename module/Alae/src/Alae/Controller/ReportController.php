@@ -870,6 +870,75 @@ class ReportController extends BaseController
         }
     }
 
+    /**
+     * Summary of calibration curve parameter
+     * $_GET['id'] = pkStudy
+     * $_GET['an'] = pkAnalyte
+     */
+    public function r10Action()
+    {
+        //REPORTE 4 EXCEL r10
+        $request = $this->getRequest();
+        if ($request->isGet())
+        {
+            $batch   = $this->getRepository("\\Alae\\Entity\\Batch")->findBy(array(
+                "fkAnalyte" => $request->getQuery('an'),
+                "fkStudy"   => $request->getQuery('id'),
+                "validFlag" => true
+            ), array("fileName" => asc));
+            $Analyte = $this->getRepository("\\Alae\\Entity\\Analyte")->find($request->getQuery('an'));
+            $Study   = $this->getRepository("\\Alae\\Entity\\Study")->find($request->getQuery('id'));
+            $AnalyteName = $Analyte->getName();
+            $studyName = $Study->getCode();
+
+            if (count($batch) > 0)
+            {
+                ini_set('max_execution_time', 9000);
+                $message = array();
+
+                foreach ($batch as $Batch)
+                {
+                    $em   = $this->getEntityManager();
+                    $db   = $em->getConnection();
+                    //LLAMAR AL STORED PROCEDURE PROC_ALAE_SAMPLE_ERRORS
+                    $stmt = $db->prepare('call proc_alae_sample_errors(:pk_batch)');
+                    $stmt->bindValue('pk_batch', $Batch->getPkBatch());
+
+                    $stmt->execute();
+
+                    while ($row = $stmt->fetch())
+                    {
+                        $message[] = array(
+                            "sampleName"   => $row['sample_name'],
+                            "codeError"    => str_replace(",", "<br>", $row['code_error']),
+                            "messageError" => str_replace(",", "<br>", $row['message_error']),
+                            "filename"     => $Batch->getFileName()
+                        );
+                    }
+                }
+
+
+                $viewModel = new ViewModel();
+                $viewModel->setTerminal(true);
+                $viewModel->setVariable('list', $message);
+                $viewModel->setVariable('analyte', $AnalyteName);
+                $viewModel->setVariable('study', $studyName);
+
+                $viewModel->setVariable('filename', "listado_de_muestras_a_repetir" . date("Ymd-Hi"));
+
+                return $viewModel;
+            }
+            else
+            {
+                return $this->redirect()->toRoute('report', array(
+                            'controller' => 'report',
+                            'action'     => 'index',
+                            'id'         => 1
+                ));
+            }
+        }
+    }
+
     public function graphicsAction()
     {
 
