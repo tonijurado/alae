@@ -342,6 +342,7 @@ class ReportController extends BaseController
                 SELECT b
                 FROM Alae\Entity\Batch b
                 WHERE b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id') . "
+                AND b.validationDate IS NOT NULL
                 ORDER BY b.fileName ASC");
             $elements = $query->getResult();
 
