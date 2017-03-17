@@ -40,6 +40,7 @@ class AnalyteController extends BaseController
         $request = $this->getRequest();
 
         $error = "";
+        $centi = 0;
 
         if ($request->isPost())
         {
@@ -68,27 +69,77 @@ class AnalyteController extends BaseController
                     }
                     else
                     {
-                        try
+                        if (preg_match("/'/i", $value))
                         {
-                            //AGREGA A LA TABLA ANALYTE
-                            $Analyte = new \Alae\Entity\Analyte();
-                            $Analyte->setName($value);
-                            $Analyte->setShortening($createShortnames[$key]);
-                            $Analyte->setFkUser($User);
-                            $this->getEntityManager()->persist($Analyte);
-                            $this->getEntityManager()->flush();
-                            $this->transaction(
-                                "Ingreso de analitos",
-                                sprintf('Se ha ingresado el analito %1$s(%2$s)',
-                                    $Analyte->getName(),
-                                    $Analyte->getShortening()
-                                ),
-                                false
-                            );
+                            $centi = 1;
                         }
-                        catch (Exception $e)
+                        if (preg_match("/´/i", $value))
                         {
-                            exit;
+                            $centi = 1;
+                        }
+
+                        if (preg_match("/`/i", $value))
+                        {
+                            $centi = 1;
+                        }
+
+                        if (preg_match("/\*/i", $value))
+                        {
+                            $centi = 1;
+                        }
+
+                        if (preg_match("/'/i", $createShortnames[$key]))
+                        {
+                            $centi = 1;
+                        }
+                        if (preg_match("/´/i", $createShortnames[$key]))
+                        {
+                            $centi = 1;
+                        }
+
+                        if (preg_match("/`/i", $createShortnames[$key]))
+                        {
+                            $centi = 1;
+                        }
+
+                        if (preg_match("/\*/i", $createShortnames[$key]))
+                        {
+                            $centi = 1;
+                        }
+
+                        if (preg_match("/\s/i", $createShortnames[$key]))
+                        {
+                            $centi = 1;
+                        }
+
+                        if ($centi == 0)
+                        {
+                            try
+                            {
+                                //AGREGA A LA TABLA ANALYTE
+                                $Analyte = new \Alae\Entity\Analyte();
+                                $Analyte->setName($value);
+                                $Analyte->setShortening($createShortnames[$key]);
+                                $Analyte->setFkUser($User);
+                                $this->getEntityManager()->persist($Analyte);
+                                $this->getEntityManager()->flush();
+                                $this->transaction(
+                                    "Ingreso de analitos",
+                                    sprintf('Se ha ingresado el analito %1$s(%2$s)',
+                                        $Analyte->getName(),
+                                        $Analyte->getShortening()
+                                    ),
+                                    false
+                                );
+                            }
+                            catch (Exception $e)
+                            {
+                                exit;
+                            }
+                        }
+                        else
+                        {
+                            $error .= sprintf('<li>Carácteres no permitidos<li>');
                         }
                     }
                 }
