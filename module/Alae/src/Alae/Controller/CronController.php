@@ -36,6 +36,25 @@ class CronController extends BaseController
     }
 
     /**
+     * Verificamos que el lote no exista.
+     */
+    private function isExistBatch($fileName)
+    {
+        $query = $this->getEntityManager()->createQuery("
+                SELECT COUNT(b.pkBatch)
+                FROM Alae\Entity\Batch b
+                WHERE b.fileName = '" . $fileName . "'");
+        $count = $query->getSingleScalarResult();
+
+        if ($count == 0)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Verificamos que el lote no se encuentre repetido.
      */
     private function isRepeatedBatch($fileName)
@@ -108,20 +127,25 @@ class CronController extends BaseController
             $this->_other = array();
             if (!is_dir($file))
             {
-                if(!$this->isRepeatedBatch($file))
+                //verificamos que el lote no exista
+                //retorna false si no existe
+                if(!$this->isExistBatch($file))
                 {
-                    if (preg_match("/^([a-zA-Z0-9]+-\d{4}(-[0-9]+)?)\+(M|O|R|X)[0-9]*\_(([a-zA-Z0-9](-|\.|,)?\s*)+|(\((\+|-)\)-[a-zA-Z0-9]+))\.txt$/i", $file))
+                    if(!$this->isRepeatedBatch($file))
                     {
-                        $this->validateFile($file);
+                        if (preg_match("/^([a-zA-Z0-9]+-\d{4}(-[0-9]+)?)\+(M|O|R|X)[0-9]*\_(([a-zA-Z0-9](-|\.|,)?\s*)+|(\((\+|-)\)-[a-zA-Z0-9]+))\.txt$/i", $file))
+                        {
+                            $this->validateFile($file);
+                        }
                     }
-                }
 
-                $this->insertBatch($file, $this->_Study, $this->_Analyte);
-                rename(Helper:: getVarsConfig("batch_directory") . "/" . $file, Helper:: getVarsConfig("batch_directory_older") . "/" . $file);
+                    $this->insertBatch($file, $this->_Study, $this->_Analyte);
+                    rename(Helper:: getVarsConfig("batch_directory") . "/" . $file, Helper:: getVarsConfig("batch_directory_older") . "/" . $file);
 
-                if (file_exists(Helper:: getVarsConfig("batch_directory") . "/" . $file))
-                {
-                    unlink(Helper:: getVarsConfig("batch_directory") . "/" . $file);
+                    if (file_exists(Helper:: getVarsConfig("batch_directory") . "/" . $file))
+                    {
+                        unlink(Helper:: getVarsConfig("batch_directory") . "/" . $file);
+                    }
                 }
             }
         }
