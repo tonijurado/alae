@@ -35,12 +35,14 @@ class VerificationController extends BaseController
     {
         if ($this->getEvent()->getRouteMatch()->getParam('id'))
         {
+
             $Batch = $this->getRepository()->find($this->getEvent()->getRouteMatch()->getParam('id'));
             for ($i = 4; $i < 12; $i++)
             {
                 $function = 'V' . $i;
                 $this->$function($Batch);
             }
+
 
             $response = $this->V12($Batch);
             if ($response)
@@ -171,7 +173,6 @@ class VerificationController extends BaseController
                 $errors = $query->getSingleScalarResult();
                 $status = $errors > 0 ? false : true;
             }
-
             $Batch->setValidFlag($status);
             $Batch->setValidationDate(new \DateTime('now'));
             $Batch->setFkUser($this->_getSession());
@@ -210,8 +211,9 @@ class VerificationController extends BaseController
             $this->$function($Batch);
         }
 
-        $continue = $this->evaluation($Batch);
 
+        $continue = $this->evaluation($Batch);
+        
         if ($continue && is_null($Batch->getFkParameter()))
         {
             for ($i = 21; $i <= 24; $i++)
@@ -969,7 +971,21 @@ class VerificationController extends BaseController
     {
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V23"));
         $value      = $Batch->getIsCsQcAcceptedAvg() * ($parameters[0]->getMinValue() / 100);
+        
+        //TYPE Unknown
         $where = "s.sampleType = 'Unknown' AND s.isPeakArea < $value AND s.fkBatch = " . $Batch->getPkBatch();
+        $this->error($where, $parameters[0], array(), false);
+
+        //SampleName ZS, TYPE Unknown
+        $where = "s.sampleName LIKE 'ZS%' AND s.sampleType = 'Unknown' AND s.isPeakArea < $value AND s.fkBatch = " . $Batch->getPkBatch();
+        $this->error($where, $parameters[0], array(), false);
+
+        //SampleName CS, TYPE Standard
+        $where = "s.sampleName LIKE 'CS%' AND s.sampleType = 'Standard' AND s.isPeakArea < $value AND s.fkBatch = " . $Batch->getPkBatch();
+        $this->error($where, $parameters[0], array(), false);
+
+        //SampleName QC, TYPE Quality Control
+        $where = "s.sampleName LIKE 'QC%' AND s.sampleType = 'Quality Control' AND s.isPeakArea < $value AND s.fkBatch = " . $Batch->getPkBatch();
         $this->error($where, $parameters[0], array(), false);
     }
 
