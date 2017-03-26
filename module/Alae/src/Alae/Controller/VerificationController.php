@@ -47,7 +47,7 @@ class VerificationController extends BaseController
             $response = $this->V12($Batch);
             if ($response)
             {
-                $this->V13_24($Batch);
+                $this->V13_25($Batch);
             }
             else
             {
@@ -105,7 +105,7 @@ class VerificationController extends BaseController
                 )";
 
             $this->error($where, $parameters[0], array('regexp1' => '^CS[0-9]+(-[0-9]+)?$','regexp2' => '^QC[0-9]+(-[0-9]+)?$','regexp3' => '^((L|H)?DQC)[0-9]+(-[0-9]+)?$'), false);
-            $this->V13_24($Batch);
+            $this->V13_25($Batch);
         }
 
         if ($this->getEvent()->getRouteMatch()->getParam('id'))
@@ -200,10 +200,10 @@ class VerificationController extends BaseController
     }
 
     /**
-     * Varificaciones desde la 13 hasta la 24
+     * Varificaciones desde la 13 hasta la 25
      * @param \Alae\Entity\Batch $Batch
      */
-    protected function V13_24(\Alae\Entity\Batch $Batch)
+    protected function V13_25(\Alae\Entity\Batch $Batch)
     {
         for ($i = 13; $i <= 20; $i++)
         {
@@ -216,7 +216,7 @@ class VerificationController extends BaseController
         
         if ($continue && is_null($Batch->getFkParameter()))
         {
-            for ($i = 21; $i <= 24; $i++)
+            for ($i = 21; $i <= 25; $i++)
             {
                 $function = 'V' . $i;
                 $this->$function($Batch);
@@ -1036,6 +1036,42 @@ class VerificationController extends BaseController
             $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V24"));
             $where = "s.sampleType = 'Unknown' AND s.calculatedConcentration > $max AND s.fkBatch = " . $Batch->getPkBatch();
             $this->error($where, $parameters[0]);
+        }
+    }
+
+    /**
+     * V25: Basales cuantificables
+     * @param \Alae\Entity\Batch $Batch
+     */
+    protected function V25(\Alae\Entity\Batch $Batch)
+    {
+        $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V25"));
+
+        $query = $this->getEntityManager()->createQuery("
+            SELECT s.analyteConcentration
+            FROM Alae\Entity\SampleBatch s
+            WHERE s.sampleName LIKE 'CS1%' AND s.fkBatch = " . $Batch->getPkBatch() . "
+            ORDER BY s.sampleName DESC")
+            ->setMaxResults(1);
+        $analyteConcentration = $query->getSingleScalarResult();
+        
+        $query    = $this->getEntityManager()->createQuery("
+            SELECT s.pkSampleBatch
+            FROM Alae\Entity\SampleBatch s
+            WHERE (REGEXP(s.sampleName, :regexp) = 1  OR REGEXP(s.sampleName, :regexp1) = 1)
+            AND s.analyteConcentration >= $analyteConcentration
+            AND s.sampleType = 'Unknown'
+            AND s.fkBatch = " . $Batch->getPkBatch() . "
+            ORDER BY s.pkSampleBatch");
+
+        $query->setParameter('regexp', '([0-9])+([0-9])-([0-9])+(\\.01)');
+        $query->setParameter('regexp1', '([0-9])+([0-9])-([0-9])+(\\.01-[0-9])');
+        $elements = $query->getResult();
+
+        foreach($elements as $SampleName)
+        {
+            $where = "s.pkSampleBatch = " . $SampleName['pkSampleBatch'];
+            $this->error($where, $parameters[0], array(), false);
         }
     }
 }
