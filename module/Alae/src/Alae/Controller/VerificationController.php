@@ -43,6 +43,7 @@ class VerificationController extends BaseController
                 $this->$function($Batch);
             }
 
+            //$this->V13_25($Batch);
 
             $response = $this->V12($Batch);
             if ($response)
@@ -1045,15 +1046,39 @@ class VerificationController extends BaseController
      */
     protected function V25(\Alae\Entity\Batch $Batch)
     {
+        
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V25"));
 
-        $query = $this->getEntityManager()->createQuery("
+        $elements = $this->getRepository("\\Alae\\Entity\\AnalyteStudy")->findBy(array("fkStudy" => $Batch->getFkStudy(), "fkAnalyte" => $Batch->getFkAnalyte()));
+
+        foreach ($elements as $AnaStudy)
+        {
+            $cs_values = explode(",", $AnaStudy->getCsValues());
+            //print_r($cs_values);die();
+            if (count($cs_values) == $AnaStudy->getCsNumber())
+            {
+                for ($i = 1; $i <= 1; $i++)
+                {
+                    $analyteConcentration = \Alae\Service\Conversion::conversion(
+                        $AnaStudy->getFkUnit()->getName(),
+                        $Batch->getAnalyteConcentrationUnits(),
+                        $cs_values[$i - 1]
+                    );
+                }
+            }
+        }
+
+        //echo $analyteConcentration."pr";die();
+
+        /*$query = $this->getEntityManager()->createQuery("
             SELECT s.analyteConcentration
             FROM Alae\Entity\SampleBatch s
             WHERE s.sampleName LIKE 'CS1%' AND s.fkBatch = " . $Batch->getPkBatch() . "
             ORDER BY s.sampleName DESC")
             ->setMaxResults(1);
         $analyteConcentration = $query->getSingleScalarResult();
+
+        echo $analyteConcentration;die();*/
         
         $query    = $this->getEntityManager()->createQuery("
             SELECT s.pkSampleBatch
