@@ -293,10 +293,21 @@ class ReportController extends BaseController
                     }
                     ksort($message);
 
+                    $AnaStudy = $this->getRepository("\\Alae\\Entity\\AnalyteStudy")->findBy(array(
+                        "fkAnalyte" => $request->getQuery('an'),
+                        "fkStudy"   => $request->getQuery('id')
+                    ));
+
+                    $varIs = $Batch->getIsCsQcAcceptedAvg() * ($AnaStudy[0]->getInternalStandard() / 100);
+                    
+                    $var5 = $Batch->getIsCsQcAcceptedAvg() * (5 / 100);
+                    
                     $properties = array(
                         "batch"  => $Batch,
                         "tr1"    => $tr1,
                         "tr2"    => $tr2,
+                        "varIs"    => $varIs,
+                        "var5"    => $var5,
                         "errors" => implode(" // ", $message)
                     );
                     $page .= $this->render('alae/report/r2page', $properties);
