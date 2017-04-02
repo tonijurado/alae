@@ -301,7 +301,7 @@ class ReportController extends BaseController
                     $varIs = $Batch->getIsCsQcAcceptedAvg() * ($AnaStudy[0]->getInternalStandard() / 100);
                     
                     $var5 = $Batch->getIsCsQcAcceptedAvg() * (5 / 100);
-                    
+
                     $properties = array(
                         "batch"  => $Batch,
                         "tr1"    => $tr1,
@@ -938,6 +938,80 @@ class ReportController extends BaseController
 
                 $viewModel->setVariable('filename', "listado_de_muestras_a_repetir" . date("Ymd-Hi"));
 
+                return $viewModel;
+            }
+            else
+            {
+                return $this->redirect()->toRoute('report', array(
+                            'controller' => 'report',
+                            'action'     => 'index',
+                            'id'         => 1
+                ));
+            }
+        }
+    }
+
+    /**
+     * Calculo de las concentraciones de los CS (accuracy)
+     * $_GET['id'] = pkStudy
+     * $_GET['an'] = pkAnalyte
+     */
+    public function r11Action()
+    {
+        //REPORTE 7 EXCEL
+        $request = $this->getRequest();
+        if ($request->isGet())
+        {
+            
+            $analytes = $this->getRepository('\\Alae\\Entity\\AnalyteStudy')->findBy(array("fkAnalyte" => $request->getQuery('an'), "fkStudy" => $request->getQuery('id')));
+            $query    = $this->getEntityManager()->createQuery("
+                SELECT b
+                FROM Alae\Entity\Batch b
+                WHERE b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id') . "
+                ORDER BY b.fileName ASC");
+            $batch    = $query->getResult();
+
+            if (count($batch) > 0)
+            {
+                $list    = array();
+                $pkBatch = array();
+
+                $data = array();
+                foreach ($batch as $Batch)
+                {
+                    $query    = $this->getEntityManager()->createQuery("
+                        SELECT COUNT(s.pkSampleBatch) as count1
+                        FROM Alae\Entity\SampleBatch s
+                        WHERE s.fkBatch = " . $Batch->getPkBatch() ."
+                        ORDER By s.sampleName");
+                    $elements1 = $query->getResult();
+
+                    $query    = $this->getEntityManager()->createQuery("
+                        SELECT COUNT(s.useRecord) as useRecord
+                        FROM Alae\Entity\SampleBatch s
+                        WHERE s.fkBatch = " . $Batch->getPkBatch() ." AND
+                        s.useRecord = 1
+                        ORDER By s.sampleName");
+                    $elements2 = $query->getResult();
+
+                    $data[] = array(
+                        "pkBatch" => $Batch->getPkBatch(),
+                        "sampleName" => $Batch->getFileName(),
+                        "count" => $elements1[0]['count1'],
+                        "useRecord" => $elements2[0]['useRecord']
+                    );
+                    
+
+                }
+
+                $properties = array(
+                    "analyte"      => $analytes[0],
+                    "data"         => $data,
+                    "filename"     => "Listado_de_muestras" . date("Ymd-Hi")
+                );
+
+                $viewModel = new ViewModel($properties);
+                $viewModel->setTerminal(true);
                 return $viewModel;
             }
             else
