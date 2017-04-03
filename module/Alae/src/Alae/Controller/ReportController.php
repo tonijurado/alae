@@ -958,7 +958,6 @@ class ReportController extends BaseController
      */
     public function r11Action()
     {
-        //REPORTE 7 EXCEL
         $request = $this->getRequest();
         if ($request->isGet())
         {
@@ -979,6 +978,7 @@ class ReportController extends BaseController
                 $data = array();
                 foreach ($batch as $Batch)
                 {
+                    //número total de muestras
                     $query    = $this->getEntityManager()->createQuery("
                         SELECT COUNT(s.pkSampleBatch) as count1
                         FROM Alae\Entity\SampleBatch s
@@ -986,6 +986,7 @@ class ReportController extends BaseController
                         ORDER By s.sampleName");
                     $elements1 = $query->getResult();
 
+                    //número de muestras con “Record Modified = 1”
                     $query    = $this->getEntityManager()->createQuery("
                         SELECT COUNT(s.useRecord) as useRecord
                         FROM Alae\Entity\SampleBatch s
@@ -994,11 +995,26 @@ class ReportController extends BaseController
                         ORDER By s.sampleName");
                     $elements2 = $query->getResult();
 
+                    //% de muestras modificadas sobre el número total de muestras
+                    $percent =  ($elements2[0]['useRecord'] * 100) / $elements1[0]['count1'];
+
+                    //integracion manual
+                    $query    = $this->getEntityManager()->createQuery("
+                        SELECT s.sampleName
+                        FROM Alae\Entity\SampleBatch s
+                        WHERE s.fkBatch = " . $Batch->getPkBatch() ." AND
+                        (s.analyteIntegrationType = 'Manual' OR
+                        s.isIntegrationType = 'Manual')
+                        ORDER By s.sampleName");
+                    $elements3 = $query->getResult();
+
                     $data[] = array(
                         "pkBatch" => $Batch->getPkBatch(),
                         "sampleName" => $Batch->getFileName(),
                         "count" => $elements1[0]['count1'],
-                        "useRecord" => $elements2[0]['useRecord']
+                        "useRecord" => $elements2[0]['useRecord'],
+                        "percent" => $percent,
+                        "manual" => $elements3
                     );
                     
 
