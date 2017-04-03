@@ -152,6 +152,27 @@ class AnalyteStudy
      */
     protected $fkUserApprove;
 
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="retention_time_analyte", type="decimal", precision=19, scale=4, nullable=false)
+     */
+    protected $retentionTimeAnalyte = 0;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="retention_time_is", type="decimal", precision=19, scale=4, nullable=false)
+     */
+    protected $retentionTimeIS = 0;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="acceptance_margin", type="decimal", precision=19, scale=4, nullable=false)
+     */
+    protected $acceptanceMargin = 0;
+
     public function __construct()
     {
         $this->updatedAt = new \DateTime('now');
@@ -325,5 +346,35 @@ class AnalyteStudy
     public function getHdqcValues()
     {
         return $this->hdqcValues;
+    }
+
+    public function getRetentionTimeAnalyte()
+    {
+        return (float) $this->retentionTimeAnalyte;
+    }
+
+    public function setRetentionTimeAnalyte($retentionTimeAnalyte)
+    {
+        $this->retentionTimeAnalyte = $retentionTimeAnalyte;
+    }
+
+    public function getRetentionTimeIS()
+    {
+        return (float) $this->retentionTimeIS;
+    }
+
+    public function setRetentionTimeIS($retentionTimeIS)
+    {
+        $this->retentionTimeIS = $retentionTimeIS;
+    }
+
+    public function getAcceptanceMargin()
+    {
+        return (float) $this->acceptanceMargin;
+    }
+
+    public function setAcceptanceMargin($acceptanceMargin)
+    {
+        $this->acceptanceMargin = $acceptanceMargin;
     }
 }

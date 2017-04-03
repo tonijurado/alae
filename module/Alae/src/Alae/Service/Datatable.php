@@ -198,7 +198,7 @@ class Datatable
     //COLUMNAS DEL ESTUDIO DE ANALITO
     protected function getAnaStudyColumns()
     {
-        $header = array("analyte", "analyte_is", "cs_number", "qc_number", "unit", "is", "use");
+        $header = array("analyte", "analyte_is", "cs_number", "qc_number", "unit", "is", "retention_TimeA","retention_TimeIS","acceptance_Margin","use");
         $data   = $this->getData();
 
         return array(
@@ -210,10 +210,13 @@ class Datatable
                 array("key" => "qc_number", "label" => "Núm. QC", "sortable" => true),
                 array("key" => "unit", "label" => "Unidades", "sortable" => false),
                 array("key" => "is", "label" => "% var IS", "sortable" => true, "allowHTML" => true),
+                array("key" => "retention_TimeA", "label" => "Tiempo de retención teórico del analito", "sortable" => true, "allowHTML" => true),
+                array("key" => "retention_TimeIS", "label" => "Tiempo de retención teórico del IS", "sortable" => true, "allowHTML" => true),
+                array("key" => "acceptance_Margin", "label" => "% Margen de aceptación", "sortable" => true, "allowHTML" => true),
                 array("key" => "use", "label" => "usar", "sortable" => false, "allowHTML" => true, "formatter" => '{value}'),
                 array("key" => "edit", "allowHTML" => true)
             )),
-            "editable" => json_encode(array("analyte", "analyte_is", "cs_number", "qc_number", "unit", "is", "use")),
+            "editable" => json_encode(array("analyte", "analyte_is", "cs_number", "qc_number", "unit", "is","retention_TimeA","retention_TimeIS","acceptance_Margin", "use")),
             "header"   => json_encode($header),
             "filters"  => $this->getFilters($header)
         );

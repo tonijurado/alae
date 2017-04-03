@@ -1,0 +1,119 @@
+<?php
+header('Content-Disposition: attachment; filename="'. $filename .'.xls";');
+header('Content-Type: application/vnd.ms-excel;charset=utf-8');
+?>
+<html xmlns:v="urn:schemas-microsoft-com:vml"
+xmlns:o="urn:schemas-microsoft-com:office:office"
+xmlns:x="urn:schemas-microsoft-com:office:excel"
+xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+<meta charset="UTF-8">
+<meta name=ProgId content=Excel.Sheet>
+<meta name=Generator content="Microsoft Excel 11">
+<!--[if gte mso 9]><xml>
+ <o:DocumentProperties>
+  <o:Author>Pat Willener</o:Author>
+  <o:Company>Good Day Books</o:Company>
+ </o:DocumentProperties>
+ <o:OfficeDocumentSettings>
+  <o:RelyOnVML/>
+  <o:AllowPNG/>
+ </o:OfficeDocumentSettings>
+</xml><![endif]-->
+<style>
+<!--
+@page
+	{mso-page-orientation:landscape;}
+
+-->
+</style>
+<!--[if gte mso 9]><xml>
+ <x:ExcelWorkbook>
+  <x:ExcelWorksheets>
+   <x:ExcelWorksheet>
+    <x:Name>percent_calculated_nominal_concentration_of_calibration_standards</x:Name>
+    <x:WorksheetOptions>
+     <x:Print>
+      <x:ValidPrinterInfo/>
+      <x:PaperSizeIndex>9</x:PaperSizeIndex>
+      <x:HorizontalResolution>600</x:HorizontalResolution>
+      <x:VerticalResolution>600</x:VerticalResolution>
+     </x:Print>
+     <x:Selected/>
+     <x:Panes>
+      <x:Pane>
+       <x:Number>1</x:Number>
+       <x:ActiveRow>1</x:ActiveRow>
+      </x:Pane>
+     </x:Panes>
+     <x:ProtectContents>False</x:ProtectContents>
+     <x:ProtectObjects>False</x:ProtectObjects>
+     <x:ProtectScenarios>False</x:ProtectScenarios>
+    </x:WorksheetOptions>
+   </x:ExcelWorksheet>
+  </x:ExcelWorksheets>
+  <x:WindowHeight>8835</x:WindowHeight>
+  <x:WindowWidth>15180</x:WindowWidth>
+  <x:WindowTopX>120</x:WindowTopX>
+  <x:WindowTopY>105</x:WindowTopY>
+  <x:ProtectStructure>False</x:ProtectStructure>
+  <x:ProtectWindows>False</x:ProtectWindows>
+ </x:ExcelWorkbook>
+</xml><![endif]-->
+
+<title></title>
+</head>
+<body>
+<div class="Section1">
+	<div class="table-container">
+	    <table width="900" border="0" cellspacing="0" cellpadding="0"  style="background-color:#fff;padding:10px 0 0 0;">
+		<tr>
+		    <td width="238" colspan="2" align="left" height="20"  style="padding:10px 0 0 0;">
+			<strong>Listrado de muestras</strong>
+		    </td>
+		</tr>
+		<tr>
+		    <td width="238" align="left" height="20">
+			Study No:
+		    </td>
+		    <td width="205" height="20" style="">
+                        <?php echo $analyte->getFkStudy()->getCode(); ?>
+		    </td>
+		</tr>
+		<tr>
+		    <td width="238" align="left" height="20"  style="padding: 10px 0 0 0">
+			Analyte:
+		    </td>
+		    <td width="205" height="20" style="">
+                        <?php echo $analyte->getFkAnalyte()->getName(); ?>
+		    </td>
+		</tr>
+	    </table>
+	    <div class="cler"></div>
+		<table width="900" border="0" cellspacing="0" cellpadding="0"  style="margin-top:10px;text-aling:center;">
+		    <tr>
+			<td  align="center" style="color:#000; border: black 1px solid;font-size:14px;padding:10px;font-style:bold;"><strong>Muestra</strong> </td>
+			<td  align="center" style=" border: black 1px solid;padding:2px">Total de muestras</td>
+			<td  align="center" style=" border: black 1px solid;padding:2px">Total Record modified = 1</td>
+			<td  align="center" style=" border: black 1px solid;padding:2px">% muestras modificadas</td>
+			<td  align="center" style=" border: black 1px solid;padding:2px">Muestras con integración manual</td>
+		    </tr>
+		    <?php foreach ($data as $row) 
+		    {
+		    ?>
+		    	<tr>
+		    		<td><?php echo $row["sampleName"]; ?></td>
+		    		<td><?php echo $row["count"]; ?></td>
+		    		<td><?php echo $row["useRecord"]; ?></td>
+		    		<td></td>
+		    		<td></td>
+		    	</tr>
+		    <?php 
+			} 
+			?>
+                
+	    </div>
+	</div>
+       </div>
+    </body>
+</html>
