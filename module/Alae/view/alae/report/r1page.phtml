@@ -1,7 +1,7 @@
 <nobreak>
 <div>
 
-<table border="0" cellspacing="0" cellpadding="0"  style="padding:50px; width:100%;background-color:#fff;text-aling:center; font-size:20px;">
+<table border="0" cellspacing="0" cellpadding="0"  style="padding:20px; width:100%;background-color:#fff;text-aling:center; font-size:20px;">
 <tr>
 <td>
 <strong>INFORMACIÓN GENERAL DE UN ESTUDIO</strong>
@@ -9,51 +9,62 @@
 </tr>
 </table>
     
-    <table border="0" cellspacing="0" cellpadding="0" style="padding:50px; width:100%;background-color:#fff;margin-top:10px;text-aling:center">
-
+    <table border="0" cellspacing="0" cellpadding="0" style="padding:20px; width:100%;margin-top:10px;text-aling:center">
         <tr>
-            <td  colspan="2" align="center" height="20" bgcolor="#252525" style="width:10%;color:#fff;text-aling:justify;">
+            <td align="center" height="20" bgcolor="#252525" style="width:10%;color:#fff;text-aling:justify;border: white 1px solid;">
                 <strong>Código del Estudio</strong>
             </td>
-            <td   align="center" height="20" style="border: black 1px solid;">
+            <td align="center" height="20" style="border: black 1px solid;">
                 <?php echo $study->getCode(); ?>
             </td>
-            <td width="20" ></td>
-            <td  colspan="2" align="center" height="20" bgcolor="#252525" style="width:10%;color:#fff; border: black 1px solid;">
+        </tr>
+
+        <tr>
+            <td align="center" height="20" bgcolor="#252525" style="width:10%;color:#fff;text-aling:justify;border: white 1px solid;">
                 <strong>Nº de Analitos</strong>
             </td>
-            <td   align="center"  height="20" style="width:10%;border: black 1px solid;">
+            <td   align="center" height="20" style="border: black 1px solid;">
                 <?php echo $counterAnalyte; ?>
             </td>
-            <td width="20" ></td>
-            <td   align="center" height="20" bgcolor="#000000" style="width:10%;color:#fff; border: black 1px solid;">
-                <strong>Arbol de Diluciónn Nº</strong>
+        </tr>
+
+        <tr>
+            <td align="center" height="20" bgcolor="#252525" style="width:10%;color:#fff;text-aling:justify;border: white 1px solid;">
+                <strong>Arbol de Dilución Nº</strong>
             </td>
-            <td  align="center" height="20" style="width:10%;border: black 1px solid;">
+            <td   align="center" height="20" style="border: black 1px solid;">
                 <?php echo $study->getFkDilutionTree(); ?>
             </td>
         </tr>
+    </table>
+
+    <table border="0" cellspacing="0" cellpadding="0" style="padding:20px; width:100%;margin-top:10px;text-aling:center">
+
         <tr>
-            <td   aling="left" height=20 colspan="8"  bgcolor="#ffffff" style="color:#000000;font-size:11px;padding:10px">
-                &nbsp;
+            <td  align="center" width ="100" bgcolor="#000000" style="color:#ffffff;border: black 1px solid;font-size:11px;">
+                <strong>Analito</strong>
             </td>
+            <td colspan="4" bgcolor="#000000"></td>
+            <td  align="center" width ="100" bgcolor="#000000" style="color:#ffffff;border: black 1px solid;font-size:11px;">
+                <strong>Patrón interno</strong>
+            </td>
+            <td colspan="5" bgcolor="#000000"></td>
         </tr>
+
         <tr>
-            <td  align="center"  style="color:#ffffff;"></td>
-            <td  align="center"  bgcolor="#000000" colspan="2"  style="color:#ffffff;font-size:11px;padding:5px;"><strong>Analito</strong></td>
-            <td  align="center"></td>
-            <td  align="center" colspan="4" bgcolor="#000000"  colspan="2"  style="color:#ffffff;font-size:11px;padding:5px;"><strong>Patrón Interno</strong></td>
-        </tr>
-        <tr>
-            <td  align="center"  style="color:#ffffff;"></td>
+            <td  align="center"  bgcolor="#D8D8D8"   style="color:#000000;font-size:11px;padding:5px;border: black 1px solid;"></td>
             <td  align="center"  bgcolor="#D8D8D8"   style="color:#000000;font-size:11px;padding:5px;border: black 1px solid;"><strong>Nombre</strong></td>
-            <td  align="center"  bgcolor="#D8D8D8"   style="color:#000000;font-size:11px;padding:5px;border: black 1px solid;"><strong>Abreviatura</strong></td>
-            <td  align="center"></td>
+            <td  align="center"  bgcolor="#D8D8D8"   style="color:#000000;font-size:11px;padding:5px;border: black 1px solid;"><strong>Abr.</strong></td>
+            <td  align="center"  bgcolor="#D8D8D8"   style="color:#000000;font-size:11px;padding:5px;border: black 1px solid;"><strong>Tret. Mínimo</strong></td>
+            <td  align="center"  bgcolor="#D8D8D8"   style="color:#000000;font-size:11px;padding:5px;border: black 1px solid;"><strong>Tret. Máximo</strong></td>
             <td  align="center"  bgcolor="#D8D8D8"   style="color:#000000;font-size:11px;padding:5px;border: black 1px solid;"><strong>Nombre</strong></td>
-            <td  align="center"  bgcolor="#D8D8D8"   style="color:#000000;font-size:11px;padding:5px;border: black 1px solid;"><strong>Abreviatura</strong></td>
-            <td  align="center"  bgcolor="#D8D8D8"   style="color:#000000;font-size:11px;padding:5px;border: black 1px solid;"><strong>% Variabiidad IS </strong></td>
+            <td  align="center"  bgcolor="#D8D8D8"   style="color:#000000;font-size:11px;padding:5px;border: black 1px solid;"><strong>Abr.</strong></td>
+            <td  align="center"  bgcolor="#D8D8D8"   style="color:#000000;font-size:11px;padding:5px;border: black 1px solid;"><strong>% Variabilidad IS </strong></td>
+            <td  align="center"  bgcolor="#D8D8D8"   style="color:#000000;font-size:11px;padding:5px;border: black 1px solid;"><strong>Tret. Mínimo</strong></td>
+            <td  align="center"  bgcolor="#D8D8D8"   style="color:#000000;font-size:11px;padding:5px;border: black 1px solid;"><strong>Tret. Máximo</strong></td>
             <td  align="center"  bgcolor="#D8D8D8"   style="color:#000000;font-size:11px;padding:5px;border: black 1px solid;"><strong>usar</strong></td>
         </tr>
+
         <?php $count = 1; foreach ($analytes as $anaStudy) : ?>
         <tr>
             <td  align="center"  width ="100" style="color:#000000;padding:5px;border: black 1px solid;font-size:11px;">
@@ -65,7 +76,14 @@
             <td  align="center" width ="100"  style="color:#000000;border: black 1px solid;font-size:11px;">
                 <?php echo $anaStudy->getFkAnalyte()->getShortening(); ?>
             </td>
-            <td  align="center" width ="100" bgcolor="#FFFFFF" style="color:#FFFFFF;font-size:11px;"></td>
+            <td  align="center" width ="100"  style="color:#000000;border: black 1px solid;font-size:11px;">
+                <?php $anamintret = $anaStudy->getRetentionTimeAnalyte() - $anaStudy->getAcceptanceMargin() / 100 * $anaStudy->getRetentionTimeAnalyte() ?>
+                <?php echo number_format($anamintret,2,'.',''); ?>
+            </td>
+            <td  align="center" width ="100"  style="color:#000000;border: black 1px solid;font-size:11px;">
+                <?php $anamaxtret = $anaStudy->getRetentionTimeAnalyte() + $anaStudy->getAcceptanceMargin() / 100 * $anaStudy->getRetentionTimeAnalyte() ?>
+                <?php echo number_format($anamaxtret,2,'.',''); ?>
+            </td>
             <td  align="center" width ="100"  style="color:#000000;border: black 1px solid;font-size:11px;">
                 <?php echo $anaStudy->getFkAnalyteIs()->getName(); ?>
             </td>
@@ -74,13 +92,24 @@
             </td>
             <td  align="center" width ="100"  style="color:#000000;border: black 1px solid;font-size:11px;">
                 <?php echo number_format($anaStudy->getInternalStandard(),2,'.',''); ?>
-                
+            </td>
+            <td  align="center" width ="100"  style="color:#000000;border: black 1px solid;font-size:11px;">
+                <?php $ismintret = $anaStudy->getRetentionTimeIS() - $anaStudy->getAcceptanceMargin() / 100 * $anaStudy->getRetentionTimeIS() ?>
+                <?php echo number_format($ismintret,2,'.',''); ?>
+            </td>
+            <td  align="center" width ="100"  style="color:#000000;border: black 1px solid;font-size:11px;">
+                <?php $ismaxtret = $anaStudy->getRetentionTimeIS() + $anaStudy->getAcceptanceMargin() / 100 * $anaStudy->getRetentionTimeIS() ?>
+                <?php echo number_format($ismaxtret,2,'.',''); ?>
             </td>
             <td  align="center" width ="100"  style="color:#000000;border: black 1px solid;font-size:11px;">
                 <?php echo $anaStudy->getIsUsed() ? "S" : "N"; ?>
             </td>
         </tr>
         <?php $count++; endforeach; ?>
+    </table>
+
+    <table border="0" cellspacing="0" cellpadding="0" style="padding:20px; width:100%;margin-top:10px;text-aling:center">
+
         <tr>
             <td   aling="left" height=20 colspan="8"  bgcolor="#ffffff" style="color:#000000;font-size:11px;padding:10px">
                 &nbsp;
@@ -205,6 +234,8 @@
                  <?php echo date("d.m.Y H:i:s"); ?>
             </td>
         </tr>
+
     </table>
+
 </div>
 </nobreak>

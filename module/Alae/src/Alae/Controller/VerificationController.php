@@ -42,6 +42,12 @@ class VerificationController extends BaseController
                 $function = 'V' . $i;
                 $this->$function($Batch);
             }
+            
+            $response = $this->V12($Batch);
+            if ($response)
+            {
+                $this->V26($Batch);
+            }
 
             //$this->V13_25($Batch);
 
@@ -1098,5 +1104,76 @@ class VerificationController extends BaseController
             $where = "s.pkSampleBatch = " . $SampleName['pkSampleBatch'];
             $this->error($where, $parameters[0], array(), false);
         }
+    }
+
+    /**
+     * V26: Tiempo de retención CS/QC (C2)
+     * @param \Alae\Entity\Batch $Batch
+     */
+    protected function V26(\Alae\Entity\Batch $Batch)
+    {
+        $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V26"));
+        $parameters2 = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V27"));
+        
+        $AnaStudy = $this->getRepository("\\Alae\\Entity\\AnalyteStudy")->findBy(array(
+            "fkAnalyte" => $Batch->getFkAnalyte(),
+            "fkStudy"   => $Batch->getFkStudy()
+        ));
+
+        $minTretAna = $AnaStudy[0]->getRetentionTimeAnalyte() - $AnaStudy[0]->getAcceptanceMargin() / 100 * $AnaStudy[0]->getRetentionTimeAnalyte();
+        $maxTretAna = $AnaStudy[0]->getRetentionTimeAnalyte() + $AnaStudy[0]->getAcceptanceMargin() / 100 * $AnaStudy[0]->getRetentionTimeAnalyte();
+
+        $minTretIS = $AnaStudy[0]->getRetentionTimeIS() - $AnaStudy[0]->getAcceptanceMargin() / 100 * $AnaStudy[0]->getRetentionTimeIS();
+        $maxTretIS = $AnaStudy[0]->getRetentionTimeIS() + $AnaStudy[0]->getAcceptanceMargin() / 100 * $AnaStudy[0]->getRetentionTimeIS();
+        
+        $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V26"));
+
+        $where = " (s.analyteRetentionTime NOT BETWEEN $minTretAna AND $maxTretAna OR 
+                    s.isRetentionTime NOT BETWEEN $minTretIS AND $maxTretIS)
+                   AND s.fkBatch = " . $Batch->getPkBatch();
+        
+        $this->error($where, $parameters[0], array(), false);
+
+        $where2 = "(s.sampleName LIKE 'CS%' OR s.sampleName LIKE 'QC%') AND 
+                   (s.analyteRetentionTime NOT BETWEEN $minTretAna AND $maxTretAna OR 
+                    s.isRetentionTime NOT BETWEEN $minTretIS AND $maxTretIS)
+                   AND s.useRecord != 0
+                   AND s.fkBatch = " . $Batch->getPkBatch();
+        
+        $this->error($where2, $parameters2[0], array(), false);
+
+        /*$query = $this->getEntityManager()->createQuery("
+            SELECT s.pkSampleBatch as pkSampleBatch, s.sampleName as sampleName, 
+                   s.analyteRetentionTime as AnaRetentionTime, s.isRetentionTime as IsRetentionTime
+            FROM Alae\Entity\SampleBatch s
+            WHERE s.fkBatch = " . $Batch->getPkBatch());
+        $elements = $query->getResult();
+
+        if (count($elements) > 0)
+        {
+            foreach ($elements as $temp)
+            {
+
+                if($temp['AnaRetentionTime'] > $minTretAna && $temp['AnaRetentionTime'] < $maxTretAna)
+                {
+                    $centi = 0;
+                }
+                else
+                {
+                    $centi = 1;
+                }
+
+                //echo $temp['AnaRetentionTime']." ".$minTretAna." ".$maxTretAna;die();
+
+                if($centi == 1)
+                {
+                    
+                    $where = "s.pkSampleBatch = ".$temp['pkSampleBatch']."
+                              AND s.fkBatch = " . $Batch->getPkBatch();
+
+                    $this->error($where, $parameters[0]);
+                }
+            }
+        }*/
     }
 }

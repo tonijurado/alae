@@ -210,9 +210,9 @@ class Datatable
                 array("key" => "qc_number", "label" => "Núm. QC", "sortable" => true),
                 array("key" => "unit", "label" => "Unidades", "sortable" => false),
                 array("key" => "is", "label" => "% var IS", "sortable" => true, "allowHTML" => true),
-                array("key" => "retention_TimeA", "label" => "Tiempo de retención teórico del analito", "sortable" => true, "allowHTML" => true),
-                array("key" => "retention_TimeIS", "label" => "Tiempo de retención teórico del IS", "sortable" => true, "allowHTML" => true),
-                array("key" => "acceptance_Margin", "label" => "% Margen de aceptación", "sortable" => true, "allowHTML" => true),
+                array("key" => "retention_TimeA", "label" => "tr teórico analito", "sortable" => true, "allowHTML" => true),
+                array("key" => "retention_TimeIS", "label" => "tr teórico IS", "sortable" => true, "allowHTML" => true),
+                array("key" => "acceptance_Margin", "label" => "margen de aceptación % ", "sortable" => true, "allowHTML" => true),
                 array("key" => "use", "label" => "usar", "sortable" => false, "allowHTML" => true, "formatter" => '{value}'),
                 array("key" => "edit", "allowHTML" => true)
             )),
