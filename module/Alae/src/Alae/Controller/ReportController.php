@@ -986,6 +986,14 @@ class ReportController extends BaseController
                         ORDER By s.sampleName");
                     $elements1 = $query->getResult();
 
+                    //muestras reinyectadas
+                    $query    = $this->getEntityManager()->createQuery("
+                        SELECT s.sampleName
+                        FROM Alae\Entity\SampleBatch s
+                        WHERE (s.sampleName LIKE  '%R%' AND s.sampleName NOT LIKE  '%\*%') AND  s.fkBatch = " . $Batch->getPkBatch() . "
+                        ORDER By s.sampleName");
+                    $reinjection = $query->getResult();
+
                     //número de muestras con “Record Modified = 1”
                     $query    = $this->getEntityManager()->createQuery("
                         SELECT COUNT(s.recordModified) as recordModified
@@ -1019,6 +1027,7 @@ class ReportController extends BaseController
                     $data[] = array(
                         "pkBatch" => $Batch->getPkBatch(),
                         "sampleName" => $Batch->getFileName(),
+                        "reinjection" => $reinjection,
                         "count" => $elements1[0]['count1'],
                         "recordModified" => $elements2[0]['recordModified'],
                         "percent" => $percent,

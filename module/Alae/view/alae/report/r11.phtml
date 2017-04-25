@@ -114,8 +114,12 @@ xmlns="http://www.w3.org/TR/REC-html40">
 		    		    }
 		    			?>
 		    		</td>
-		    		<td style="mso-number-format:'#,##0.00';">
-		    			<?php echo $row["percent"]; ?>
+		    		<td >
+		    			<?php foreach ($row["reinjection"] as $row1) 
+		    			{
+		    				echo $row1["sampleName"]." ";
+		    		    }
+		    			?>
 		    		</td>
 		    	</tr>
 		    <?php 
