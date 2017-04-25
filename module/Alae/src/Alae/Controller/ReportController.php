@@ -952,7 +952,7 @@ class ReportController extends BaseController
     }
 
     /**
-     * Calculo de las concentraciones de los CS (accuracy)
+     * Listado Record Modified
      * $_GET['id'] = pkStudy
      * $_GET['an'] = pkAnalyte
      */
@@ -982,39 +982,48 @@ class ReportController extends BaseController
                     $query    = $this->getEntityManager()->createQuery("
                         SELECT COUNT(s.pkSampleBatch) as count1
                         FROM Alae\Entity\SampleBatch s
-                        WHERE s.fkBatch = " . $Batch->getPkBatch() ."
+                        WHERE NOT (s.sampleName LIKE  '%R%' AND s.sampleName NOT LIKE  '%\*%') AND  s.fkBatch = " . $Batch->getPkBatch() . "
                         ORDER By s.sampleName");
                     $elements1 = $query->getResult();
 
                     //número de muestras con “Record Modified = 1”
                     $query    = $this->getEntityManager()->createQuery("
-                        SELECT COUNT(s.useRecord) as useRecord
+                        SELECT COUNT(s.recordModified) as recordModified
                         FROM Alae\Entity\SampleBatch s
                         WHERE s.fkBatch = " . $Batch->getPkBatch() ." AND
-                        s.useRecord = 1
+                        s.recordModified = 1
                         ORDER By s.sampleName");
                     $elements2 = $query->getResult();
 
                     //% de muestras modificadas sobre el número total de muestras
-                    $percent =  ($elements2[0]['useRecord'] * 100) / $elements1[0]['count1'];
+                    $percent =  ($elements2[0]['recordModified'] / $elements1[0]['count1']) * 100 ;
 
-                    //integracion manual
+                    //integracion manual Analyte
                     $query    = $this->getEntityManager()->createQuery("
                         SELECT s.sampleName
                         FROM Alae\Entity\SampleBatch s
                         WHERE s.fkBatch = " . $Batch->getPkBatch() ." AND
-                        (s.analyteIntegrationType = 'Manual' OR
-                        s.isIntegrationType = 'Manual')
+                        s.analyteIntegrationType = 'Manual'
                         ORDER By s.sampleName");
-                    $elements3 = $query->getResult();
+                    $MIAnalyte = $query->getResult();
+
+                    //integracion manual IS
+                    $query    = $this->getEntityManager()->createQuery("
+                        SELECT s.sampleName
+                        FROM Alae\Entity\SampleBatch s
+                        WHERE s.fkBatch = " . $Batch->getPkBatch() ." AND
+                        s.isIntegrationType = 'Manual'
+                        ORDER By s.sampleName");
+                    $MIIs = $query->getResult();
 
                     $data[] = array(
                         "pkBatch" => $Batch->getPkBatch(),
                         "sampleName" => $Batch->getFileName(),
                         "count" => $elements1[0]['count1'],
-                        "useRecord" => $elements2[0]['useRecord'],
+                        "recordModified" => $elements2[0]['recordModified'],
                         "percent" => $percent,
-                        "manual" => $elements3
+                        "MIAnalyte" => $MIAnalyte,
+                        "MIIs" => $MIIs
                     );
                     
 
