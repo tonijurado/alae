@@ -498,30 +498,65 @@ class VerificationController extends BaseController
         $min = $parameters[0]->getMinValue();
         $max = $parameters[0]->getMaxValue();
 
-        $where = "REGEXP(s.sampleName, :regexp) = 1 AND s.accuracy NOT BETWEEN " . $min . " AND " . $max . " AND s.fkBatch = " . $Batch->getPkBatch();
-        $this->error($where, $parameters[0], array('regexp' => '^QC[0-9]+-[0-9]+R[0-9]+\\*$'), false);
+        $parameters2 = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V9.2"));
 
-        $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V9.2"));
-        $where = "REGEXP(s.sampleName, :regexp) = 1 AND s.useRecord <> 0 AND s.fkBatch = " . $Batch->getPkBatch();
-        $this->error($where, $parameters[0], array('regexp' => '^QC[0-9]+-[0-9]+R[0-9]+\\*$'), false);
+        $parameters3 = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V9.3"));
 
-        $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V9.3"));
-        $where = "REGEXP(s.sampleName, :regexp) = 1 AND s.useRecord <> 0 AND s.accuracy NOT BETWEEN " . $min . " AND " . $max . " AND s.fkBatch = " . $Batch->getPkBatch();
-        $this->error($where, $parameters[0], array('regexp' => '^QC[0-9]+-[0-9]+R[0-9]+\\*$'), false);
+        //$where = "REGEXP(s.sampleName, :regexp) = 1 AND s.accuracy NOT BETWEEN " . $min . " AND " . $max . " AND s.fkBatch = " . $Batch->getPkBatch();
+        //$this->error($where, $parameters[0], array('regexp' => '^QC[0-9]+-[0-9]+R[0-9]+\\*$'), false);
 
         $query    = $this->getEntityManager()->createQuery("
-            SELECT s.sampleName
+            SELECT s.sampleName, s.areaRatio, s.useRecord
             FROM Alae\Entity\SampleBatch s
-            WHERE REGEXP(s.sampleName, :regexp) = 1 AND (s.useRecord <> 0 OR s.accuracy NOT BETWEEN " . $min . " AND " . $max . ") AND s.fkBatch = " . $Batch->getPkBatch() . "
+            WHERE (REGEXP(s.sampleName, :regexp) = 1 OR REGEXP(s.sampleName, :regexp2) = 1) AND s.fkBatch = " . $Batch->getPkBatch() . "
             ORDER BY s.sampleName DESC");
         $query->setParameter('regexp', '^QC[0-9]+-[0-9]+R[0-9]+\\*$');
+        $query->setParameter('regexp2', '^CS[0-9]+-[0-9]+R[0-9]+\\*$');
         $elements = $query->getResult();
 
         foreach($elements as $SampleName)
         {
-            $name  = preg_replace(array('/QC[0-9]+-[0-9]+/', '/\*/'), '', $SampleName['sampleName']);
-            $where = "s.sampleName LIKE '%" . $name . "%' AND s.fkBatch = " . $Batch->getPkBatch();
-            $this->error($where, $parameters[0], array(), false);
+            $areaRatioInj = $SampleName['areaRatio'];
+            $injName = $SampleName['sampleName'];
+            $useRecord = $SampleName['useRecord'];
+            $originName  = preg_replace(array('/R[0-9]+/', '/\*/'), '', $SampleName['sampleName']);
+
+            $query    = $this->getEntityManager()->createQuery("
+            SELECT s.areaRatio
+            FROM Alae\Entity\SampleBatch s
+            WHERE s.sampleName = '". $originName . "' AND s.fkBatch = " . $Batch->getPkBatch());
+            $query->setMaxResults(1);
+            $areaRatioOrig = $query->getSingleScalarResult();
+
+            $dif = (($areaRatioOrig - $areaRatioInj) / $areaRatioOrig) * 100;
+
+            $centi = "N";
+            if ($dif >= $min && $dif <= $max)
+            {
+                $centi = "S";
+            }
+
+            $centi91 = "N";
+            if($centi == "N")
+            {
+                $centi91 = "S";
+                $where = "s.sampleName = '" . $injName . "' AND s.fkBatch = " . $Batch->getPkBatch();
+                $this->error($where, $parameters[0], array(), false);
+            }
+
+            $centi92 = "N";
+            if($useRecord == 0)
+            {
+                $centi92 = "S";
+                $where = "s.sampleName = '" . $injName . "' AND s.fkBatch = " . $Batch->getPkBatch();
+                $this->error($where, $parameters2[0], array(), false);   
+            }
+
+            if($centi91 == "S" && $centi92 == "S")
+            {
+                $where = "s.sampleName = '" . $injName . "' AND s.fkBatch = " . $Batch->getPkBatch();
+                $this->error($where, $parameters3[0], array(), false);
+            }
         }
     }
 
