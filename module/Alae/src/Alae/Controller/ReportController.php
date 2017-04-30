@@ -961,23 +961,27 @@ class ReportController extends BaseController
         $request = $this->getRequest();
         if ($request->isGet())
         {
-            
-            $analytes = $this->getRepository('\\Alae\\Entity\\AnalyteStudy')->findBy(array("fkAnalyte" => $request->getQuery('an'), "fkStudy" => $request->getQuery('id')));
-            $query    = $this->getEntityManager()->createQuery("
-                SELECT b
-                FROM Alae\Entity\Batch b
-                WHERE b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id') . "
-                ORDER BY b.fileName ASC");
-            $batch    = $query->getResult();
+            $batch   = $this->getRepository("\\Alae\\Entity\\Batch")->findBy(array(
+                "fkAnalyte" => $request->getQuery('an'),
+                "fkStudy"   => $request->getQuery('id'),
+                "validFlag" => true
+            ), array("fileName" => asc));
+            $Analyte = $this->getRepository("\\Alae\\Entity\\Analyte")->find($request->getQuery('an'));
+            $Study   = $this->getRepository("\\Alae\\Entity\\Study")->find($request->getQuery('id'));
+            $AnalyteName = $Analyte->getName();
+            $studyName = $Study->getCode();
+
+            $IntegrationSample = 0;
+            $TotalSample = 0;
 
             if (count($batch) > 0)
             {
-                $list    = array();
-                $pkBatch = array();
+                ini_set('max_execution_time', 9000);
+                $message = array();
 
-                $data = array();
                 foreach ($batch as $Batch)
                 {
+
                     //número total de muestras
                     $query    = $this->getEntityManager()->createQuery("
                         SELECT COUNT(s.pkSampleBatch) as count1
@@ -985,14 +989,6 @@ class ReportController extends BaseController
                         WHERE NOT (s.sampleName LIKE  '%R%' AND s.sampleName NOT LIKE  '%\*%') AND  s.fkBatch = " . $Batch->getPkBatch() . "
                         ORDER By s.sampleName");
                     $elements1 = $query->getResult();
-
-                    //muestras reinyectadas
-                    $query    = $this->getEntityManager()->createQuery("
-                        SELECT s.sampleName
-                        FROM Alae\Entity\SampleBatch s
-                        WHERE (s.sampleName LIKE  '%R%' AND s.sampleName NOT LIKE  '%\*%') AND  s.fkBatch = " . $Batch->getPkBatch() . "
-                        ORDER By s.sampleName");
-                    $reinjection = $query->getResult();
 
                     //número de muestras con “Record Modified = 1”
                     $query    = $this->getEntityManager()->createQuery("
@@ -1006,46 +1002,37 @@ class ReportController extends BaseController
                     //% de muestras modificadas sobre el número total de muestras
                     $percent =  ($elements2[0]['recordModified'] / $elements1[0]['count1']) * 100 ;
 
-                    //integracion manual Analyte
                     $query    = $this->getEntityManager()->createQuery("
-                        SELECT s.sampleName
+                        SELECT s.sampleName, s.analyteIntegrationType, s.isIntegrationType
                         FROM Alae\Entity\SampleBatch s
                         WHERE s.fkBatch = " . $Batch->getPkBatch() ." AND
-                        s.analyteIntegrationType = 'Manual'
+                        s.recordModified = 1
                         ORDER By s.sampleName");
-                    $MIAnalyte = $query->getResult();
+                    $results = $query->getResult();
 
-                    //integracion manual IS
-                    $query    = $this->getEntityManager()->createQuery("
-                        SELECT s.sampleName
-                        FROM Alae\Entity\SampleBatch s
-                        WHERE s.fkBatch = " . $Batch->getPkBatch() ." AND
-                        s.isIntegrationType = 'Manual'
-                        ORDER By s.sampleName");
-                    $MIIs = $query->getResult();
-
-                    $data[] = array(
-                        "pkBatch" => $Batch->getPkBatch(),
-                        "sampleName" => $Batch->getFileName(),
-                        "reinjection" => $reinjection,
-                        "count" => $elements1[0]['count1'],
-                        "recordModified" => $elements2[0]['recordModified'],
-                        "percent" => $percent,
-                        "MIAnalyte" => $MIAnalyte,
-                        "MIIs" => $MIIs
-                    );
-                    
-
+                    foreach ($results as $row1) 
+                    {
+                        $message[] = array(
+                            "sampleName"   => $row1['sampleName'],
+                            "analyteIntegrationType"    => $row1['analyteIntegrationType'],
+                            "isIntegrationType" => $row1['isIntegrationType'],
+                            "filename"     => $Batch->getFileName()
+                        );
+                    }
                 }
 
-                $properties = array(
-                    "analyte"      => $analytes[0],
-                    "data"         => $data,
-                    "filename"     => "Listado_de_muestras" . date("Ymd-Hi")
-                );
 
-                $viewModel = new ViewModel($properties);
+                $viewModel = new ViewModel();
                 $viewModel->setTerminal(true);
+                $viewModel->setVariable('list', $message);
+                $viewModel->setVariable('analyte', $AnalyteName);
+                $viewModel->setVariable('study', $studyName);
+                $viewModel->setVariable('count', $studyName);
+                $viewModel->setVariable('recordModified', $studyName);
+                $viewModel->setVariable('percent', $percent);
+
+                $viewModel->setVariable('filename', "listado_de_muestras_con_integracion_modificada" . date("Ymd-Hi"));
+
                 return $viewModel;
             }
             else
