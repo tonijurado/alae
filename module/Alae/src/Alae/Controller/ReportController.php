@@ -191,7 +191,7 @@ class ReportController extends BaseController
                 $qb       = $this->getEntityManager()->createQueryBuilder();
                 $qb
                         ->select('s.sampleName, s.analytePeakName, s.sampleType, s.fileName, s.analytePeakArea, s.isPeakArea, s.areaRatio, s.analyteConcentration, s.calculatedConcentration, s.dilutionFactor, s.accuracy, s.useRecord,
-                     s.acquisitionDate, s.analyteIntegrationType, s.isIntegrationType, s.recordModified,
+                     s.acquisitionDate, s.analyteRetentionTime, s.isRetentionTime, s.analyteIntegrationType, s.isIntegrationType, s.recordModified,
                     GROUP_CONCAT(DISTINCT p.codeError) as codeError,
                     GROUP_CONCAT(DISTINCT p.messageError) as messageError')
                         ->from('Alae\Entity\SampleBatch', 's')
@@ -205,10 +205,12 @@ class ReportController extends BaseController
                 if (count($elements) > 0)
                 {
                     $tr1 = $tr2 = "";
+                    $tr3 = $tr4 = "";
 
                     foreach ($elements as $sampleBatch)
                     {
                         $row1     = $row2     = "";
+                        $row3     = $row4     = "";
                         $isTable2 = false;
 
                         foreach ($sampleBatch as $key => $value)
@@ -217,6 +219,7 @@ class ReportController extends BaseController
                             {
                                 case "sampleName":
                                     $row1 .= sprintf('<td style="width:75px;text-align:left;border: black 1px solid;font-size:13px;padding:4px">%s</td>', $value);
+                                    $row3 .= sprintf('<td style="width:100px;text-align:left;border: black 1px solid;font-size:13px;padding:4px">%s</td>', $value);
                                     break;
                                 case "fileName":
                                     $row1 .= sprintf('<td style="width:110px;text-align:left;border: black 1px solid;font-size:13px;padding:4px">%s</td>', $value);
@@ -242,16 +245,24 @@ class ReportController extends BaseController
                                 case "useRecord":
                                     $row1 .= sprintf('<td style="width:40px;text-align:center;border: black 1px solid;font-size:13px;padding:4px">%s</td>', $value);
                                     break;
+                                case "analyteRetentionTime":
+                                    $row3 .= sprintf('<td style="width:150px;text-align:center;border: black 1px solid;font-size:13px;padding:4px">%s</td>', $value);
+                                    break;
+                                case "isRetentionTime":
+                                    $row3 .= sprintf('<td style="width:150px;text-align:center;border: black 1px solid;font-size:13px;padding:4px">%s</td>', $value);
+                                    break;
+                                case "analyteIntegrationType":
+                                    $row3 .= sprintf('<td style="width:150px;text-align:center;border: black 1px solid;font-size:13px;padding:4px">%s</td>', $value);
+                                    break;
+                                case "isIntegrationType":
+                                    $row3 .= sprintf('<td style="width:150px;text-align:center;border: black 1px solid;font-size:13px;padding:4px">%s</td>', $value);
+                                    break;
                                 case "recordModified":
-                                    $row1 .= sprintf('<td style="width:50px;text-align:center;border: black 1px solid;font-size:13px;padding:4px">%s</td>', $value);
+                                    $row3 .= sprintf('<td style="width:100px;text-align:center;border: black 1px solid;font-size:13px;padding:4px">%s</td>', $value);
                                     break;
                                 case "acquisitionDate":
                                     $value = $value->format('d.m.Y H:i:s');
                                     $row1 .= sprintf('<td style="width:70px;text-align:right;border: black 1px solid;font-size:13px;padding:4px">%s</td>', $value);
-                                    break;
-                                case "analyteIntegrationType":
-                                case "isIntegrationType":
-                                    $row1 .= sprintf('<td style="width:80px;text-align:left;border: black 1px solid;font-size:13px;padding:4px">%s</td>', $value);
                                     break;
                                 case "codeError":
                                     $row1 .= sprintf('<td style="width:50px;text-align:center;border: black 1px solid;font-size:13px;padding:4px">%s</td>', $value);
@@ -259,6 +270,7 @@ class ReportController extends BaseController
                                 case "messageError":
                                 	$value = str_replace(",", " // ", $value);
                                     $row1 .= sprintf('<td style="width:150px;text-align:left;border: black 1px solid;font-size:13px;padding:4px">%s</td>', htmlentities($value));
+                                    $row3 .= sprintf('<td style="width:200px;text-align:left;border: black 1px solid;font-size:13px;padding:4px">%s</td>', htmlentities($value));
                                     break;  
                                 default:
                                     $row1 .= sprintf('<td style="width:50px;text-align:left;border: black 1px solid;font-size:13px;padding:4px">%s</td>', $value);
@@ -268,6 +280,9 @@ class ReportController extends BaseController
 
                         $tr1 .= sprintf("<tr>%s</tr>", $row1);
                         $tr2 .= sprintf("<tr>%s</tr>", $row2);
+
+                        $tr3 .= sprintf("<tr>%s</tr>", $row3);
+                        $tr4 .= sprintf("<tr>%s</tr>", $row4);
 
                     }
 
@@ -302,7 +317,7 @@ class ReportController extends BaseController
                     
                     $var5 = $Batch->getIsCsQcAcceptedAvg() * (5 / 100);
 
-                    $properties = array(
+                    /*$properties = array(
                         "batch"  => $Batch,
                         "tr1"    => $tr1,
                         "tr2"    => $tr2,
@@ -310,7 +325,22 @@ class ReportController extends BaseController
                         "var5"    => $var5,
                         "errors" => implode(" // ", $message)
                     );
-                    $page .= $this->render('alae/report/r2page', $properties);
+                    $page .= $this->render('alae/report/r2', $properties);*/
+                    $viewModel = new ViewModel();
+                    $viewModel->setTerminal(true);
+                    //$page      = $this->render('acua/report/r2page', $data);
+                    $viewModel->setVariable('batch', $Batch);
+                    $viewModel->setVariable('tr1', $tr1);
+                    $viewModel->setVariable('dataIS', $dataIS);
+                    $viewModel->setVariable('tr2', $tr2);
+                    $viewModel->setVariable('tr3', $tr3);
+                    $viewModel->setVariable('tr4', $tr4);
+                    $viewModel->setVariable('varIs', $varIs);
+                    $viewModel->setVariable('var5', $var5);
+                    $viewModel->setVariable('errors', implode(" // ", $message));
+            //$viewModel->setVariable('page', $page);
+            $viewModel->setVariable('filename', "tabla_alae_de_cada_lote_analitico" . date("YmdHi"));
+            return $viewModel;
                 }
                 else
                 {
@@ -331,11 +361,11 @@ class ReportController extends BaseController
             }
         }
 
-        $viewModel = new ViewModel();
+        /*$viewModel = new ViewModel();
         $viewModel->setTerminal(true);
         $viewModel->setVariable('page', $page);
         $viewModel->setVariable('filename', "tabla_alae_de_cada_lote_analitico" . date("Ymd-Hi"));
-        return $viewModel;
+        return $viewModel;*/
     }
 
     /**
