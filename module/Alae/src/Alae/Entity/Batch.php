@@ -37,6 +37,13 @@ class Batch
     protected $fileName;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="file_size", type="string", length=100, nullable=true)
+     */
+    protected $fileSize;
+
+    /**
      * @var \DateTime
      *
      * @ORM\Column(name="created_at", type="datetime", nullable=false)
@@ -256,6 +263,16 @@ class Batch
     public function setFileName($fileName)
     {
         $this->fileName = $fileName;
+    }
+
+    public function getFileSize()
+    {
+        return $this->fileSize;
+    }
+
+    public function setFileSize($fileSize)
+    {
+        $this->fileSize = $fileSize;
     }
 
     public function getCreatedAt()

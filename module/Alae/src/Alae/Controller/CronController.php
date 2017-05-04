@@ -179,25 +179,37 @@ class CronController extends BaseController
     private function insertBatch($fileName, $Study, $Analyte)
     {
         $data  = $this->getData(Helper::getVarsConfig("batch_directory") . "/" . $fileName, $Study, $Analyte);
-        $Batch = $this->saveBatch($fileName);
+        
+        $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V1.1"));
+        $value      = $parameters[0]->getMinValue();
+        $fileSize = $data["size"];
+        $Batch = $this->saveBatch($fileName, $fileSize);
 
-        if(count($data["data"]) > 0)
+        //si el tamaño del archivo es mayor que el tamaño del parametro
+        if($fileSize > $value)
         {
-            $this->saveSampleBatch($data["headers"], $data['data'], $Batch);
-
-            if (!is_null($Analyte) && !is_null($Study))
+            $this->execute(\Alae\Service\Verification::updateBatch("b.pkBatch = " . $Batch->getPkBatch(), "V1.1"));
+        }
+        else
+        {    
+            if(count($data["data"]) > 0)
             {
-                $this->batchVerify($Batch, $Analyte, $fileName);
-                $this->updateBatch($Batch, $Analyte, $Study);
+                $this->saveSampleBatch($data["headers"], $data['data'], $Batch);
+
+                if (!is_null($Analyte) && !is_null($Study))
+                {
+                    $this->batchVerify($Batch, $Analyte, $fileName);
+                    $this->updateBatch($Batch, $Analyte, $Study);
+                }
+                else
+                {
+                    $this->execute(\Alae\Service\Verification::updateBatch("b.pkBatch = " . $Batch->getPkBatch(), "V1"));
+                }
             }
             else
             {
                 $this->execute(\Alae\Service\Verification::updateBatch("b.pkBatch = " . $Batch->getPkBatch(), "V1"));
             }
-        }
-        else
-        {
-            $this->execute(\Alae\Service\Verification::updateBatch("b.pkBatch = " . $Batch->getPkBatch(), "V1"));
         }
     }
 
@@ -232,6 +244,8 @@ class CronController extends BaseController
         $content = fread($fp, filesize($filename));
         fclose($fp);
 
+        $size = filesize($filename);
+
         $lines    = explode("\n", $content);
         $continue = false;
         $data     = $headers  = $other    = array();
@@ -257,7 +271,8 @@ class CronController extends BaseController
 
         return array(
             "headers" => $headers,
-            "data"    => $data
+            "data"    => $data,
+            "size"    => $size
         );
     }
 
@@ -288,13 +303,14 @@ class CronController extends BaseController
     /*
      * Función que se encarga del almacenamiento del batch
      */
-    private function saveBatch($fileName)
+    private function saveBatch($fileName, $fileSize)
     {
         $response = $this->explodeFile($fileName);
 
         $Batch = new \Alae\Entity\Batch();
         $Batch->setSerial((string) $response['batch']);
         $Batch->setFileName($fileName);
+        $Batch->setFileSize($fileSize);
         $Batch->setFkUser($this->_getSystem());
         $this->getEntityManager()->persist($Batch);
         $this->getEntityManager()->flush();

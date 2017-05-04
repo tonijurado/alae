@@ -225,7 +225,7 @@ class Datatable
     //COLUMNAS DEL LOTE
     protected function getBatchColumns()
     {
-        $header = array("batch", "filename", "create_at", "valid_flag", "validation_date", "result", "modify", "accepted_flag", "justification");
+        $header = array("batch", "filename","filesize", "create_at", "valid_flag", "validation_date", "result", "modify", "accepted_flag", "justification");
         $data   = $this->getData();
 
         return array(
@@ -233,6 +233,7 @@ class Datatable
             "columns"  => json_encode(array(
                 array("key" => "batch", "label" => "Lote #", "sortable" => true),
                 array("key" => "filename", "label" => "Archivo", "sortable" => true),
+                array("key" => "filesize", "label" => "Tamaño", "sortable" => true),
                 array("key" => "create_at", "label" => "Importado el", "sortable" => true),
                 array("key" => "valid_flag", "label" => "Validar", "sortable" => false, "allowHTML" => true),
                 array("key" => "validation_date", "label" => "Validado el", "sortable" => true),

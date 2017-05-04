@@ -165,6 +165,7 @@ class BatchController extends BaseController
             $data[] = array(
                 "batch"           => $batch->getSerial(),
                 "filename"        => $batch->getFileName(),
+                "filesize"        => $batch->getFileSize(),
                 "create_at"       => $batch->getCreatedAt(),
                 "valid_flag"      => $validation,
                 "validation_date" => $batch->getValidationDate(),
