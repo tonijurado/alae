@@ -64,10 +64,10 @@ class Batch extends \Alae\Entity\Batch implements \Doctrine\ORM\Proxy\Proxy
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'pkBatch', 'serial', 'fileName', 'createdAt', 'updatedAt', 'validFlag', 'acceptedFlag', 'justification', 'validationDate', 'codeError', 'intercept', 'slope', 'correlationCoefficient', 'csTotal', 'qcTotal', 'ldqcTotal', 'hdqcTotal', 'csAcceptedTotal', 'qcAcceptedTotal', 'ldqcAcceptedTotal', 'hdqcAcceptedTotal', 'isCsQcAcceptedAvg', 'analyteConcentrationUnits', 'calculatedConcentrationUnits', 'fkParameter', 'fkAnalyte', 'fkUser', 'fkStudy');
+            return array('__isInitialized__', 'pkBatch', 'serial', 'fileName', 'fileSize', 'createdAt', 'updatedAt', 'validFlag', 'acceptedFlag', 'justification', 'validationDate', 'codeError', 'intercept', 'slope', 'correlationCoefficient', 'csTotal', 'qcTotal', 'ldqcTotal', 'hdqcTotal', 'csAcceptedTotal', 'qcAcceptedTotal', 'ldqcAcceptedTotal', 'hdqcAcceptedTotal', 'isCsQcAcceptedAvg', 'analyteConcentrationUnits', 'calculatedConcentrationUnits', 'fkParameter', 'fkAnalyte', 'fkUser', 'fkStudy');
         }
 
-        return array('__isInitialized__', 'pkBatch', 'serial', 'fileName', 'createdAt', 'updatedAt', 'validFlag', 'acceptedFlag', 'justification', 'validationDate', 'codeError', 'intercept', 'slope', 'correlationCoefficient', 'csTotal', 'qcTotal', 'ldqcTotal', 'hdqcTotal', 'csAcceptedTotal', 'qcAcceptedTotal', 'ldqcAcceptedTotal', 'hdqcAcceptedTotal', 'isCsQcAcceptedAvg', 'analyteConcentrationUnits', 'calculatedConcentrationUnits', 'fkParameter', 'fkAnalyte', 'fkUser', 'fkStudy');
+        return array('__isInitialized__', 'pkBatch', 'serial', 'fileName', 'fileSize', 'createdAt', 'updatedAt', 'validFlag', 'acceptedFlag', 'justification', 'validationDate', 'codeError', 'intercept', 'slope', 'correlationCoefficient', 'csTotal', 'qcTotal', 'ldqcTotal', 'hdqcTotal', 'csAcceptedTotal', 'qcAcceptedTotal', 'ldqcAcceptedTotal', 'hdqcAcceptedTotal', 'isCsQcAcceptedAvg', 'analyteConcentrationUnits', 'calculatedConcentrationUnits', 'fkParameter', 'fkAnalyte', 'fkUser', 'fkStudy');
     }
 
     /**
@@ -241,6 +241,28 @@ class Batch extends \Alae\Entity\Batch implements \Doctrine\ORM\Proxy\Proxy
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setFileName', array($fileName));
 
         return parent::setFileName($fileName);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getFileSize()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getFileSize', array());
+
+        return parent::getFileSize();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setFileSize($fileSize)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setFileSize', array($fileSize));
+
+        return parent::setFileSize($fileSize);
     }
 
     /**

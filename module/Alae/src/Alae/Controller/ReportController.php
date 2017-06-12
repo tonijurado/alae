@@ -1001,8 +1001,8 @@ class ReportController extends BaseController
             $AnalyteName = $Analyte->getName();
             $studyName = $Study->getCode();
 
-            $IntegrationSample = 0;
-            $TotalSample = 0;
+            $countTot1 = 0;
+            $recordModifiedTot1 = 0;
 
             if (count($batch) > 0)
             {
@@ -1011,7 +1011,6 @@ class ReportController extends BaseController
 
                 foreach ($batch as $Batch)
                 {
-
                     //número total de muestras
                     $query    = $this->getEntityManager()->createQuery("
                         SELECT COUNT(s.pkSampleBatch) as count1
@@ -1020,6 +1019,7 @@ class ReportController extends BaseController
                         ORDER By s.sampleName");
                     $elements1 = $query->getResult();
 
+                    $count1 = $elements1[0]['count1'];
                     //número de muestras con “Record Modified = 1”
                     $query    = $this->getEntityManager()->createQuery("
                         SELECT COUNT(s.recordModified) as recordModified
@@ -1029,8 +1029,7 @@ class ReportController extends BaseController
                         ORDER By s.sampleName");
                     $elements2 = $query->getResult();
 
-                    //% de muestras modificadas sobre el número total de muestras
-                    $percent =  ($elements2[0]['recordModified'] / $elements1[0]['count1']) * 100 ;
+                    $recordModified =  $elements2[0]['recordModified'];
 
                     $query    = $this->getEntityManager()->createQuery("
                         SELECT s.sampleName, s.analyteIntegrationType, s.isIntegrationType
@@ -1039,6 +1038,9 @@ class ReportController extends BaseController
                         s.recordModified = 1
                         ORDER By s.sampleName");
                     $results = $query->getResult();
+
+                    $countTot1 = $countTot1 + $count1;
+                    $recordModifiedTot1 = $recordModifiedTot1 + $recordModified;
 
                     foreach ($results as $row1) 
                     {
@@ -1051,14 +1053,16 @@ class ReportController extends BaseController
                     }
                 }
 
+                //% de muestras modificadas sobre el número total de muestras
+                $percent =  ($recordModifiedTot1 / $countTot1) * 100 ;
 
                 $viewModel = new ViewModel();
                 $viewModel->setTerminal(true);
                 $viewModel->setVariable('list', $message);
                 $viewModel->setVariable('analyte', $AnalyteName);
                 $viewModel->setVariable('study', $studyName);
-                $viewModel->setVariable('count', $studyName);
-                $viewModel->setVariable('recordModified', $studyName);
+                $viewModel->setVariable('countTot1', $countTot1);
+                $viewModel->setVariable('recordModified', $recordModifiedTot1);
                 $viewModel->setVariable('percent', $percent);
 
                 $viewModel->setVariable('filename', "listado_de_muestras_con_integracion_modificada" . date("Ymd-Hi"));

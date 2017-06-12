@@ -49,12 +49,12 @@ class VerificationController extends BaseController
                 $this->V26($Batch);
             }
 
-            //$this->V13_25($Batch);
+            $this->V13_25($Batch);
 
             $response = $this->V12($Batch);
             if ($response)
             {
-                $this->V13_25($Batch);
+                //$this->V13_25($Batch);
             }
             else
             {
@@ -217,7 +217,8 @@ class VerificationController extends BaseController
             $function = 'V' . $i;
             $this->$function($Batch);
         }
-
+                $function = 'V23';
+                $this->$function($Batch);
 
         $continue = $this->evaluation($Batch);
         
@@ -1015,11 +1016,11 @@ class VerificationController extends BaseController
         $value      = $Batch->getIsCsQcAcceptedAvg() * ($parameters[0]->getMinValue() / 100);
         
         //TYPE Unknown
-        $where = "s.sampleType = 'Unknown' AND s.isPeakArea < $value AND s.fkBatch = " . $Batch->getPkBatch();
+        $where = "(s.sampleName NOT LIKE 'ZS%' AND s.sampleName NOT LIKE 'CS%' AND s.sampleName NOT LIKE 'QC%') AND s.sampleType = 'Unknown' AND s.isPeakArea < $value AND s.fkBatch = " . $Batch->getPkBatch();
         $this->error($where, $parameters[0], array(), false);
 
         //SampleName ZS, TYPE Unknown
-        $where = "s.sampleName LIKE 'ZS%' AND s.sampleType = 'Unknown' AND s.isPeakArea < $value AND s.fkBatch = " . $Batch->getPkBatch();
+        $where = "s.sampleName LIKE 'ZS%' AND s.sampleType = 'Blank' AND s.isPeakArea < $value AND s.fkBatch = " . $Batch->getPkBatch();
         $this->error($where, $parameters[0], array(), false);
 
         //SampleName CS, TYPE Standard
