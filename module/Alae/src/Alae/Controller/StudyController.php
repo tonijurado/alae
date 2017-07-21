@@ -560,6 +560,7 @@ class StudyController extends BaseController
                     $User = $this->_getSession();
                     $Study->setApprove(true);
                     $Study->setFkUserApprove($User);
+                    $Study->setApprovedAt(new \DateTime('now'));
                     $this->getEntityManager()->persist($Study);
                     $this->getEntityManager()->flush();
                     $this->transaction(

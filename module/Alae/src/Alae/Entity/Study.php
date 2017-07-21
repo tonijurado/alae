@@ -44,6 +44,13 @@ class Study
     protected $updatedAt;
 
     /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="approved_at", type="datetime", nullable=true)
+     */
+    protected $approvedAt;
+
+    /**
      * @var string
      *
      * @ORM\Column(name="description", type="text", nullable=true)
@@ -165,6 +172,16 @@ class Study
     public function setUpdatedAt(\DateTime $updatedAt)
     {
         $this->updatedAt = $updatedAt;
+    }
+
+    public function getApprovedAt()
+    {
+        return $this->approvedAt->format('d.m.Y H:i:s');
+    }
+
+    public function setApprovedAt(\DateTime $approvedAt)
+    {
+        $this->approvedAt = $approvedAt;
     }
 
     public function getDescription()

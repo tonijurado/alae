@@ -58,7 +58,7 @@
                     <?php endif; ?>
                     <?php if($study->getApprove()) : ?>
                     <li>
-                        <p class="approve_notification"><?php printf("confirmado por: %s (%s). %s", $study->getFkUserApprove()->getUsername(), $study->getFkUserApprove()->getFkProfile()->getname(), $study->getUpdatedAt()); ?></p>
+                        <p class="approve_notification"><?php printf("confirmado por: %s (%s). %s", $study->getFkUserApprove()->getUsername(), $study->getFkUserApprove()->getFkProfile()->getname(), $study->getApprovedAt()); ?></p>
                     </li>
                     <?php endif; ?>
                 </ul>
