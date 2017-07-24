@@ -64,10 +64,10 @@ class Study extends \Alae\Entity\Study implements \Doctrine\ORM\Proxy\Proxy
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'pkStudy', 'code', 'createdAt', 'updatedAt', 'description', 'observation', 'closeFlag', 'status', 'approve', 'duplicate', 'fkDilutionTree', 'fkUser', 'fkUserApprove', 'fkUserClose');
+            return array('__isInitialized__', 'pkStudy', 'code', 'createdAt', 'updatedAt', 'approvedAt', 'description', 'observation', 'closeFlag', 'status', 'approve', 'duplicate', 'fkDilutionTree', 'fkUser', 'fkUserApprove', 'fkUserClose');
         }
 
-        return array('__isInitialized__', 'pkStudy', 'code', 'createdAt', 'updatedAt', 'description', 'observation', 'closeFlag', 'status', 'approve', 'duplicate', 'fkDilutionTree', 'fkUser', 'fkUserApprove', 'fkUserClose');
+        return array('__isInitialized__', 'pkStudy', 'code', 'createdAt', 'updatedAt', 'approvedAt', 'description', 'observation', 'closeFlag', 'status', 'approve', 'duplicate', 'fkDilutionTree', 'fkUser', 'fkUserApprove', 'fkUserClose');
     }
 
     /**
@@ -263,6 +263,28 @@ class Study extends \Alae\Entity\Study implements \Doctrine\ORM\Proxy\Proxy
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setUpdatedAt', array($updatedAt));
 
         return parent::setUpdatedAt($updatedAt);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getApprovedAt()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getApprovedAt', array());
+
+        return parent::getApprovedAt();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setApprovedAt(\DateTime $approvedAt)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setApprovedAt', array($approvedAt));
+
+        return parent::setApprovedAt($approvedAt);
     }
 
     /**

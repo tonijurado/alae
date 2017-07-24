@@ -1012,10 +1012,11 @@ class ReportController extends BaseController
                 foreach ($batch as $Batch)
                 {
                     //número total de muestras
+                    //WHERE NOT (s.sampleName LIKE  '%R%' AND s.sampleName NOT LIKE  '%\*%') AND  s.fkBatch = " . $Batch->getPkBatch() . "
                     $query    = $this->getEntityManager()->createQuery("
                         SELECT COUNT(s.pkSampleBatch) as count1
                         FROM Alae\Entity\SampleBatch s
-                        WHERE NOT (s.sampleName LIKE  '%R%' AND s.sampleName NOT LIKE  '%\*%') AND  s.fkBatch = " . $Batch->getPkBatch() . "
+                        WHERE s.fkBatch = " . $Batch->getPkBatch() . "
                         ORDER By s.sampleName");
                     $elements1 = $query->getResult();
 
