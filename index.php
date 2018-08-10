@@ -1,3 +1,3 @@
 <?php
-header ("Location: http://www.alae.com/public");
+header ("Location: http://localhost/alae/alae/public/init");
 ?>

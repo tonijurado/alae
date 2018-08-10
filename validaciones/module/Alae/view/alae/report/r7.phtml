@@ -1,0 +1,203 @@
+<?php
+header('Content-Disposition: attachment; filename="'. $filename .'.xls";');
+header('Content-Type: application/vnd.ms-excel;charset=utf-8');
+?>
+<html xmlns:v="urn:schemas-microsoft-com:vml"
+xmlns:o="urn:schemas-microsoft-com:office:office"
+xmlns:x="urn:schemas-microsoft-com:office:excel"
+xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+<meta charset="UTF-8">
+<meta name=ProgId content=Excel.Sheet>
+<meta name=Generator content="Microsoft Excel 11">
+<!--[if gte mso 9]><xml>
+ <o:DocumentProperties>
+  <o:Author>Pat Willener</o:Author>
+  <o:Company>Good Day Books</o:Company>
+ </o:DocumentProperties>
+ <o:OfficeDocumentSettings>
+  <o:RelyOnVML/>
+  <o:AllowPNG/>
+ </o:OfficeDocumentSettings>
+</xml><![endif]-->
+<style>
+<!--
+@page
+	{mso-page-orientation:landscape;}
+
+-->
+</style>
+<!--[if gte mso 9]><xml>
+ <x:ExcelWorkbook>
+  <x:ExcelWorksheets>
+   <x:ExcelWorksheet>
+    <x:Name>percent_calculated_nominal_concentration_of_calibration_standards</x:Name>
+    <x:WorksheetOptions>
+     <x:Print>
+      <x:ValidPrinterInfo/>
+      <x:PaperSizeIndex>9</x:PaperSizeIndex>
+      <x:HorizontalResolution>600</x:HorizontalResolution>
+      <x:VerticalResolution>600</x:VerticalResolution>
+     </x:Print>
+     <x:Selected/>
+     <x:Panes>
+      <x:Pane>
+       <x:Number>1</x:Number>
+       <x:ActiveRow>1</x:ActiveRow>
+      </x:Pane>
+     </x:Panes>
+     <x:ProtectContents>False</x:ProtectContents>
+     <x:ProtectObjects>False</x:ProtectObjects>
+     <x:ProtectScenarios>False</x:ProtectScenarios>
+    </x:WorksheetOptions>
+   </x:ExcelWorksheet>
+  </x:ExcelWorksheets>
+  <x:WindowHeight>8835</x:WindowHeight>
+  <x:WindowWidth>15180</x:WindowWidth>
+  <x:WindowTopX>120</x:WindowTopX>
+  <x:WindowTopY>105</x:WindowTopY>
+  <x:ProtectStructure>False</x:ProtectStructure>
+  <x:ProtectWindows>False</x:ProtectWindows>
+ </x:ExcelWorkbook>
+</xml><![endif]-->
+
+<title></title>
+</head>
+<body>
+<div class="Section1">
+	<div class="table-container">
+	    <table width="900" border="0" cellspacing="0" cellpadding="0"  style="background-color:#fff;padding:10px 0 0 0;">
+		<tr>
+		    <td width="238" align="left" height="20">
+			Study No:
+		    </td>
+		    <td width="205" height="20" style="">
+                        <?php echo $analyte->getFkStudy()->getCode(); ?>
+		    </td>
+		</tr>
+		<tr>
+		    <td width="238" align="left" height="20"  style="padding:10px 0 0 0;">
+			Table
+		    </td>
+                    <td width="205" height="20" style="">
+
+		    </td>
+		</tr>
+		<tr>
+		    <td width="238" colspan="2" align="left" height="20"  style="padding:10px 0 0 0;">
+			<strong> % Calculated Nominal Concentration of Calibration Standards</strong>
+		    </td>
+		</tr>
+		<tr>
+		    <td width="238" align="left" height="20"  style="padding: 10px 0 0 0">
+			Analyte:
+		    </td>
+		    <td width="205" height="20" style="">
+                        <?php echo $analyte->getFkAnalyte()->getName(); ?>
+		    </td>
+		</tr>
+		<tr>
+		    <td width="238" align="left" height="20"  style="padding: 10px 00 0">
+			Biological Matrix
+		    </td>
+		    <td width="205" height="20" style="">
+
+		    </td>
+		</tr>
+		<tr>
+		    <td width="238" align="left" height="20"  style="padding: 10px 00 0">
+			Concentration Units:
+		    </td>
+		    <td width="205" height="20" style="">
+                        <?php echo $analyte->getFkUnit()->getName(); ?>
+		    </td>
+		</tr>
+	    </table>
+	    <div class="cler"></div>
+	    <div class="table-row">
+		<table width="900" border="0" cellspacing="0" cellpadding="0"  style="background-color:#fff;margin-top:10px;text-aling:center;">
+		    <tr>
+			<td  colspan="2" align="center"></td>
+		    </tr>
+		    <tr>
+			<td  align="center" colspan="2"  style="color:#000; border: black 1px solid;font-size:14px;padding:10px;font-style:bold;"><strong>Calibration Standards</strong> </td>
+			<?php for($i = 1; $i <= $analyte->getCsNumber(); $i++) : ?>
+                        <td  align="center"  colspan="2" style=" border: black 1px solid;padding:2px">CS<?php echo $i; ?></td>
+                        <?php endfor; ?>
+		    </tr>
+		    <tr>
+			<td  align="center"  colspan="2"  style="color:#000; border: black 1px solid;font-size:14px;padding:10px;font-style:bold;"><strong>Nominal Concentrations</strong> </td>
+			<?php foreach ($cs_values as $key => $value) : ?>
+                        <td style="mso-number-format:'#,##0.00';" align="center"   colspan="2"  style=" border: black 1px solid;padding:2px">
+                            <?php echo number_format($value,2,'.',''); ?>
+                        </td>
+                        <?php endforeach; ?>
+		    </tr>
+		    <tr>
+			<td colspan="<?php echo ($analyte->getCsNumber() * 2) + 2; ?>" align="left" style="border: black 1px solid;padding:2px"></td>
+		    </tr>
+		</table>
+		<table width="900" border="0" cellspacing="0" cellpadding="0"  style="margin-top:10px;text-aling:center;">
+		    <tr>
+			<td  align="center"  colspan="2" style="color:#000; border: black 1px solid;font-size:14px;padding:10px;font-style:bold;"><strong>Batch Results Table No.</strong> </td>
+			<td  align="center" colspan="<?php echo ($analyte->getCsNumber() * 2); ?>" style=" border: black 1px solid;padding:2px">Back-Calculated Concentrations (5)</td>
+		    </tr>
+                    <?php foreach($list as $list) : ?>
+		    <tr>
+			<td  align="center"  colspan="2" style="color:#000; border: black 1px solid;font-size:14px;padding:10px;font-style:bold;">
+                            <strong>'<?php echo $list['name']; ?></strong>
+                        </td>
+                        <?php foreach ($list['par'] as $key => $value) : ?>
+                        <td  style="mso-number-format:'#,##0.00';" align="center"    style=" border: black 1px solid;padding:2px">
+                            <?php echo ($value[1] != "") ? "RCS" : $value[0]; ?>
+                        </td>
+                        <td  align="center"    style=" border: black 1px solid;padding:2px;font-size:10px">
+                            <?php echo $value[1]; ?>
+                        </td>
+                        <?php endforeach; ?>
+		    </tr>
+                    <tr>
+			<td  align="center"  colspan="2" style="color:#000; border: black 1px solid;font-size:14px;padding:10px;font-style:bold;">
+                            <strong></strong>
+                        </td>
+                        <?php foreach ($list['impar'] as $key => $value) : ?>
+                        <td  style="mso-number-format:'#,##0.00';" align="center"    style=" border: black 1px solid;padding:2px">
+                            <?php echo ($value[1] != "") ? "RCS" : $value[0]; ?>
+                        </td>
+                        <td  align="center"   style=" border: black 1px solid;padding:2px;font-size:10px">
+                            <?php echo $value[1]; ?>
+                        </td>
+                        <?php endforeach; ?>
+		    </tr>
+                    <?php endforeach; ?>
+		    <tr>
+			<td colspan="<?php echo ($analyte->getCsNumber() * 2) + 2; ?>" align="left" style="border: black 1px solid;padding:2px"></td>
+		    </tr>
+		    <tr>
+			<td  align="center"   colspan="2" style="color:#000; border: black 1px solid;font-size:14px;padding:10px;font-style:bold;"><strong>N</strong> </td>
+			<?php foreach ($calculations as $calculation) : ?>
+                        <td  align="center"   colspan="2" style=" border: black 1px solid;padding:2px;">
+                            <?php echo $calculation['count']; ?>
+                        </td>
+                        <?php endforeach; ?>
+		    </tr>
+		    <tr>
+			<td  align="center"   colspan="2" style="color:#000; border: black 1px solid;font-size:14px;padding:10px;font-style:bold;"><strong>Mean</strong> </td>
+			<?php foreach ($calculations as $calculation) : ?>
+                        <td  style= "mso-number-format:'#,##0.00';" align="center"   colspan="2" style=" border: black 1px solid;padding:2px;">
+                            <?php echo number_format($calculation['prom'],2); ?>
+                        </td>
+                        <?php endforeach; ?>
+		    </tr>
+		    <tr>
+			<td colspan="<?php echo ($analyte->getCsNumber() * 2) + 2; ?>" align="left" style="padding: 10px;">Acceptance criteria: </td>
+		    </tr>
+		    <tr>
+			<td colspan="<?php echo ($analyte->getCsNumber() * 2) + 2; ?>" align="left" style="padding: 10px;">CV (%) ≤15% except LLOQ ≤ 20%</td>
+		    </tr>
+		</table>
+	    </div>
+	</div>
+       </div>
+    </body>
+</html>

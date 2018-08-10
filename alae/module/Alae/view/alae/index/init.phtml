@@ -1,0 +1,61 @@
+<div id="principal">
+    <div id="cuerpo">
+        <div id="central">
+            <a href="<?php echo $this->url('index', array('action' => 'login')); ?>">
+                <img src="<?php echo $this->basePath() . '/img/alaelogo.png' ?> "/>
+            </a>
+            <div id='login'>
+                <h1>Inicio </h1>
+                <form method='POST'  id="loginusr" action="">
+                    
+                    <table>
+                        
+                        <tr>
+                            <td>[<a href="<?php
+				echo $this->basePath();
+				?>"><?php echo 'Alae'; ?></a>]</td>
+                            <td >&nbsp;</td>
+                        </tr><tr>
+
+                            <td>[<?php echo $validation; ?>]</td>
+                            <!-- para efectos de demostración, cambiar por SUBMIT  el botón a continuación-->
+                            <td ></td>
+                        </tr><tr>
+                        </tr>
+                    </table>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+    $("#loginusr").validate({
+	rules: {
+	    username: {
+		required: true
+
+	    },
+	    password: {
+		required: true
+
+
+	    }
+	},
+	messages: {
+	    username: {
+		required: "El campo <strong>Nombre de usuario</strong> es obligatorio"
+
+	    },
+	    password: {
+		required: "El campo <strong>Constraseña</strong> es obligatorio"
+	    }
+
+	},
+	errorLabelContainer: "#errorContainer",
+	wrapper: "li",
+	errorPlacement: function(error, element) {
+
+	}});
+
+</script>

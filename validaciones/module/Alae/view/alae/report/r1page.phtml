@@ -1,0 +1,241 @@
+<nobreak>
+<div>
+
+<table border="0" cellspacing="0" cellpadding="0"  style="padding:20px; width:100%;background-color:#fff;text-aling:center; font-size:20px;">
+<tr>
+<td>
+<strong>INFORMACIÓN GENERAL DE UN ESTUDIO</strong>
+</td>
+</tr>
+</table>
+    
+    <table border="0" cellspacing="0" cellpadding="0" style="padding:20px; width:100%;margin-top:10px;text-aling:center">
+        <tr>
+            <td align="center" height="20" bgcolor="#252525" style="width:10%;color:#fff;text-aling:justify;border: white 1px solid;">
+                <strong>Código del Estudio</strong>
+            </td>
+            <td align="center" height="20" style="border: black 1px solid;">
+                <?php echo $study->getCode(); ?>
+            </td>
+        </tr>
+
+        <tr>
+            <td align="center" height="20" bgcolor="#252525" style="width:10%;color:#fff;text-aling:justify;border: white 1px solid;">
+                <strong>Nº de Analitos</strong>
+            </td>
+            <td   align="center" height="20" style="border: black 1px solid;">
+                <?php echo $counterAnalyte; ?>
+            </td>
+        </tr>
+
+        <tr>
+            <td align="center" height="20" bgcolor="#252525" style="width:10%;color:#fff;text-aling:justify;border: white 1px solid;">
+                <strong>Arbol de Dilución Nº</strong>
+            </td>
+            <td   align="center" height="20" style="border: black 1px solid;">
+                <?php echo $study->getFkDilutionTree(); ?>
+            </td>
+        </tr>
+    </table>
+
+    <table border="0" cellspacing="0" cellpadding="0" style="padding:20px; width:100%;margin-top:10px;text-aling:center">
+
+        <tr>
+            <td  align="center" width ="100" bgcolor="#000000" style="color:#ffffff;border: black 1px solid;font-size:11px;">
+                <strong>Analito</strong>
+            </td>
+            <td colspan="4" bgcolor="#000000"></td>
+            <td  align="center" width ="100" bgcolor="#000000" style="color:#ffffff;border: black 1px solid;font-size:11px;">
+                <strong>Patrón interno</strong>
+            </td>
+            <td colspan="5" bgcolor="#000000"></td>
+        </tr>
+
+        <tr>
+            <td  align="center"  bgcolor="#D8D8D8"   style="color:#000000;font-size:11px;padding:5px;border: black 1px solid;"></td>
+            <td  align="center"  bgcolor="#D8D8D8"   style="color:#000000;font-size:11px;padding:5px;border: black 1px solid;"><strong>Nombre</strong></td>
+            <td  align="center"  bgcolor="#D8D8D8"   style="color:#000000;font-size:11px;padding:5px;border: black 1px solid;"><strong>Abr.</strong></td>
+            <td  align="center"  bgcolor="#D8D8D8"   style="color:#000000;font-size:11px;padding:5px;border: black 1px solid;"><strong>Tret. Mínimo</strong></td>
+            <td  align="center"  bgcolor="#D8D8D8"   style="color:#000000;font-size:11px;padding:5px;border: black 1px solid;"><strong>Tret. Máximo</strong></td>
+            <td  align="center"  bgcolor="#D8D8D8"   style="color:#000000;font-size:11px;padding:5px;border: black 1px solid;"><strong>Nombre</strong></td>
+            <td  align="center"  bgcolor="#D8D8D8"   style="color:#000000;font-size:11px;padding:5px;border: black 1px solid;"><strong>Abr.</strong></td>
+            <td  align="center"  bgcolor="#D8D8D8"   style="color:#000000;font-size:11px;padding:5px;border: black 1px solid;"><strong>% Variabilidad IS </strong></td>
+            <td  align="center"  bgcolor="#D8D8D8"   style="color:#000000;font-size:11px;padding:5px;border: black 1px solid;"><strong>Tret. Mínimo</strong></td>
+            <td  align="center"  bgcolor="#D8D8D8"   style="color:#000000;font-size:11px;padding:5px;border: black 1px solid;"><strong>Tret. Máximo</strong></td>
+            <td  align="center"  bgcolor="#D8D8D8"   style="color:#000000;font-size:11px;padding:5px;border: black 1px solid;"><strong>usar</strong></td>
+        </tr>
+
+        <?php $count = 1; foreach ($analytes as $anaStudy) : ?>
+        <tr>
+            <td  align="center"  width ="100" style="color:#000000;padding:5px;border: black 1px solid;font-size:11px;">
+                <?php echo $count; ?>
+            </td>
+            <td  align="center" width ="100"   style="color:#000000;border: black 1px solid;font-size:11px;">
+                <?php echo $anaStudy->getFkAnalyte()->getName(); ?>
+            </td>
+            <td  align="center" width ="100"  style="color:#000000;border: black 1px solid;font-size:11px;">
+                <?php echo $anaStudy->getFkAnalyte()->getShortening(); ?>
+            </td>
+            <td  align="center" width ="100"  style="color:#000000;border: black 1px solid;font-size:11px;">
+                <?php $anamintret = $anaStudy->getRetentionTimeAnalyte() - $anaStudy->getAcceptanceMargin() / 100 * $anaStudy->getRetentionTimeAnalyte() ?>
+                <?php echo number_format($anamintret,2,'.',''); ?>
+            </td>
+            <td  align="center" width ="100"  style="color:#000000;border: black 1px solid;font-size:11px;">
+                <?php $anamaxtret = $anaStudy->getRetentionTimeAnalyte() + $anaStudy->getAcceptanceMargin() / 100 * $anaStudy->getRetentionTimeAnalyte() ?>
+                <?php echo number_format($anamaxtret,2,'.',''); ?>
+            </td>
+            <td  align="center" width ="100"  style="color:#000000;border: black 1px solid;font-size:11px;">
+                <?php echo $anaStudy->getFkAnalyteIs()->getName(); ?>
+            </td>
+            <td  align="center" width ="100"  style="color:#000000;border: black 1px solid;font-size:11px;">
+                <?php echo $anaStudy->getFkAnalyteIs()->getShortening(); ?>
+            </td>
+            <td  align="center" width ="100"  style="color:#000000;border: black 1px solid;font-size:11px;">
+                <?php echo number_format($anaStudy->getInternalStandard(),2,'.',''); ?>
+            </td>
+            <td  align="center" width ="100"  style="color:#000000;border: black 1px solid;font-size:11px;">
+                <?php $ismintret = $anaStudy->getRetentionTimeIS() - $anaStudy->getAcceptanceMargin() / 100 * $anaStudy->getRetentionTimeIS() ?>
+                <?php echo number_format($ismintret,2,'.',''); ?>
+            </td>
+            <td  align="center" width ="100"  style="color:#000000;border: black 1px solid;font-size:11px;">
+                <?php $ismaxtret = $anaStudy->getRetentionTimeIS() + $anaStudy->getAcceptanceMargin() / 100 * $anaStudy->getRetentionTimeIS() ?>
+                <?php echo number_format($ismaxtret,2,'.',''); ?>
+            </td>
+            <td  align="center" width ="100"  style="color:#000000;border: black 1px solid;font-size:11px;">
+                <?php echo $anaStudy->getIsUsed() ? "S" : "N"; ?>
+            </td>
+        </tr>
+        <?php $count++; endforeach; ?>
+    </table>
+
+    <table border="0" cellspacing="0" cellpadding="0" style="padding:20px; width:100%;margin-top:10px;text-aling:center">
+
+        <tr>
+            <td   aling="left" height=20 colspan="8"  bgcolor="#ffffff" style="color:#000000;font-size:11px;padding:10px">
+                &nbsp;
+            </td>
+        </tr>
+        <tr>
+            <td   aling="left" height=20 colspan="8"  bgcolor="#ffffff" style="color:#000000;font-size:11px;padding:10px">
+                <strong>Concentración Nominal de los Estándares de Calibración</strong>
+            </td>
+        </tr>
+        <tr>
+            <td  align="center" width ="100" bgcolor="#000000" colspan="3" style="color:#ffffff;border: black 1px solid;font-size:11px;">
+                <strong>Identificación de la muestra</strong>
+            </td>
+            <?php foreach ($analytes as $anaStudy) : ?>
+            <td  align="center" width ="100" bgcolor="#000000" style="color:#ffffff;border: black 1px solid;font-size:11px;">
+                <strong>Conc. <?php echo $anaStudy->getFkAnalyte()->getName(); ?></strong>
+            </td>
+            <?php endforeach; ?>
+        </tr>
+        <tr>
+            <td  align="center" width ="100" bgcolor="#000000" colspan="3" style="color:#ffffff;border: black 1px solid;font-size:11px;"></td>
+            <?php foreach ($analytes as $anaStudy) : ?>
+            <td  align="center" width ="100" bgcolor="#000000" style="color:#ffffff;border: black 1px solid;font-size:11px;">
+                <strong>(<?php echo $anaStudy->getFkUnit()->getName(); ?>)</strong>
+            </td>
+            <?php endforeach; ?>
+        </tr>
+        <?php for($i = 0; $i < $anaStudy->getCsNumber(); $i++) : ?>
+        <tr>
+            <td  align="center" width ="100" colspan="3" style="color:#000000;border: black 1px solid;font-size:11px;">
+                CS<?php echo $i + 1; ?>
+            </td>
+            <?php foreach ($cs_values as $key => $value) : ?>
+            <td  align="center" width ="100"  style="color:#000000;border: black 1px solid;font-size:11px;">
+                <?php echo number_format($cs_values[$key][$i], 2, '.', ''); ?>
+            </td>
+            <?php endforeach; ?>
+        </tr>
+        <?php endfor; ?>
+        <tr>
+            <td   aling="left" height=20 colspan="8"  bgcolor="#ffffff" style="color:#000000;font-size:11px;padding:10px">
+                &nbsp;
+            </td>
+        </tr>
+        <tr>
+            <td  align="left"  height=20 colspan="8"  bgcolor="#ffffff" style="color:#000000;font-size:11px;padding:10px">
+                <strong>Concentración Nominal de los Controles de Calidad</strong>
+            </td>
+        </tr>
+        <tr>
+            <td  align="center" width ="100" bgcolor="#000000" colspan="3" style="color:#ffffff;border: black 1px solid;font-size:11px;">
+                Identificación de la muestra
+            </td>
+            <?php foreach ($analytes as $anaStudy) : ?>
+            <td  align="center" width ="100" bgcolor="#000000" style="color:#ffffff;border: black 1px solid;font-size:11px;">
+                <strong>Conc. <?php echo $anaStudy->getFkAnalyte()->getName(); ?></strong>
+            </td>
+            <?php endforeach; ?>
+        </tr>
+        <tr>
+            <td  align="center" width ="100" bgcolor="#000000" colspan="3" style="color:#ffffff;border: black 1px solid;font-size:11px;"></td>
+            <?php foreach ($analytes as $anaStudy) : ?>
+            <td  align="center" width ="100" bgcolor="#000000" style="color:#ffffff;border: black 1px solid;font-size:11px;">
+                <strong>(<?php echo $anaStudy->getFkUnit()->getName(); ?>)</strong>
+            </td>
+            <?php endforeach; ?>
+        </tr>
+        <?php for($i = 0; $i < $anaStudy->getQcNumber(); $i++) : ?>
+        <tr>
+            <td  align="center" width ="100" colspan="3" style="color:#000000;border: black 1px solid;font-size:11px;">
+                QC<?php echo $i + 1; ?>
+            </td>
+            <?php foreach ($qc_values as $key => $value) : ?>
+            <td  align="center" width ="100" style="color:#000000;border: black 1px solid;font-size:11px;">
+                <?php echo number_format($qc_values[$key][$i], 2, '.', ''); ?>
+            </td>
+            <?php endforeach; ?>
+        </tr>
+        <?php endfor; ?>
+        <tr>
+            <td  align="center" width ="100"  colspan="3" style="color:#000000;border: black 1px solid;font-size:11px;">
+                LDQC
+            </td>
+            <?php foreach ($analytes as $anaStudy) : ?>
+            <td  align="center" width ="100"  style="color:#000000;border: black 1px solid;font-size:11px;">
+                <?php echo number_format($anaStudy->getLdqcValues(), 2, '.', ''); ?>
+            </td>
+            <?php endforeach; ?>
+        </tr>
+        <tr>
+            <td  align="center" width ="100"  colspan="3" style="color:#000000;border: black 1px solid;font-size:11px;">
+                HDQC
+            </td>
+            <?php foreach ($analytes as $anaStudy) : ?>
+            <td  align="center" width ="100" style="color:#000000;border: black 1px solid;font-size:11px;">
+                <?php echo number_format($anaStudy->getHdqcValues(), 2, '.', ''); ?>
+            </td>
+            <?php endforeach; ?>
+        </tr>
+        <tr>
+            <td   aling="left" height=20 colspan="8"  bgcolor="#ffffff" style="color:#000000;font-size:11px;padding:10px">&nbsp;</td>
+        </tr>
+        <tr>
+            <td   height=20  height="20" bgcolor="#000000" style="color:#ffffff;font-size:11px;padding:10px">
+                <strong>Elaboración</strong>
+            </td>
+            <td   height=20  height="20"  style="color:#000000;font-size:11px;padding:10px">
+                (<?php echo $study->getFkUser()->getUsername(); ?>)
+            </td>
+        </tr>
+        <tr>
+            <td   height="20" bgcolor="#000000" style="color:#ffffff;font-size:11px;padding:10px">
+                Aprobación:
+            </td>
+            <td   height=20   style="color:#000000;font-size:11px;padding:10px">
+                (<?php echo !is_null($study->getFkUserApprove()) ? $study->getFkUserApprove()->getUsername() : "Sin aprobación"; ?>)
+            </td>
+        </tr>
+        <tr>
+            <td align="center" bgcolor="#fff" style="text-aling:center;" colspan="2">
+                 <?php echo date("d.m.Y H:i:s"); ?>
+            </td>
+        </tr>
+
+    </table>
+
+</div>
+</nobreak>

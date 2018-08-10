@@ -1,0 +1,89 @@
+<div id="cerrar">
+    <a href="<?php echo $this->url('index', array('action' => 'login')); ?>">
+        <img title="regresar a la pantalla de login" src="<?php echo $this->basePath(); ?>/img/close.png"/>
+    </a>
+</div>
+<div id="principal">
+    <div id="cuerpo">
+	<div id="central">
+	    <a href="../alae.html"><img src=" <?php echo $this->basePath(); ?>/img/alaelogo.png" width="400px"/></a>
+	    <div id="login">
+		<h1>Solicitar acceso a ALAE</h1>
+		<form method="POST"  id="newaccount" action="<?php echo $this->url('user', array('action' => 'newaccount')); ?>">
+                    <ul id="errorContainer" <?php if (!$username && !$email) : ?>style="display: none;" <?php endif; ?>>
+                        <?php if ($username) : ?>
+                        <li><label class='error auto'>El <strong>nombre de usuario</strong> ya existe, por favor, intente de nuevo</label></li>
+                        <?php endif; ?>
+                        <?php if ($email) : ?>
+                        <li><label class='error auto'>El <strong>correo electrónico</strong> ya existe, por favor, intente de nuevo</label></li>
+                        <?php endif; ?>
+                    </ul>
+		    <table>
+			<tr>
+                            <td><label for="username">Nombre de usuario:</td>
+			    <td><input id="username" name="username" type="text"></td>
+			</tr>
+			<tr>
+                            <td><label for="email"> Correo electrónico:</td>
+			    <td><input id="email" type="email" name="email"></td>
+                        </tr>
+			<tr>
+                            <td>[ <a href="<?php echo $this->url('index', array('action' => 'login')); ?>">Inicio de sesi&oacute;n</a> ]</td>
+			    <td>
+				<input type="submit" value="Enviar" id="enviar">
+			    </td>
+			</tr>
+			<tr>
+                            <td colspan="2">
+				<p class="peq" style="line-height:1.3em;">
+                                    Le enviaremos un correo electrónico de confirmación a la dirección especificada.<br/>
+				    Usando ese mensaje de correo electrónico podrá solicitar su cuenta. <br/>
+				    Si esta solicitud no se efectúa en siete días, la misma ser&aacute; ignorada.<br/>
+				    Debe introducir una dirección de correo electrónico <strong>CORRECTA</strong>
+				    para poder recibir el mensaje de verificación.
+                                </p>
+			    </td>
+                        </tr>
+		    </table>
+		</form>
+                <script>
+                    jQuery.validator.addMethod("email", function(value, element, params) {
+					//Modificación realizada por Toni según indicación de NATALIA el 27 de Enero para hacer que se acepte cualquier dominio en los correos electrónicos
+                	//return this.optional(element) || /^(((([a-z][\.\-\+_]?)*)[a-z0-9])+)@anapharmeurope.com$/.test(value);
+					return this.optional(element) || /^(((([a-z][\.\-\+_]?)*)[a-z0-9])+)@([a-z][\.\-\+_]?)*$/.test(value);
+                    }, "La dirección de correo electrónico NO se identifica como correo válido. Consulte con el Administrador");
+
+                    //jQuery.validator.addMethod("email", function(value, element, params) {
+                	//return this.optional(element) || /^(((([a-z][\.\-\+_]?)*)[a-z0-9])+)@cilantroit.com$/.test(value);
+                    //}, "El correo electrónico debe ser <strong>abcd@cilantroit.com</strong>");
+
+                    $("#newaccount").validate({
+                        rules: {
+                            username: {
+                                required: true
+
+                            },
+                            email: {
+                                required: true,
+                		email: true
+                            }
+                        },
+                        messages: {
+                            username: {
+                                required: "El campo <strong>Nombre de usuario</strong> es obligatorio",
+                            },
+                            email: {
+                                required: "El campo <strong>Correo electrónico</strong> es obligatorio"
+                            }
+                        },
+                        errorLabelContainer: "#errorContainer",
+                        wrapper: "li",
+                        errorPlacement: function(error, element) {
+                            $(".auto").hide();
+                        }
+                    });
+                </script>
+	    </div>
+	</div>
+    </div>
+</div>

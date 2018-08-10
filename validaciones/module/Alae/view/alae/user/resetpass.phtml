@@ -1,0 +1,57 @@
+<html>
+    <div id="principal">
+	<div id="cuerpo">
+	    <div id="central">
+		<a href="<?php echo $this->url('user', array('action' => 'resetpass')); ?>">
+		    <img src="<?php echo $this->basePath() . '/img/alaelogo.png' ?> "/></a>
+		<div id="login">
+		    <h1>Reinicializar contraseña  </h1>
+		    <?php
+		    echo "<ul id='errorContainer'>" . $message . "</ul>";
+		    ?>
+		    <form method="POST"  id="resetpass" action="<?php echo $this->url('user', array('action' => 'resetpass')); ?>">
+			<table>
+			    <tbody><tr><td>Nombre de usuario:</td>
+				    <td><input type="text" id="username" name="username"></td></tr>
+				<!-- para efectos de demostración, cambiar por SUBMIT  el botón a continuación-->
+
+				<tr><td>[ <a href="<?php
+					echo $this->url('index', array('action' => 'login'));
+					?>"><?php echo 'Inicio de sesión'; ?>]</td>
+				    <td><a href="#"><input type="submit" value="Enviar" id="sentmailrpass"></a></td></tr>
+				<tr><td colspan="2">
+					<p class="peq" style="line-height:1.3em;">Recibirá por correo electrónico una dirección especial para cambiar su contraseña,<br>
+					    que contiene un código de validación para su cuenta. <br>
+					    Por favor siga las instrucciones que recibirá para cambiar su contraseña. </p>
+				    </td></tr>
+			    </tbody></table>
+		    </form>
+		</div>
+	    </div>
+	</div>
+
+    </div>
+    <script>
+	$("#resetpass").validate({
+	    rules: {
+		username: {
+		    required: true
+
+		},
+	    },
+	    messages: {
+		username: {
+		    required: "El campo <strong>Nombre de usuario</strong> es obligatorio"
+
+		},
+	    },
+	    errorLabelContainer: "#errorContainer",
+	    wrapper: "li",
+	    errorPlacement: function(error, element) {
+
+	    }});
+
+    </script>
+
+
+

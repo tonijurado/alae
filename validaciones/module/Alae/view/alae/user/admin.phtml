@@ -1,0 +1,127 @@
+<div id="logo">
+    <img src="<?php echo $this->basePath() ?>/img/alaepeq.png">
+</div>
+<div id="cerrar">
+    [<a href="<?php echo $this->basePath() ?>/index/logout">logout</a>]&nbsp;
+    [<a href="<?php echo Alae\Service\Helper::getVarsConfig('base_url') . '/index/menu' ?>">regresar al menú</a>]
+</div>
+<div id="user-admin">
+    <div id="encab">
+        <h2>administración de usuarios</h2>
+    </div>
+    <div id="datatable" class="<?php echo str_replace(" ", "_", strtolower($user->getFkProfile()->getName())) ?>"></div>
+    <input type="hidden" id="profile" value=""/>
+    <script>
+        var createNumberIncr = 0;
+        var data = <?php echo $data; ?>;
+        var filters = <?php echo $header; ?>;
+        var columns = <?php echo $columns; ?>;
+        var editable = <?php echo $editable; ?>;
+        var filtersHtml = '<?php echo $filters; ?>';
+        var profile = '';
+    </script>
+    <script type="text/javascript" src="<?php echo $this->basePath() ?>/js/datatable.js"></script>
+    <script type="text/javascript">
+        function approve(id)
+        {
+            var profile = $("#profile").val();
+            if (profile === '')
+            {
+                alert("Debe asignar un Nivel de acceso");
+            }
+            else
+            {
+                var answer = confirm("¿Desea aprobar al usuario?");
+                if (answer === true)
+                {
+                    $.ajax
+                    ({
+                        type: "GET",
+                        dataType: "json",
+                        url: basePath + "/user/approve",
+                        data: {id: id, profile: profile},
+                        success: function(data)
+                        {
+                            location.reload();
+                        }
+                    });
+                }
+                else{
+                    return false;
+                }
+            }
+        }
+
+        function reject(id)
+        {
+            var answer = confirm("¿Desea desactivar al usuario?");
+            if (answer === true){
+                $.ajax
+                ({
+                    type: "GET",
+                    dataType: "json",
+                    url: basePath + "/user/reject",
+                    data: {id: id},
+                    success: function(data)
+                    {
+                        location.reload();
+                    }
+                });
+            }
+            else{
+                return false;
+            }
+        }
+
+        function sentpassword(id)
+        {
+            var answer = confirm("¿Desea enviar password?");
+            if (answer === true){
+                $.ajax
+                ({
+                    type: "GET",
+                    dataType: "json",
+                    url: basePath + "/user/sentverification",
+                    data: {id: id},
+                    success: function(data)
+                    {
+                        location.reload();
+                    }
+                });
+            }
+            else{
+                return false;
+            }
+        }
+
+        function changeProfile(id)
+        {
+            var profile = $("#profile").val();
+            if (profile === '')
+            {
+                alert("Debe cambiar el Nivel de acceso");
+            }
+            else
+            {
+                var answer = confirm("¿Desea cambiar el nivel de acceso?");
+                if (answer === true)
+                {
+                    $.ajax
+                    ({
+                        type: "GET",
+                        dataType: "json",
+                        url: basePath + "/user/change",
+                        data: {id: id, profile: profile},
+                        success: function(data)
+                        {
+                            location.reload();
+                        }
+                    });
+                }
+                else{
+                    return false;
+                }
+            }
+        }
+    </script>
+</div>

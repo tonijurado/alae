@@ -1,0 +1,96 @@
+<?php
+header('Content-Disposition: attachment; filename="' . $filename . '.xls";');
+header('Content-Type: application/vnd.ms-excel;charset=utf-8');
+?>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title></title>
+    </head>
+    <body>
+        <table width="890" border="0" cellspacing="0" cellpadding="0"  style="background-color:#fff;padding:10px 0 0 0;">
+            <tr>
+                <td width="238" colspan="2" align="left" height="20"  style="padding:10px 0 0 0;">
+                    <strong>LISTADO DE MUESTRAS CON INTEGRACIÓN MODIFICADA</strong>
+                </td>
+            </tr>
+            <tr>
+                <td width="238" align="left" height="20">
+                    Study No:
+                </td>
+                <td width="205" height="20" style="">
+                    <?php echo $study; ?>
+                </td>
+            </tr>
+            <tr>
+                <td width="238" align="left" height="20"  style="padding: 10px 0 0 0">
+                    Analyte:
+                </td>
+                <td width="205" height="20" style="">
+                    <?php echo $analyte; ?>
+                </td>
+            </tr>
+        </table>
+        <div class="cler"></div>
+        <table width="900" border="0" cellspacing="0" cellpadding="0"  style="background-color:#fff;margin-top:10px;text-aling:center;">
+            <tr>
+                <td  colspan="4" align="center"></td>
+            </tr>
+            <tr>
+                <td  align="center"   style="color:#000; border: black 1px solid;font-size:11px;padding:10px">Identificación de la muestra</td>
+                <td  align="center"  style=" border: black 1px solid;font-size:11px;padding:10px">Analyte integration Type</td>
+                <td  align="center"   style=" border: black 1px solid;font-size:11px;padding:10px">IS integration Type</td>
+                <td align="center"   style="border: black 1px solid;font-size:11px;padding:10px"> Tabla de resultados del lote</td>
+            </tr>
+            <?php foreach ($list as $key => $value) : ?>
+            <tr>
+                <td align="center"  height="20px"  style="color:#000; border: black 1px solid;font-size:11px;padding:4px">
+                    <?php echo $value['sampleName']; ?>
+                </td>
+                <td  align="center" style=" border: black 1px solid;font-size:11px;padding:4px">
+                    <?php echo $value['analyteIntegrationType']; ?>
+                </td>
+                <td  align="center" style=" border: black 1px solid;font-size:11px;padding:4px">
+                    <?php echo $value['isIntegrationType']; ?>
+                </td>
+                <td align="center" style="border: black 1px solid;font-size:11px;padding:4px">
+                    
+                    <?php echo substr($value['filename'], 0, -4); ?>
+                </td>
+            </tr>
+            <?php $count++; endforeach; ?>
+        </table>
+
+        <table width="890" border="0" cellspacing="0" cellpadding="0"  style="background-color:#fff;padding:10px 0 0 0;">
+            <tr>
+                <td  colspan="4" align="center"></td>
+            </tr>
+            <tr>
+                <td width="238" align="left" height="20">
+                    N° total de muestras con integración modificada:
+                </td>
+                <td width="205" height="20" style="">
+                    <?php echo $recordModified; ?>
+                </td>
+            </tr>
+            <tr>
+                <td width="238" align="left" height="20"  style="padding: 10px 0 0 0">
+                    N° total de muestras analizadas:
+                </td>
+                <td width="205" height="20" style="">
+                    <?php echo $countTot1; ?>
+                </td>
+            </tr>
+            <tr>
+                <td width="238" align="left" height="20"  style="padding: 10px 0 0 0">
+                    % Muestras con integración modificada:
+                </td>
+                <td width="205" height="20" style="">
+                    <?php echo $percent; ?>
+                </td>
+            </tr>
+        </table>
+
+    </body>
+</html>
