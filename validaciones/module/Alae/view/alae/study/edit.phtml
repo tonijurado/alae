@@ -2,7 +2,19 @@
     <img src="<?php echo $this->basePath() ?>/img/alaepeq.png">
 </div>
 <div id="cerrar">
-    [<a href="<?php echo Alae\Service\Helper::getVarsConfig('base_url') . '/study/index' ?>">cerrar ficha</a>]&nbsp;
+    <?php if ($state == 'open')
+    {
+    ?>
+        [<a href="<?php echo Alae\Service\Helper::getVarsConfig('base_url') . '/study/index' ?>">cerrar ficha</a>]&nbsp;
+    <?php
+    }
+    else
+    {
+    ?>
+        [<a href="<?php echo Alae\Service\Helper::getVarsConfig('base_url') . '/study/indexClose' ?>">cerrar ficha</a>]&nbsp;
+    <?php   
+    }
+    ?>
     [<a href="<?php echo Alae\Service\Helper::getVarsConfig('base_url') . '/index/menu' ?>">regresar al menú</a>]
 </div>
 <div id="cuerpo">
@@ -26,6 +38,36 @@
                     <?php if (($user->isAdministrador() || $user->isDirectorEstudio()) && !$study->getCloseFlag()) : ?>
                     <button class="btn" type="button" onclick="changeStatus('/study/close', <?php echo $study->getPkStudy(); ?>, 1)"><span class="btn-lock"></span> cerrar estudio</button>
                     <?php endif; ?>
+                </p>
+                <p>
+                <label>Validación:</label>
+                <?php 
+                    if($study->getValidation() == 0)
+                    {
+                        $validation = "Total";
+                    } 
+                    else
+                    {
+                        $validation = "Parcial";
+                    }
+                
+                ?>
+                <input type="text" id="validationName" name="validationName" value="<?php echo $validation; ?>" readonly>
+                </p>
+                <p>
+                <label>Verificación V13:</label>
+                <?php 
+                    if($study->getVerification() == 1)
+                    {
+                        $verification = "Sí";
+                    } 
+                    else
+                    {
+                        $verification = "No";
+                    }
+                
+                ?>
+                <input type="text" id="verificationName" name="verificationName" value="<?php echo $verification; ?>" readonly>
                 </p>
                 <p>
                     <label>Descripción:</label>

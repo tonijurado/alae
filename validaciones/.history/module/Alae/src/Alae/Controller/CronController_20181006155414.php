@@ -36,6 +36,25 @@ class CronController extends BaseController
     }
 
     /**
+     * Verificamos que el lote no exista.
+     */
+    private function isExistBatch($fileName)
+    {
+        $query = $this->getEntityManager()->createQuery("
+                SELECT COUNT(b.pkBatch)
+                FROM Alae\Entity\Batch b
+                WHERE b.fileName = '" . $fileName . "'");
+        $count = $query->getSingleScalarResult();
+
+        if ($count == 0)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Verificamos que el lote no se encuentre repetido.
      */
     private function isRepeatedBatch($fileName)
@@ -108,20 +127,25 @@ class CronController extends BaseController
             $this->_other = array();
             if (!is_dir($file))
             {
-                if(!$this->isRepeatedBatch($file))
+                //verificamos que el lote no exista
+                //retorna false si no existe
+                if(!$this->isExistBatch($file))
                 {
-                    if (preg_match("/^([a-zA-Z0-9]+-\d{4}(-[0-9]+)?)\+(M|O|R)[0-9]*\_[a-zA-Z0-9]+\.txt$/i", $file))
+                    if(!$this->isRepeatedBatch($file))
                     {
-                        $this->validateFile($file);
+                        if (preg_match("/^([a-zA-Z0-9]+-\d{4}(-[0-9]+)?)\+(M|O|R|X)[0-9]*\_(([a-zA-Z0-9](-|\.|,)?\s*)+|(\((\+|-)\)-[a-zA-Z0-9]+))\.txt$/i", $file))
+                        {
+                            $this->validateFile($file);
+                        }
                     }
-                }
 
-                $this->insertBatch($file, $this->_Study, $this->_Analyte);
-                rename(Helper:: getVarsConfig("batch_directory") . "/" . $file, Helper:: getVarsConfig("batch_directory_older") . "/" . $file);
+                    $this->insertBatch($file, $this->_Study, $this->_Analyte);
+                    rename(Helper:: getVarsConfig("batch_directory") . "/" . $file, Helper:: getVarsConfig("batch_directory_older") . "/" . $file);
 
-                if (file_exists(Helper:: getVarsConfig("batch_directory") . "/" . $file))
-                {
-                    unlink(Helper:: getVarsConfig("batch_directory") . "/" . $file);
+                    if (file_exists(Helper:: getVarsConfig("batch_directory") . "/" . $file))
+                    {
+                        unlink(Helper:: getVarsConfig("batch_directory") . "/" . $file);
+                    }
                 }
             }
         }
@@ -138,26 +162,14 @@ class CronController extends BaseController
     protected function explodeFile($file)
     {
         $string = substr($file, 0, -4);
-        $array = explode("-", $string);
+        $studyBatch = preg_replace("/(\+(M|O|R|X)[0-9]*\_(([a-zA-Z0-9](-|\.|,)?\s*)+|(\((\+|-)\)-[a-zA-Z0-9]+)))/", "", $string);
+        $array = explode("-", $studyBatch);
 
-        if (count($array) == 3)
-        {
-            $return = array(
-                "batch"   => $array[0],
-                "study"   => $array[1],
-                "analyte" => preg_replace("/[0-9]+\+(M|O|R)[0-9]*\_/", "", $array[2])
-            );
-        }
-        else
-        {
-            $return = array(
-                "batch"   => $array[0],
-                "study"   => preg_replace("/\+(M|O|R)[0-9]*\_[a-zA-Z0-9]+/", "", $array[1]),
-                "analyte" => preg_replace("/[0-9]+\+(M|O|R)[0-9]*\_/", "", $array[1])
-            );
-        }
-
-        return $return;
+        return array(
+            "batch"   => $array[0],
+            "study"   => preg_replace("/(\+(M|O|R|X)[0-9]*\_)/", "", $array[1]),
+            "analyte" => preg_replace("/(([a-zA-Z0-9]+-\d{4}(-[0-9]+)?)\+(M|O|R|X)[0-9]*\_)/", "", $string)
+        );
     }
 
     /**
@@ -167,25 +179,36 @@ class CronController extends BaseController
     private function insertBatch($fileName, $Study, $Analyte)
     {
         $data  = $this->getData(Helper::getVarsConfig("batch_directory") . "/" . $fileName, $Study, $Analyte);
-        $Batch = $this->saveBatch($fileName);
-
-        if(count($data["data"]) > 0)
+        
+        $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V1.1"));
+        $value      = $parameters[0]->getMinValue();
+        $fileSize = $data["size"];
+        $Batch = $this->saveBatch($fileName, $fileSize);
+        //si el tamaño del archivo es mayor que el tamaño del parametro
+        if($fileSize > $value)
         {
-            $this->saveSampleBatch($data["headers"], $data['data'], $Batch);
-
-            if (!is_null($Analyte) && !is_null($Study))
+            $this->execute(\Alae\Service\Verification::updateBatch("b.pkBatch = " . $Batch->getPkBatch(), "V1.1"));
+        }
+        else
+        {    
+            if(count($data["data"]) > 0)
             {
-                $this->batchVerify($Batch, $Analyte, $fileName);
-                $this->updateBatch($Batch, $Analyte, $Study);
+                $this->saveSampleBatch($data["headers"], $data['data'], $Batch);
+
+                if (!is_null($Analyte) && !is_null($Study))
+                {
+                    $this->batchVerify($Batch, $Analyte, $fileName);
+                    $this->updateBatch($Batch, $Analyte, $Study);
+                }
+                else
+                {
+                    $this->execute(\Alae\Service\Verification::updateBatch("b.pkBatch = " . $Batch->getPkBatch(), "V1"));
+                }
             }
             else
             {
                 $this->execute(\Alae\Service\Verification::updateBatch("b.pkBatch = " . $Batch->getPkBatch(), "V1"));
             }
-        }
-        else
-        {
-            $this->execute(\Alae\Service\Verification::updateBatch("b.pkBatch = " . $Batch->getPkBatch(), "V1"));
         }
     }
 
@@ -220,6 +243,8 @@ class CronController extends BaseController
         $content = fread($fp, filesize($filename));
         fclose($fp);
 
+        $size = filesize($filename);
+
         $lines    = explode("\n", $content);
         $continue = false;
         $data     = $headers  = $other    = array();
@@ -245,16 +270,26 @@ class CronController extends BaseController
 
         return array(
             "headers" => $headers,
-            "data"    => $data
+            "data"    => $data,
+            "size"    => $size
         );
     }
 
     private function setter($headers, $elements)
     {
         $orderHeader = array();
-
+		
+		$findme = 'µ';
         foreach ($headers as $key => $value)
         {
+			//encontrar las micras
+			$pos = strpos($value, $findme);
+			
+			if ($pos !== false)
+			{
+				//quitar las unidades y dejar solo el nombre
+				$value = substr($value, 0, -9);
+			}
             if (array_key_exists($value, $elements))
             {
                 $orderHeader[$key] = $elements[$value];
@@ -267,13 +302,14 @@ class CronController extends BaseController
     /*
      * Función que se encarga del almacenamiento del batch
      */
-    private function saveBatch($fileName)
+    private function saveBatch($fileName, $fileSize)
     {
         $response = $this->explodeFile($fileName);
 
         $Batch = new \Alae\Entity\Batch();
         $Batch->setSerial((string) $response['batch']);
         $Batch->setFileName($fileName);
+        $Batch->setFileSize($fileSize);
         $Batch->setFkUser($this->_getSystem());
         $this->getEntityManager()->persist($Batch);
         $this->getEntityManager()->flush();
@@ -321,9 +357,10 @@ class CronController extends BaseController
         $header   = array();
         $continue = false;
         $count    = 0;
+
         foreach ($this->_other as $line)
         {
-            if (strstr($line, $Analyte->getShortening()))
+            if (strtolower(preg_replace("/\s+/i", "", $line)) == strtolower(sprintf("peakname:%s",$Analyte->getShortening())))
             {
                 $continue = true;
                 continue;
@@ -420,7 +457,7 @@ class CronController extends BaseController
     private function saveSampleBatch($headers, $data, $Batch)
     {
         $setters = $this->setter($headers, $this->getSampleBatch());
-
+        var_dump($setters);
         foreach ($data as $row)
         {
             $SampleBatch = new \Alae\Entity\SampleBatch();
@@ -431,7 +468,8 @@ class CronController extends BaseController
                 {
                     if (isset($setters[$key]))
                     {
-                        $SampleBatch->$setters[$key]($value);
+                        $SampleBatch->$setters[$key];
+                        die();
                     }
                 }
                 $SampleBatch->setFkBatch($Batch);

@@ -41,10 +41,11 @@
     <table border="0" cellspacing="0" cellpadding="0" style="padding:20px; width:100%;margin-top:10px;text-aling:center">
 
         <tr>
-            <td  align="center" width ="100" bgcolor="#000000" style="color:#ffffff;border: black 1px solid;font-size:11px;">
+        <td colspan="1" bgcolor="#000000"></td>
+            <td align="center" width ="100" bgcolor="#000000" style="color:#ffffff;border: black 1px solid;font-size:11px;">
                 <strong>Analito</strong>
             </td>
-            <td colspan="4" bgcolor="#000000"></td>
+            <td colspan="3" bgcolor="#000000"></td>
             <td  align="center" width ="100" bgcolor="#000000" style="color:#ffffff;border: black 1px solid;font-size:11px;">
                 <strong>Patrón interno</strong>
             </td>
@@ -53,15 +54,15 @@
 
         <tr>
             <td  align="center"  bgcolor="#D8D8D8"   style="color:#000000;font-size:11px;padding:5px;border: black 1px solid;"></td>
-            <td  align="center"  bgcolor="#D8D8D8"   style="color:#000000;font-size:11px;padding:5px;border: black 1px solid;"><strong>Nombre</strong></td>
+            <td  align="center"  bgcolor="#D8D8D8"   style="color:#000000;font-size:11px;padding:5px;border: black 1px solid;"><strong>Analito</strong></td>
             <td  align="center"  bgcolor="#D8D8D8"   style="color:#000000;font-size:11px;padding:5px;border: black 1px solid;"><strong>Abr.</strong></td>
-            <td  align="center"  bgcolor="#D8D8D8"   style="color:#000000;font-size:11px;padding:5px;border: black 1px solid;"><strong>Tret. Mínimo</strong></td>
-            <td  align="center"  bgcolor="#D8D8D8"   style="color:#000000;font-size:11px;padding:5px;border: black 1px solid;"><strong>Tret. Máximo</strong></td>
-            <td  align="center"  bgcolor="#D8D8D8"   style="color:#000000;font-size:11px;padding:5px;border: black 1px solid;"><strong>Nombre</strong></td>
+            <td  align="center"  bgcolor="#D8D8D8"   style="color:#000000;font-size:11px;padding:5px;border: black 1px solid;"><strong>Tr. Mínimo</strong></td>
+            <td  align="center"  bgcolor="#D8D8D8"   style="color:#000000;font-size:11px;padding:5px;border: black 1px solid;"><strong>Tr. Máximo</strong></td>
+            <td  align="center"  bgcolor="#D8D8D8"   style="color:#000000;font-size:11px;padding:5px;border: black 1px solid;"><strong>Patrón interno (IS)</strong></td>
             <td  align="center"  bgcolor="#D8D8D8"   style="color:#000000;font-size:11px;padding:5px;border: black 1px solid;"><strong>Abr.</strong></td>
-            <td  align="center"  bgcolor="#D8D8D8"   style="color:#000000;font-size:11px;padding:5px;border: black 1px solid;"><strong>% Variabilidad IS </strong></td>
-            <td  align="center"  bgcolor="#D8D8D8"   style="color:#000000;font-size:11px;padding:5px;border: black 1px solid;"><strong>Tret. Mínimo</strong></td>
-            <td  align="center"  bgcolor="#D8D8D8"   style="color:#000000;font-size:11px;padding:5px;border: black 1px solid;"><strong>Tret. Máximo</strong></td>
+            <td  align="center"  bgcolor="#D8D8D8"   style="color:#000000;font-size:11px;padding:5px;border: black 1px solid;"><strong>Tr. Mínimo (IS)</strong></td>
+            <td  align="center"  bgcolor="#D8D8D8"   style="color:#000000;font-size:11px;padding:5px;border: black 1px solid;"><strong>Tr. Máximo (IS)</strong></td>
+            <td  align="center"  bgcolor="#D8D8D8"   style="color:#000000;font-size:11px;padding:5px;border: black 1px solid;"><strong>% Variabilidad (IS) </strong></td>
             <td  align="center"  bgcolor="#D8D8D8"   style="color:#000000;font-size:11px;padding:5px;border: black 1px solid;"><strong>usar</strong></td>
         </tr>
 
@@ -77,12 +78,12 @@
                 <?php echo $anaStudy->getFkAnalyte()->getShortening(); ?>
             </td>
             <td  align="center" width ="100"  style="color:#000000;border: black 1px solid;font-size:11px;">
-                <?php $anamintret = $anaStudy->getRetentionTimeAnalyte() - $anaStudy->getAcceptanceMargin() / 100 * $anaStudy->getRetentionTimeAnalyte() ?>
-                <?php echo number_format($anamintret,2,'.',''); ?>
+                <?php $min = $anaStudy->getRetention() - ($anaStudy->getAcceptance() * $anaStudy->getRetention() / 100);?>
+                <?php echo number_format($min,2,'.',''); ?>
             </td>
             <td  align="center" width ="100"  style="color:#000000;border: black 1px solid;font-size:11px;">
-                <?php $anamaxtret = $anaStudy->getRetentionTimeAnalyte() + $anaStudy->getAcceptanceMargin() / 100 * $anaStudy->getRetentionTimeAnalyte() ?>
-                <?php echo number_format($anamaxtret,2,'.',''); ?>
+                <?php $max = $anaStudy->getRetention() + ($anaStudy->getAcceptance() * $anaStudy->getRetention() / 100); ?>
+                <?php echo number_format($max,2,'.',''); ?>
             </td>
             <td  align="center" width ="100"  style="color:#000000;border: black 1px solid;font-size:11px;">
                 <?php echo $anaStudy->getFkAnalyteIs()->getName(); ?>
@@ -91,15 +92,15 @@
                 <?php echo $anaStudy->getFkAnalyteIs()->getShortening(); ?>
             </td>
             <td  align="center" width ="100"  style="color:#000000;border: black 1px solid;font-size:11px;">
+                <?php $min_is = $anaStudy->getRetentionIs() - ($anaStudy->getAcceptanceIs() * $anaStudy->getRetentionIs() / 100); ?>
+                <?php echo number_format($min_is,2,'.',''); ?>
+            </td>
+            <td  align="center" width ="100"  style="color:#000000;border: black 1px solid;font-size:11px;">
+                <?php $max_is = $anaStudy->getRetentionIs() + ($anaStudy->getAcceptanceIs() * $anaStudy->getRetentionIs() / 100); ?>
+                <?php echo number_format($max_is,2,'.',''); ?>
+            </td>
+            <td  align="center" width ="100"  style="color:#000000;border: black 1px solid;font-size:11px;">
                 <?php echo number_format($anaStudy->getInternalStandard(),2,'.',''); ?>
-            </td>
-            <td  align="center" width ="100"  style="color:#000000;border: black 1px solid;font-size:11px;">
-                <?php $ismintret = $anaStudy->getRetentionTimeIS() - $anaStudy->getAcceptanceMargin() / 100 * $anaStudy->getRetentionTimeIS() ?>
-                <?php echo number_format($ismintret,2,'.',''); ?>
-            </td>
-            <td  align="center" width ="100"  style="color:#000000;border: black 1px solid;font-size:11px;">
-                <?php $ismaxtret = $anaStudy->getRetentionTimeIS() + $anaStudy->getAcceptanceMargin() / 100 * $anaStudy->getRetentionTimeIS() ?>
-                <?php echo number_format($ismaxtret,2,'.',''); ?>
             </td>
             <td  align="center" width ="100"  style="color:#000000;border: black 1px solid;font-size:11px;">
                 <?php echo $anaStudy->getIsUsed() ? "S" : "N"; ?>
@@ -207,6 +208,26 @@
             <?php foreach ($analytes as $anaStudy) : ?>
             <td  align="center" width ="100" style="color:#000000;border: black 1px solid;font-size:11px;">
                 <?php echo number_format($anaStudy->getHdqcValues(), 2, '.', ''); ?>
+            </td>
+            <?php endforeach; ?>
+        </tr>
+        <tr>
+            <td  align="center" width ="100"  colspan="3" style="color:#000000;border: black 1px solid;font-size:11px;">
+                LLQC
+            </td>
+            <?php foreach ($analytes as $anaStudy) : ?>
+            <td  align="center" width ="100" style="color:#000000;border: black 1px solid;font-size:11px;">
+                <?php echo number_format($anaStudy->getLlqcValues(), 2, '.', ''); ?>
+            </td>
+            <?php endforeach; ?>
+        </tr>
+        <tr>
+            <td  align="center" width ="100"  colspan="3" style="color:#000000;border: black 1px solid;font-size:11px;">
+                ULQC
+            </td>
+            <?php foreach ($analytes as $anaStudy) : ?>
+            <td  align="center" width ="100" style="color:#000000;border: black 1px solid;font-size:11px;">
+                <?php echo number_format($anaStudy->getUlqcValues(), 2, '.', ''); ?>
             </td>
             <?php endforeach; ?>
         </tr>

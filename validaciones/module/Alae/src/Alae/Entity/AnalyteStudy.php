@@ -27,14 +27,14 @@ class AnalyteStudy
      *
      * @ORM\Column(name="cs_number", type="integer", nullable=false)
      */
-    protected $csNumber = '8';
+    protected $csNumber = '15';
 
     /**
      * @var integer
      *
      * @ORM\Column(name="qc_number", type="integer", nullable=false)
      */
-    protected $qcNumber = '4';
+    protected $qcNumber = '6';
 
     /**
      * @var string
@@ -46,16 +46,30 @@ class AnalyteStudy
     /**
      * @var string
      *
-     * @ORM\Column(name="hdqc_values", type="decimal", precision=19, scale=4, nullable=false)
+     * @ORM\Column(name="hdqc_values", type="decimal", precision=19, scale=2, nullable=false)
      */
     protected $hdqcValues;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="ldqc_values", type="decimal", precision=19, scale=4, nullable=false)
+     * @ORM\Column(name="ldqc_values", type="decimal", precision=19, scale=2, nullable=false)
      */
     protected $ldqcValues;
+
+        /**
+     * @var string
+     *
+     * @ORM\Column(name="llqc_values", type="decimal", precision=19, scale=2, nullable=false)
+     */
+    protected $llqcValues;
+
+        /**
+     * @var string
+     *
+     * @ORM\Column(name="ulqc_values", type="decimal", precision=19, scale=2, nullable=false)
+     */
+    protected $ulqcValues;
 
     /**
      * @var string
@@ -155,23 +169,30 @@ class AnalyteStudy
     /**
      * @var string
      *
-     * @ORM\Column(name="retention_time_analyte", type="decimal", precision=19, scale=4, nullable=false)
+     * @ORM\Column(name="retention", type="decimal", precision=19, scale=4, nullable=false)
      */
-    protected $retentionTimeAnalyte = 0;
+    protected $retention = 0;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="retention_time_is", type="decimal", precision=19, scale=4, nullable=false)
+     * @ORM\Column(name="acceptance", type="decimal", precision=19, scale=4, nullable=false)
      */
-    protected $retentionTimeIS = 0;
+    protected $acceptance = 0;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="acceptance_margin", type="decimal", precision=19, scale=4, nullable=false)
+     * @ORM\Column(name="retention_is", type="decimal", precision=19, scale=4, nullable=false)
      */
-    protected $acceptanceMargin = 0;
+    protected $retentionIs = 0;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="acceptance_is", type="decimal", precision=19, scale=4, nullable=false)
+     */
+    protected $acceptanceIs = 0;
 
     public function __construct()
     {
@@ -348,33 +369,63 @@ class AnalyteStudy
         return $this->hdqcValues;
     }
 
-    public function getRetentionTimeAnalyte()
+    public function setLlqcValues($llqcValues)
     {
-        return (float) $this->retentionTimeAnalyte;
+        $this->llqcValues = $llqcValues;
     }
 
-    public function setRetentionTimeAnalyte($retentionTimeAnalyte)
+    public function getLlqcValues()
     {
-        $this->retentionTimeAnalyte = $retentionTimeAnalyte;
+        return $this->llqcValues;
     }
 
-    public function getRetentionTimeIS()
+    public function setUlqcValues($ulqcValues)
     {
-        return (float) $this->retentionTimeIS;
+        $this->ulqcValues = $ulqcValues;
     }
 
-    public function setRetentionTimeIS($retentionTimeIS)
+    public function getUlqcValues()
     {
-        $this->retentionTimeIS = $retentionTimeIS;
+        return $this->ulqcValues;
     }
 
-    public function getAcceptanceMargin()
+    public function getRetention()
     {
-        return (float) $this->acceptanceMargin;
+        return (float) $this->retention;
     }
 
-    public function setAcceptanceMargin($acceptanceMargin)
+    public function setRetention($retention)
     {
-        $this->acceptanceMargin = $acceptanceMargin;
+        $this->retention = $retention;
+    }
+
+    public function getAcceptance()
+    {
+        return (float) $this->acceptance;
+    }
+
+    public function setAcceptance($acceptance)
+    {
+        $this->acceptance = $acceptance;
+    }
+
+    public function getRetentionIs()
+    {
+        return (float) $this->retentionIs;
+    }
+
+    public function setRetentionIs($retentionIs)
+    {
+        $this->retentionIs = $retentionIs;
+    }
+
+    public function getAcceptanceIs()
+    {
+        return (float) $this->acceptanceIs;
+    }
+
+    public function setAcceptanceIs($acceptanceIs)
+    {
+        $this->acceptanceIs = $acceptanceIs;
     }
 }

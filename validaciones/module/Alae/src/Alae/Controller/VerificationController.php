@@ -37,6 +37,7 @@ class VerificationController extends BaseController
         {
 
             $Batch = $this->getRepository()->find($this->getEvent()->getRouteMatch()->getParam('id'));
+            
             for ($i = 4; $i < 12; $i++)
             {
                 $function = 'V' . $i;
@@ -90,6 +91,10 @@ class VerificationController extends BaseController
         $min4 = $parameters[0]->getMinValue();
         $max4 = $parameters[0]->getMaxValue();
 
+        $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.5"));
+        $min5 = $parameters[0]->getMinValue();
+        $max5 = $parameters[0]->getMaxValue();
+
         if ($request->isPost())
         {
             $Batch = $this->getRepository()->find($request->getPost('id'));
@@ -101,14 +106,16 @@ class VerificationController extends BaseController
 
             $where = "s.fkBatch = " . $Batch->getPkBatch() . "
                 AND (
-                       (s.sampleName LIKE 'CS1%' AND s.accuracy NOT BETWEEN " . $min1  . " AND " . $max1 . " AND s.useRecord = 1)
+                    ((s.sampleName LIKE 'CS1%' OR s.sampleName LIKE 'LLOQ%' OR s.sampleName LIKE 'LLQC%') AND s.accuracy NOT BETWEEN " . $min1  . " AND " . $max1 . " AND s.useRecord = 1)
                     OR (REGEXP(s.sampleName, :regexp1) = 1 AND s.sampleName NOT LIKE 'CS1%' AND s.accuracy NOT BETWEEN " . $min2 . " AND " . $max2 . " AND s.useRecord = 1)
                     OR (REGEXP(s.sampleName, :regexp2) = 1 AND s.accuracy NOT BETWEEN " . $min3 . " AND " . $max3 . " AND s.useRecord = 1)
-                    OR (REGEXP(s.sampleName, :regexp3) = 1 AND s.accuracy NOT BETWEEN " . $min4 . " AND " . $max4 . " AND s.useRecord = 1)
-                    OR (s.sampleName LIKE 'CS1%' AND s.accuracy BETWEEN " . $min1  . " AND " . $max1 . " AND s.useRecord = 0)
+                    OR (s.sampleName LIKE 'TZ%' AND s.accuracy NOT BETWEEN " . $min4 . " AND " . $max4 . " AND s.useRecord = 1)
+                    OR (REGEXP(s.sampleName, :regexp3) = 1 AND s.accuracy NOT BETWEEN " . $min5 . " AND " . $max5 . " AND s.useRecord = 1)
+                    OR ((s.sampleName LIKE 'CS1%' OR s.sampleName LIKE 'LLOQ%' OR s.sampleName LIKE 'LLQC%') AND s.accuracy BETWEEN " . $min1  . " AND " . $max1 . " AND s.useRecord = 0)
                     OR (REGEXP(s.sampleName, :regexp1) = 1 AND s.sampleName NOT LIKE 'CS1%' AND s.accuracy BETWEEN " . $min2 . " AND " . $max2 . " AND s.useRecord = 0)
                     OR (REGEXP(s.sampleName, :regexp2) = 1 AND s.accuracy BETWEEN " . $min3 . " AND " . $max3 . " AND s.useRecord = 0)
-                    OR (REGEXP(s.sampleName, :regexp3) = 1 AND s.accuracy BETWEEN " . $min4 . " AND " . $max4 . " AND s.useRecord = 0)
+                    OR (s.sampleName LIKE 'TZ%' AND s.accuracy BETWEEN " . $min4 . " AND " . $max4 . " AND s.useRecord = 0)
+                    OR (REGEXP(s.sampleName, :regexp3) = 1 AND s.accuracy BETWEEN " . $min5 . " AND " . $max5 . " AND s.useRecord = 0)
                 )";
 
             $this->error($where, $parameters[0], array('regexp1' => '^CS[0-9]+(-[0-9]+)?$','regexp2' => '^QC[0-9]+(-[0-9]+)?$','regexp3' => '^((L|H)?DQC)[0-9]+(-[0-9]+)?$'), false);
@@ -125,14 +132,17 @@ class VerificationController extends BaseController
             FROM Alae\Entity\SampleBatch s
             WHERE s.fkBatch = " . $Batch->getPkBatch() . "
                 AND (
-                       (s.sampleName LIKE 'CS1%' AND s.accuracy NOT BETWEEN " . $min1  . " AND " . $max1 . " AND s.useRecord = 1)
+                    ((s.sampleName LIKE 'CS1%' OR s.sampleName LIKE 'LLOQ%' OR s.sampleName LIKE 'LLQC%') AND s.accuracy NOT BETWEEN " . $min1  . " AND " . $max1 . " AND s.useRecord = 1)
                     OR (REGEXP(s.sampleName, :regexp1) = 1 AND s.sampleName NOT LIKE 'CS1%' AND s.accuracy NOT BETWEEN " . $min2 . " AND " . $max2 . " AND s.useRecord = 1)
                     OR (REGEXP(s.sampleName, :regexp2) = 1 AND s.accuracy NOT BETWEEN " . $min3 . " AND " . $max3 . " AND s.useRecord = 1)
-                    OR (REGEXP(s.sampleName, :regexp3) = 1 AND s.accuracy NOT BETWEEN " . $min4 . " AND " . $max4 . " AND s.useRecord = 1)
-                    OR (s.sampleName LIKE 'CS1%' AND s.accuracy BETWEEN " . $min1  . " AND " . $max1 . " AND s.useRecord = 0)
+                    OR (s.sampleName LIKE 'TZ%' AND s.accuracy NOT BETWEEN " . $min4 . " AND " . $max4 . " AND s.useRecord = 1)
+                    OR (REGEXP(s.sampleName, :regexp3) = 1 AND s.accuracy NOT BETWEEN " . $min5 . " AND " . $max5 . " AND s.useRecord = 1)
+                    OR ((s.sampleName LIKE 'CS1%' OR s.sampleName LIKE 'LLOQ%' OR s.sampleName LIKE 'LLQC%') AND s.accuracy BETWEEN " . $min1  . " AND " . $max1 . " AND s.useRecord = 0)
                     OR (REGEXP(s.sampleName, :regexp1) = 1 AND s.sampleName NOT LIKE 'CS1%' AND s.accuracy BETWEEN " . $min2 . " AND " . $max2 . " AND s.useRecord = 0)
                     OR (REGEXP(s.sampleName, :regexp2) = 1 AND s.accuracy BETWEEN " . $min3 . " AND " . $max3 . " AND s.useRecord = 0)
-                    OR (REGEXP(s.sampleName, :regexp3) = 1 AND s.accuracy BETWEEN " . $min4 . " AND " . $max4 . " AND s.useRecord = 0)
+                    OR (s.sampleName LIKE 'TZ%' AND s.accuracy BETWEEN " . $min4 . " AND " . $max4 . " AND s.useRecord = 0)
+                    OR (REGEXP(s.sampleName, :regexp3) = 1 AND s.accuracy BETWEEN " . $min5 . " AND " . $max5 . " AND s.useRecord = 0)
+                    
                 )");
         $query->setParameter('regexp1', '^CS[0-9]+(-[0-9]+)?$');
         $query->setParameter('regexp2', '^QC[0-9]+(-[0-9]+)?$');
@@ -217,8 +227,12 @@ class VerificationController extends BaseController
             $function = 'V' . $i;
             $this->$function($Batch);
         }
-                $function = 'V23';
-                $this->$function($Batch);
+        
+        $function = 'V28';
+        $this->$function($Batch);
+
+        $function = 'V23';
+        $this->$function($Batch);
 
         $continue = $this->evaluation($Batch);
         
@@ -293,8 +307,27 @@ class VerificationController extends BaseController
             (s.sampleName LIKE 'BLK%' AND s.sampleType <> 'Blank') OR
             (s.sampleName LIKE 'CS%' AND s.sampleType <> 'Standard') OR
             (s.sampleName LIKE '%QC%' AND s.sampleType <> 'Quality Control') OR
+            (s.sampleName LIKE '%LLQC%' AND s.sampleType <> 'Quality Control') OR
+            (s.sampleName LIKE '%ULQC%' AND s.sampleType <> 'Quality Control') OR
+            (s.sampleName LIKE '%LDQC%' AND s.sampleType <> 'Quality Control') OR
+            (s.sampleName LIKE '%HDQC%' AND s.sampleType <> 'Quality Control') OR
+            (s.sampleName LIKE '%TZ%' AND s.sampleType <> 'Quality Control') OR
+            (s.sampleName LIKE '%FT%' AND s.sampleType <> 'Quality Control') OR
+            (s.sampleName LIKE '%ST%' AND s.sampleType <> 'Quality Control') OR
+            (s.sampleName LIKE '%LT%' AND s.sampleType <> 'Quality Control') OR
+            (s.sampleName LIKE '%PP%' AND s.sampleType <> 'Quality Control') OR
+            (s.sampleName LIKE '%SLP%' AND s.sampleType <> 'Quality Control') OR
+            (s.sampleName LIKE '%PID%' AND s.sampleType <> 'Quality Control') OR
+            (s.sampleName LIKE '%LLOQ%' AND s.sampleType <> 'Quality Control') OR
             (REGEXP(s.sampleName, :regexp1) = 1 AND s.sampleType <> 'Solvent') OR
-            (REGEXP(s.sampleName, :regexp2) = 1 AND s.sampleType <> 'Unknown')
+            (REGEXP(s.sampleName, :regexp2) = 1 AND s.sampleType <> 'Unknown') OR
+            (s.sampleName LIKE '%EGC%' AND s.sampleType <> 'Solvent') OR
+            (s.sampleName LIKE '%ES%' AND s.sampleType <> 'Solvent') OR
+            (s.sampleName LIKE '%SCAx%' AND s.sampleType <> 'Unknown') OR
+            (s.sampleName LIKE '%SCBx%' AND s.sampleType <> 'Unknown') OR
+            (s.sampleName LIKE '%ULOQ%' AND s.sampleType <> 'Unknown') OR
+            (s.sampleName LIKE '%RSQC1%' AND s.sampleType <> 'Unknown') OR
+            (s.sampleName LIKE '%RSQC3%' AND s.sampleType <> 'Unknown')
         ) AND s.fkBatch = " . $Batch->getPkBatch();
         $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V4"));
         $this->error(
@@ -330,7 +363,7 @@ class VerificationController extends BaseController
                         $cs_values[$i - 1]
                     );
 
-                    $where = "s.sampleName LIKE 'CS" . $i . "%' AND s.analyteConcentration <> " . $value . " AND s.fkBatch = " . $Batch->getPkBatch();
+                    $where = "s.sampleType LIKE 'CS" . $i . "%' AND s.analyteConcentration <> " . $value . " AND s.fkBatch = " . $Batch->getPkBatch();
                     $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V5"));
                     $this->error($where, $fkParameter[0]);
                 }
@@ -351,6 +384,46 @@ class VerificationController extends BaseController
                     $this->error($where, $fkParameter[0]);
                 }
             }
+
+            $valueLDQC = \Alae\Service\Conversion::conversion(
+                $AnaStudy->getFkUnit()->getName(),
+                $Batch->getAnalyteConcentrationUnits(),
+                $AnaStudy->getLdqcValues()
+            );
+
+            $where = "s.sampleName LIKE 'LDQC' AND s.analyteConcentration <> " . $valueLDQC . " AND s.fkBatch = " . $Batch->getPkBatch();
+            $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V5"));
+            $this->error($where, $fkParameter[0]);
+
+            $valueHDQC = \Alae\Service\Conversion::conversion(
+                $AnaStudy->getFkUnit()->getName(),
+                $Batch->getAnalyteConcentrationUnits(),
+                $AnaStudy->getHdqcValues()
+            );
+
+            $where = "s.sampleName LIKE 'HDQC' AND s.analyteConcentration <> " . $valueHDQC . " AND s.fkBatch = " . $Batch->getPkBatch();
+            $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V5"));
+            $this->error($where, $fkParameter[0]);
+
+            $valueLLQC = \Alae\Service\Conversion::conversion(
+                $AnaStudy->getFkUnit()->getName(),
+                $Batch->getAnalyteConcentrationUnits(),
+                $AnaStudy->getLlqcValues()
+            );
+
+            $where = "s.sampleName LIKE 'LLQC' AND s.analyteConcentration <> " . $valueLLQC . " AND s.fkBatch = " . $Batch->getPkBatch();
+            $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V5"));
+            $this->error($where, $fkParameter[0]);
+
+            $valueULQC = \Alae\Service\Conversion::conversion(
+                $AnaStudy->getFkUnit()->getName(),
+                $Batch->getAnalyteConcentrationUnits(),
+                $AnaStudy->getUlqcValues()
+            );
+
+            $where = "s.sampleName LIKE 'ULQC' AND s.analyteConcentration <> " . $valueULQC . " AND s.fkBatch = " . $Batch->getPkBatch();
+            $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V5"));
+            $this->error($where, $fkParameter[0]);
         }
 
 
@@ -368,7 +441,7 @@ class VerificationController extends BaseController
             SELECT s.pkSampleBatch, SUBSTRING(s.sampleName, 1, 4) as sampleName,  COUNT(s.pkSampleBatch) as counter
             FROM Alae\Entity\SampleBatch s
             WHERE s.sampleName LIKE 'CS%' AND s.fkBatch = " . $Batch->getPkBatch() . "
-            GROUP BY sampleName
+            GROUP BY s.sampleName
             HAVING counter < " . $parameters[0]->getMinValue());
         $elements   = $query->getResult();
 
@@ -566,13 +639,14 @@ class VerificationController extends BaseController
      * V10.1: Accuracy (CS1) - NO CUMPLE ACCURACY
      * V10.2: Accuracy (CS2-CSx) - NO CUMPLE ACCURACY
      * V10.3: Accuracy (QC) - NO CUMPLE ACCURACY
-     * V10.4: Accuracy (DQC) - NO CUMPLE ACCURACY
+     * V10.4: Accuracy (TZ) - NO CUMPLE ACCURACY
+     * V10.5: Accuracy (DQC) - NO CUMPLE ACCURACY
      * @param \Alae\Entity\Batch $Batch
      */
     protected function V10(\Alae\Entity\Batch $Batch)
     {
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.1"));
-        $where      = "s.sampleName LIKE 'CS1%' AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.fkBatch = " . $Batch->getPkBatch();
+        $where      = "(s.sampleName LIKE 'CS1%' OR s.sampleName LIKE 'LLOQ%' OR s.sampleName LIKE 'LLQC%') AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.fkBatch = " . $Batch->getPkBatch();
         $this->error($where, $parameters[0], array(), false);
 
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.2"));
@@ -581,11 +655,15 @@ class VerificationController extends BaseController
         $this->error($where, $parameters[0], array('regexp' => '^CS[0-9]+(-[0-9]+(R[0-9]+)?)?$'), false);
 
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.3"));
-        $where      = "REGEXP(s.sampleName, :regexp) = 1 AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.fkBatch = " . $Batch->getPkBatch();
+        $where      = "(REGEXP(s.sampleName, :regexp) = 1 OR s.sampleName LIKE 'ULQC%') AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.fkBatch = " . $Batch->getPkBatch();
         //$this->error($where, $parameters[0], array('regexp' => '^QC[0-9]+(-[0-9]+)?$'), false);
         $this->error($where, $parameters[0], array('regexp' => '^QC[0-9]+(-[0-9]+(R[0-9]+)?)?$'), false);
 
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.4"));
+        $where      = "s.sampleName LIKE 'TZ%' AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.fkBatch = " . $Batch->getPkBatch();
+        $this->error($where, $parameters[0], array(), false);
+
+        $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.5"));
         $where      = "REGEXP(s.sampleName, :regexp) = 1 AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.fkBatch = " . $Batch->getPkBatch();
         $this->error($where, $parameters[0], array('regexp' => '^((L|H)?DQC)[0-9]+(-[0-9]+)?$'), false);
     }
@@ -643,19 +721,26 @@ class VerificationController extends BaseController
         $min4 = $parameters[0]->getMinValue();
         $max4 = $parameters[0]->getMaxValue();
 
+        $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.5"));
+        $min5 = $parameters[0]->getMinValue();
+        $max5 = $parameters[0]->getMaxValue();
+
         $query   = $this->getEntityManager()->createQuery("
             SELECT COUNT(s.pkSampleBatch) as counter
             FROM Alae\Entity\SampleBatch s
             WHERE s.fkBatch = " . $Batch->getPkBatch() . "
                 AND (
-                       (s.sampleName LIKE 'CS1%' AND s.accuracy NOT BETWEEN " . $min1  . " AND " . $max1 . " AND s.useRecord = 1)
+                       ((s.sampleName LIKE 'CS1%' OR s.sampleName LIKE 'LLOQ%' OR s.sampleName LIKE 'LLQC%') AND s.accuracy NOT BETWEEN " . $min1  . " AND " . $max1 . " AND s.useRecord = 1)
                     OR (REGEXP(s.sampleName, :regexp1) = 1 AND s.sampleName NOT LIKE 'CS1%' AND s.accuracy NOT BETWEEN " . $min2 . " AND " . $max2 . " AND s.useRecord = 1)
                     OR (REGEXP(s.sampleName, :regexp2) = 1 AND s.accuracy NOT BETWEEN " . $min3 . " AND " . $max3 . " AND s.useRecord = 1)
-                    OR (REGEXP(s.sampleName, :regexp3) = 1 AND s.accuracy NOT BETWEEN " . $min4 . " AND " . $max4 . " AND s.useRecord = 1)
-                    OR (s.sampleName LIKE 'CS1%' AND s.accuracy BETWEEN " . $min1  . " AND " . $max1 . " AND s.useRecord = 0)
+                    OR (s.sampleName LIKE 'TZ%' AND s.accuracy NOT BETWEEN " . $min4 . " AND " . $max4 . " AND s.useRecord = 1)
+                    OR (REGEXP(s.sampleName, :regexp3) = 1 AND s.accuracy NOT BETWEEN " . $min5 . " AND " . $max5 . " AND s.useRecord = 1)
+                    OR ((s.sampleName LIKE 'CS1%' OR s.sampleName LIKE 'LLOQ%' OR s.sampleName LIKE 'LLQC%') AND s.accuracy BETWEEN " . $min1  . " AND " . $max1 . " AND s.useRecord = 0)
                     OR (REGEXP(s.sampleName, :regexp1) = 1 AND s.sampleName NOT LIKE 'CS1%' AND s.accuracy BETWEEN " . $min2 . " AND " . $max2 . " AND s.useRecord = 0)
                     OR (REGEXP(s.sampleName, :regexp2) = 1 AND s.accuracy BETWEEN " . $min3 . " AND " . $max3 . " AND s.useRecord = 0)
-                    OR (REGEXP(s.sampleName, :regexp3) = 1 AND s.accuracy BETWEEN " . $min4 . " AND " . $max4 . " AND s.useRecord = 0)
+                    OR (s.sampleName LIKE 'TZ%' AND s.accuracy BETWEEN " . $min4 . " AND " . $max4 . " AND s.useRecord = 0)
+                    OR (REGEXP(s.sampleName, :regexp3) = 1 AND s.accuracy BETWEEN " . $min5 . " AND " . $max5 . " AND s.useRecord = 0)
+                    
                 )");
         $query->setParameter('regexp1', '^CS[0-9]+(-[0-9]+)?$');
         $query->setParameter('regexp2', '^QC[0-9]+(-[0-9]+)?$');
@@ -664,47 +749,10 @@ class VerificationController extends BaseController
         return $query->getSingleScalarResult() > 0 ? false : true;
     }
 
-    /**
-     * Criterio de aceptación de blancos y ceros
-     * V13.1: Selección manual de los CS válidos
-     * V13.2: Interf. Analito en BLK - BLK NO CUMPLE
-     * V13.3: Interf. IS en BLK - BLK NO CUMPLE
-     * V13.4: Interf. Analito en ZS - ZS NO CUMPLE
-     * @param \Alae\Entity\Batch $Batch
-     */
+    
     protected function V13(\Alae\Entity\Batch $Batch)
     {
-        $query = $this->getEntityManager()->createQuery("
-            SELECT COUNT(s.pkSampleBatch)
-            FROM Alae\Entity\SampleBatch s
-            WHERE s.sampleName LIKE 'CS1%' AND s.useRecord = 0 AND s.fkBatch = " . $Batch->getPkBatch());
-        $counter = $query->getSingleScalarResult();
-
-        $i = ($counter == 2) ? 2 : 1;
-        $query = $this->getEntityManager()->createQuery("
-            SELECT AVG(s.analytePeakArea) as analyte_peak_area, AVG(s.isPeakArea) as is_peak_area
-            FROM Alae\Entity\SampleBatch s
-            WHERE s.sampleName like 'CS" . $i . "%' AND s.validFlag = 1 AND s.fkBatch = " . $Batch->getPkBatch());
-        $elements = $query->getResult();
-
-        $analytePeakArea = $isPeakArea      = 0;
-        foreach ($elements as $temp)
-        {
-            $analytePeakArea = $temp["analyte_peak_area"];
-            $isPeakArea      = $temp["is_peak_area"];
-        }
-
-        $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V13.2"));
-        $where      = "s.sampleName LIKE 'BLK%' AND s.analytePeakArea > " . ($analytePeakArea * ($parameters[0]->getMinValue() / 100)) . " AND s.fkBatch = " . $Batch->getPkBatch();
-        $this->error($where, $parameters[0], array(), false);
-
-        $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V13.3"));
-        $where      = "s.sampleName LIKE 'BLK%' AND s.isPeakArea > " . ($isPeakArea * ($parameters[0]->getMinValue() / 100)) . " AND s.fkBatch = " . $Batch->getPkBatch();
-        $this->error($where, $parameters[0], array(), false);
-
-        $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V13.4"));
-        $where      = "s.sampleName LIKE 'ZS%' AND s.analytePeakArea > " . ($analytePeakArea * ($parameters[0]->getMinValue() / 100)) . " AND s.fkBatch = " . $Batch->getPkBatch();
-        $this->error($where, $parameters[0], array(), false);
+        
     }
 
     /**
@@ -772,7 +820,7 @@ class VerificationController extends BaseController
         $query = $this->getEntityManager()->createQuery("
             SELECT AVG(s.isPeakArea)
             FROM Alae\Entity\SampleBatch s
-            WHERE (s.sampleName LIKE 'CS%' OR s.sampleName LIKE 'QC%') AND s.sampleName NOT LIKE  '%\*%' AND s.validFlag <> 0 AND s.useRecord = 1 AND s.fkBatch = " . $Batch->getPkBatch());
+            WHERE (s.sampleName LIKE 'CS%' OR s.sampleName LIKE 'QC%') AND (s.sampleName NOT LIKE  '%\*%' OR s.sampleName NOT LIKE  'HDQC%' OR s.sampleName NOT LIKE  'LDQC%') AND s.validFlag <> 0 AND s.useRecord = 1 AND s.fkBatch = " . $Batch->getPkBatch());
         $value = $query->getSingleScalarResult();
         $Batch->setIsCsQcAcceptedAvg($value);
 
@@ -844,6 +892,8 @@ class VerificationController extends BaseController
         }
     }
 
+    
+
     /**
      * Revisar
      * V17: r > 0.99 - LOTE RECHAZADO (r< 0.99)
@@ -853,9 +903,11 @@ class VerificationController extends BaseController
     {
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V17"));
 
-        if (($Batch->getCorrelationCoefficient() * 100) < $parameters[0]->getMinValue())
+        if ($Batch->getCorrelationCoefficient() < $parameters[0]->getMinValue())
         {
-            $this->evaluation($Batch, false, $parameters[0]);
+            //$this->evaluation($Batch, false, $parameters[0]);
+            //$where = "s.sampleName LIKE 'CS%' AND s.fkBatch = " . $Batch->getPkBatch();
+            //$this->error($where, $parameters[0]);
         }
     }
 
@@ -870,7 +922,7 @@ class VerificationController extends BaseController
 
         if ($value < $parameters[0]->getMinValue())
         {
-            $where = "s.sampleName LIKE 'QC%' AND s.fkBatch = " . $Batch->getPkBatch();
+            $where = "(s.sampleName NOT LIKE 'DQC%' AND s.sampleName LIKE 'QC%') AND s.fkBatch = " . $Batch->getPkBatch();
             $this->error($where, $parameters[0]);
         }
     }
@@ -884,7 +936,7 @@ class VerificationController extends BaseController
         $query    = $this->getEntityManager()->createQuery("
             SELECT SUBSTRING(s.sampleName, 1, 3) as sample_name, s.validFlag, s.sampleName as otro
             FROM Alae\Entity\SampleBatch s
-            WHERE s.sampleName like 'QC%' AND s.isUsed = 1 AND s.fkBatch = " . $Batch->getPkBatch() . "
+            WHERE (s.sampleName like 'QC%' OR s.sampleName like 'LLQC%')  AND s.isUsed = 1 AND s.fkBatch = " . $Batch->getPkBatch() . "
             GROUP BY sample_name
             ORDER BY sample_name ASC");
         $elements = $query->getResult();
@@ -989,7 +1041,7 @@ class VerificationController extends BaseController
      */
     protected function V22(\Alae\Entity\Batch $Batch)
     {
-        $AnaStudy = $this->getRepository("\\Alae\\Entity\\AnalyteStudy")->findBy(array(
+        /*$AnaStudy = $this->getRepository("\\Alae\\Entity\\AnalyteStudy")->findBy(array(
             "fkAnalyte" => $Batch->getFkAnalyte(),
             "fkStudy"   => $Batch->getFkStudy()
         ));
@@ -1003,38 +1055,77 @@ class VerificationController extends BaseController
             $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V22"));
             $where = "s.sampleType = 'Unknown' AND s.isPeakArea NOT BETWEEN $min AND $max AND s.fkBatch = " . $Batch->getPkBatch();
             $this->error($where, $parameters[0], array(), false);
-        }
+        }*/
     }
 
     /**
-     * V23: < 5% respuesta IS (unknown) ( B ) - ERROR EXTRACCIÓN IS
+     * V23: < 5% respuesta IS ( B ) - ERROR EXTRACCIÓN IS
      * @param \Alae\Entity\Batch $Batch
      */
     protected function V23(\Alae\Entity\Batch $Batch)
     {
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V23"));
         $value      = $Batch->getIsCsQcAcceptedAvg() * ($parameters[0]->getMinValue() / 100);
+
+        $where = "(s.sampleName NOT LIKE 'BLK%' OR s.sampleName NOT LIKE 'SEL%') AND 
+        s.sampleType <> 'Solvent' AND s.isPeakArea < $value 
+        AND s.fkBatch = " . $Batch->getPkBatch();
+        $this->error($where, $parameters[0], array(), false);
+
+        $parameters2 = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V27"));
         
-        //TYPE Unknown
-        $where = "(s.sampleName NOT LIKE 'ZS%' AND s.sampleName NOT LIKE 'CS%' AND s.sampleName NOT LIKE 'QC%') AND s.sampleType = 'Unknown' AND s.isPeakArea < $value AND s.fkBatch = " . $Batch->getPkBatch();
-        $this->error($where, $parameters[0], array(), false);
-
-        //SampleName ZS, TYPE Unknown
-        $where = "s.sampleName LIKE 'ZS%' AND s.sampleType = 'Blank' AND s.isPeakArea < $value AND s.fkBatch = " . $Batch->getPkBatch();
-        $this->error($where, $parameters[0], array(), false);
-
-        //SampleName CS, TYPE Standard
-        $where = "s.sampleName LIKE 'CS%' AND s.sampleType = 'Standard' AND s.isPeakArea < $value AND s.fkBatch = " . $Batch->getPkBatch();
-        $this->error($where, $parameters[0], array(), false);
-
-        //SampleName QC, TYPE Quality Control
-        $where = "s.sampleName LIKE 'QC%' AND s.sampleType = 'Quality Control' AND s.isPeakArea < $value AND s.fkBatch = " . $Batch->getPkBatch();
-        $this->error($where, $parameters[0], array(), false);
+        $where2 = "
+        (s.sampleName NOT LIKE 'BLK%' OR s.sampleName NOT LIKE 'SEL%')   
+        AND s.sampleType <> 'Solvent' AND s.isPeakArea < $value
+        AND (s.sampleName LIKE 'CS%' OR s.sampleName LIKE 'CS%') 
+        AND (s.sampleType = 'Standard' OR s.sampleType = 'Quality Control') 
+        AND s.useRecord = 0
+        AND s.fkBatch = " . $Batch->getPkBatch();
+        $this->error($where2, $parameters2[0], array(), false);
     }
 
+    /**
+     * Criterio de aceptación de blancos y ceros
+     * V13.1: Selección manual de los CS válidos
+     * V13.2: Interf. Analito en BLK - BLK NO CUMPLE
+     * V13.3: Interf. IS en BLK - BLK NO CUMPLE
+     * V13.4: Interf. Analito en ZS - ZS NO CUMPLE
+     * @param \Alae\Entity\Batch $Batch
+     */
     protected function V24(\Alae\Entity\Batch $Batch)
     {
         $query = $this->getEntityManager()->createQuery("
+            SELECT COUNT(s.pkSampleBatch)
+            FROM Alae\Entity\SampleBatch s
+            WHERE s.sampleName LIKE 'CS1%' AND s.useRecord = 0 AND s.fkBatch = " . $Batch->getPkBatch());
+        $counter = $query->getSingleScalarResult();
+
+        $i = ($counter == 2) ? 2 : 1;
+        $query = $this->getEntityManager()->createQuery("
+            SELECT AVG(s.analytePeakArea) as analyte_peak_area, AVG(s.isPeakArea) as is_peak_area
+            FROM Alae\Entity\SampleBatch s
+            WHERE s.sampleName like 'CS1%' AND s.useRecord = 1 AND s.validFlag = 1 AND s.fkBatch = " . $Batch->getPkBatch());
+        $elements = $query->getResult();
+
+        $analytePeakArea = $isPeakArea      = 0;
+        foreach ($elements as $temp)
+        {
+            $analytePeakArea = $temp["analyte_peak_area"];
+            $isPeakArea      = $temp["is_peak_area"];
+        }
+
+        $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V13.2"));
+        $where      = "s.sampleName LIKE 'BLK%' AND s.analytePeakArea > " . ($analytePeakArea * ($parameters[0]->getMinValue() / 100)) . " AND s.fkBatch = " . $Batch->getPkBatch();
+        $this->error($where, $parameters[0], array(), false);
+
+        $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V13.3"));
+        $where      = "s.sampleName LIKE 'BLK%' AND s.isPeakArea > " . ($isPeakArea * ($parameters[0]->getMinValue() / 100)) . " AND s.fkBatch = " . $Batch->getPkBatch();
+        $this->error($where, $parameters[0], array(), false);
+
+        $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V13.4"));
+        $where      = "s.sampleName LIKE 'ZS%' AND s.analytePeakArea > " . ($analytePeakArea * ($parameters[0]->getMinValue() / 100)) . " AND s.fkBatch = " . $Batch->getPkBatch();
+        $this->error($where, $parameters[0], array(), false);
+        /*$query = $this->getEntityManager()->createQuery("
             SELECT COUNT(s.pkSampleBatch)
             FROM Alae\Entity\SampleBatch s
             WHERE s.sampleName LIKE 'CS1%' AND s.useRecord = 0 AND s.fkBatch = " . $Batch->getPkBatch());
@@ -1079,7 +1170,7 @@ class VerificationController extends BaseController
             $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V24"));
             $where = "s.sampleType = 'Unknown' AND s.calculatedConcentration > $max AND s.fkBatch = " . $Batch->getPkBatch();
             $this->error($where, $parameters[0]);
-        }
+        }*/
     }
 
     /**
@@ -1148,6 +1239,7 @@ class VerificationController extends BaseController
      */
     protected function V26(\Alae\Entity\Batch $Batch)
     {
+        
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V26"));
         $parameters2 = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V27"));
         
@@ -1156,28 +1248,37 @@ class VerificationController extends BaseController
             "fkStudy"   => $Batch->getFkStudy()
         ));
 
-        $minTretAna = $AnaStudy[0]->getRetentionTimeAnalyte() - $AnaStudy[0]->getAcceptanceMargin() / 100 * $AnaStudy[0]->getRetentionTimeAnalyte();
-        $maxTretAna = $AnaStudy[0]->getRetentionTimeAnalyte() + $AnaStudy[0]->getAcceptanceMargin() / 100 * $AnaStudy[0]->getRetentionTimeAnalyte();
+        $Study = $this->getRepository("\\Alae\\Entity\\Study")->findBy(array(
+            "pkStudy"   => $Batch->getFkStudy()
+        ));
 
-        $minTretIS = $AnaStudy[0]->getRetentionTimeIS() - $AnaStudy[0]->getAcceptanceMargin() / 100 * $AnaStudy[0]->getRetentionTimeIS();
-        $maxTretIS = $AnaStudy[0]->getRetentionTimeIS() + $AnaStudy[0]->getAcceptanceMargin() / 100 * $AnaStudy[0]->getRetentionTimeIS();
+
+        if($Study[0]->getValidation() == 1)
+        { 
+            $min = $AnaStudy[0]->getRetention() - ($AnaStudy[0]->getAcceptance() * $AnaStudy[0]->getRetention() / 100);
+            $max = $AnaStudy[0]->getRetention() + ($AnaStudy[0]->getAcceptance() * $AnaStudy[0]->getRetention() / 100);
+
+            $min_is = $AnaStudy[0]->getRetentionIs() - ($AnaStudy[0]->getAcceptanceIs() * $AnaStudy[0]->getRetentionIs() / 100);
+            $max_is = $AnaStudy[0]->getRetentionIs() + ($AnaStudy[0]->getAcceptanceIs() * $AnaStudy[0]->getRetentionIs() / 100);
         
-        $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V26"));
+            $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V26"));
 
-        $where = " (s.analyteRetentionTime NOT BETWEEN $minTretAna AND $maxTretAna OR 
-                    s.isRetentionTime NOT BETWEEN $minTretIS AND $maxTretIS)
-                   AND s.fkBatch = " . $Batch->getPkBatch();
+            $where = " (s.sampleType != 'Solvent' AND s.analyteRetentionTime NOT BETWEEN $min AND $max OR 
+                        s.isRetentionTime NOT BETWEEN $min_is AND $max_is)
+                    AND s.fkBatch = " . $Batch->getPkBatch();
+            
+            $this->error($where, $parameters[0], array(), false);
+
+            $where2 = "(s.sampleName LIKE 'CS%' OR s.sampleName LIKE 'QC%') AND
+                        s.sampleType != 'Solvent' AND 
+                    (s.analyteRetentionTime NOT BETWEEN $min AND $max OR 
+                        s.isRetentionTime NOT BETWEEN $min_is AND $max_is)
+                    AND s.useRecord != 0
+                    AND s.fkBatch = " . $Batch->getPkBatch();
+            
+            $this->error($where2, $parameters2[0], array(), false);
+        }
         
-        $this->error($where, $parameters[0], array(), false);
-
-        $where2 = "(s.sampleName LIKE 'CS%' OR s.sampleName LIKE 'QC%') AND 
-                   (s.analyteRetentionTime NOT BETWEEN $minTretAna AND $maxTretAna OR 
-                    s.isRetentionTime NOT BETWEEN $minTretIS AND $maxTretIS)
-                   AND s.useRecord != 0
-                   AND s.fkBatch = " . $Batch->getPkBatch();
-        
-        $this->error($where2, $parameters2[0], array(), false);
-
         /*$query = $this->getEntityManager()->createQuery("
             SELECT s.pkSampleBatch as pkSampleBatch, s.sampleName as sampleName, 
                    s.analyteRetentionTime as AnaRetentionTime, s.isRetentionTime as IsRetentionTime
@@ -1211,5 +1312,63 @@ class VerificationController extends BaseController
                 }
             }
         }*/
+    }
+
+    /**
+     * Al menos el 50% de los estándares de calibración al nivel del límite inferior de cuantificación (CS1) 
+     * y el límite superior de cuantificación (CS8 o superior) deben ser válidos. 
+     * @param \Alae\Entity\Batch $Batch
+     */
+    protected function V28(\Alae\Entity\Batch $Batch)
+    {
+        $query = $this->getEntityManager()->createQuery("
+            SELECT COUNT(s.pkSampleBatch)
+            FROM Alae\Entity\SampleBatch s
+            WHERE s.sampleName LIKE 'CS1%' AND s.fkBatch = " . $Batch->getPkBatch());
+        $cs1Total = $query->getSingleScalarResult();
+
+        $query = $this->getEntityManager()->createQuery("
+            SELECT COUNT(s.pkSampleBatch)
+            FROM Alae\Entity\SampleBatch s
+            WHERE s.sampleName LIKE 'CS1%'  AND s.useRecord = 1 AND s.fkBatch = " . $Batch->getPkBatch());
+        $cs1AceptadosTotal = $query->getSingleScalarResult();
+
+        $value      = ($cs1Total / $cs1AceptadosTotal) * 100;
+        
+        $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V28"));
+
+        if ($value < $parameters[0]->getMinValue())
+        {
+            $where = "s.sampleName LIKE 'CS1%' AND s.fkBatch = " . $Batch->getPkBatch();
+            $this->error($where, $parameters[0]);
+        }
+
+        $AnaStudy = $this->getRepository("\\Alae\\Entity\\AnalyteStudy")->findBy(array(
+            "fkAnalyte" => $Batch->getFkAnalyte(),
+            "fkStudy" => $Batch->getFkStudy()
+        ));
+        
+
+        $query = $this->getEntityManager()->createQuery("
+            SELECT COUNT(s.pkSampleBatch)
+            FROM Alae\Entity\SampleBatch s
+            WHERE s.sampleName LIKE 'CS" .$AnaStudy[0]->getCsNumber(). "%' AND s.fkBatch = " . $Batch->getPkBatch());
+        $csMaxTotal = $query->getSingleScalarResult();
+
+        $query = $this->getEntityManager()->createQuery("
+        SELECT COUNT(s.pkSampleBatch)
+        FROM Alae\Entity\SampleBatch s
+        WHERE s.sampleName LIKE 'CS" .$AnaStudy[0]->getCsNumber(). "%' AND s.useRecord = 1 AND s.fkBatch = " . $Batch->getPkBatch());
+        $csMaxAceptadosTotal = $query->getSingleScalarResult();
+
+        $value      = ($csMaxTotal / $csMaxAceptadosTotal) * 100;
+
+        $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V29"));
+
+        if ($value < $parameters[0]->getMinValue())
+        {
+            $where = "s.sampleName LIKE 'CS" .$AnaStudy[0]->getCsNumber(). "%' AND s.fkBatch = " . $Batch->getPkBatch();
+            $this->error($where, $parameters[0]);
+        }
     }
 }

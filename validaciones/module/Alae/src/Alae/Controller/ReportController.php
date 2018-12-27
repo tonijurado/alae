@@ -184,6 +184,7 @@ class ReportController extends BaseController
         if ($request->isGet())
         {
             //GENERA LOS DATOS DEL REPORTE
+            
             ini_set('max_execution_time', 300000);
             $Batch = $this->getRepository('\\Alae\\Entity\\Batch')->find($request->getQuery('ba'));
             if ($Batch && $Batch->getPkBatch())
@@ -201,7 +202,7 @@ class ReportController extends BaseController
                         ->groupBy('s.pkSampleBatch')
                         ->orderBy('s.pkSampleBatch', 'ASC');
                 $elements = $qb->getQuery()->getResult();
-
+                
                 if (count($elements) > 0)
                 {
                     $tr1 = $tr2 = "";
@@ -277,7 +278,7 @@ class ReportController extends BaseController
                                     break;
                             }
                         }
-
+                        
                         $tr1 .= sprintf("<tr>%s</tr>", $row1);
                         $tr2 .= sprintf("<tr>%s</tr>", $row2);
 
@@ -316,7 +317,7 @@ class ReportController extends BaseController
                     $varIs = $Batch->getIsCsQcAcceptedAvg() * ($AnaStudy[0]->getInternalStandard() / 100);
                     
                     $var5 = $Batch->getIsCsQcAcceptedAvg() * (5 / 100);
-
+                    //echo $tr1;die();
                     /*$properties = array(
                         "batch"  => $Batch,
                         "tr1"    => $tr1,
@@ -331,7 +332,7 @@ class ReportController extends BaseController
                     //$page      = $this->render('acua/report/r2page', $data);
                     $viewModel->setVariable('batch', $Batch);
                     $viewModel->setVariable('tr1', $tr1);
-                    $viewModel->setVariable('dataIS', $dataIS);
+                    
                     $viewModel->setVariable('tr2', $tr2);
                     $viewModel->setVariable('tr3', $tr3);
                     $viewModel->setVariable('tr4', $tr4);
@@ -459,7 +460,7 @@ class ReportController extends BaseController
                 "fkAnalyte" => $request->getQuery('an'),
                 "fkStudy"   => $request->getQuery('id'),
                 "validFlag" => true
-            ), array("fileName" => asc));
+            ), array("fileName" => 'asc'));
             $Analyte = $this->getRepository("\\Alae\\Entity\\Analyte")->find($request->getQuery('an'));
             $Study   = $this->getRepository("\\Alae\\Entity\\Study")->find($request->getQuery('id'));
 			$AnalyteName = $Analyte->getName();
@@ -490,6 +491,8 @@ class ReportController extends BaseController
                         );
                     }
                 }
+
+                echo "prueba";die();
 
 
                 $viewModel = new ViewModel();
@@ -927,7 +930,7 @@ class ReportController extends BaseController
                 "fkAnalyte" => $request->getQuery('an'),
                 "fkStudy"   => $request->getQuery('id'),
                 "validFlag" => true
-            ), array("fileName" => asc));
+            ), array("fileName" => 'asc'));
             $Analyte = $this->getRepository("\\Alae\\Entity\\Analyte")->find($request->getQuery('an'));
             $Study   = $this->getRepository("\\Alae\\Entity\\Study")->find($request->getQuery('id'));
             $AnalyteName = $Analyte->getName();
@@ -958,7 +961,7 @@ class ReportController extends BaseController
                         );
                     }
                 }
-
+                
 
                 $viewModel = new ViewModel();
                 $viewModel->setTerminal(true);

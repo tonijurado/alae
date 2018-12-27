@@ -78,6 +78,14 @@ class BatchController extends BaseController
 
     public function listAction()
     {
+        if(isset($_GET['state']))
+        {
+            $state = $_GET['state'];
+        }
+        else
+        {
+            $state = 'open';
+        }
         $request = $this->getRequest();
 
         if ($request->isPost())
@@ -158,7 +166,7 @@ class BatchController extends BaseController
                 }
                 if($this->_getSession()->isAdministrador() || $this->_getSession()->isDirectorEstudio() || $this->_getSession()->isLaboratorio())
                 {
-                    $validation = is_null($batch->getValidFlag()) ? '<a href="' . \Alae\Service\Helper::getVarsConfig("base_url") . '/verification/index/' . $batch->getPkBatch() . '" class="btn" type="button"><span class="btn-validate"></span>validar</a>' : "";
+                    $validation = is_null($batch->getValidFlag()) ? '<a href="' . \Alae\Service\Helper::getVarsConfig("base_url") . '/verification/index/' . $batch->getPkBatch() . '?state='.$state. '" class="btn" type="button"><span class="btn-validate"></span>validar</a>' : "";
                 }
             }
 
@@ -180,6 +188,7 @@ class BatchController extends BaseController
         $viewModel = new ViewModel($datatable->getDatatable());
         $viewModel->setVariable('AnaStudy', $AnaStudy);
         $viewModel->setVariable('user', $this->_getSession());
+        $viewModel->setVariable('state', $state);
         return $viewModel;
     }
 }

@@ -42,7 +42,7 @@ class StudyController extends BaseController
     public function indexAction()
     {
         $data     = array();
-        $elements = $this->getRepository()->findBy(array("status" => true));
+        $elements = $this->getRepository()->findBy(array("status" => true, "closeFlag" => 0), array("pkStudy" => 'desc'));
         $User     = $this->_getSession();
 
         foreach ($elements as $study)
@@ -53,13 +53,13 @@ class StudyController extends BaseController
                     //CASO DIRECTOR DE ESTUDIO MOSTRAR BOTONES DE VER Y EDITAR
                 case "Director Estudio":
                     $buttons = ($study->getCloseFlag()) ?
-                        '<a href="' . \Alae\Service\Helper::getVarsConfig("base_url") . '/study/edit/' . $study->getPkStudy() . '"><span class="form-datatable-lupa"></span></a>' :
-                        '<a href="' . \Alae\Service\Helper::getVarsConfig("base_url") . '/study/edit/' . $study->getPkStudy() . '"><span class="form-datatable-change"></span></a>';
+                        '<a href="' . \Alae\Service\Helper::getVarsConfig("base_url") . '/study/edit/' . $study->getPkStudy() . '?state=open"><span class="form-datatable-lupa"></span></a>' :
+                        '<a href="' . \Alae\Service\Helper::getVarsConfig("base_url") . '/study/edit/' . $study->getPkStudy() . '?state=open"><span class="form-datatable-change"></span></a>';
                     break;
                 case "Laboratorio":
                     //CASO UGC MOSTRAR BOTON DE VER
                 case "UGC":
-                    $buttons = '<a href="' . \Alae\Service\Helper::getVarsConfig("base_url") . '/study/edit/' . $study->getPkStudy() . '"><span class="form-datatable-lupa"></span></a>';
+                    $buttons = '<a href="' . \Alae\Service\Helper::getVarsConfig("base_url") . '/study/edit/' . $study->getPkStudy() . '?state=open"><span class="form-datatable-lupa"></span></a>';
                     break;
             }
 
@@ -71,12 +71,52 @@ class StudyController extends BaseController
                 "date"        => $study->getCreatedAt(),
                 "analyte"     => $counterAnalyte,
                 "observation" => $study->getObservation(),
-                "closed"      => $study->getCloseFlag() ? "S" : "N",
                 "edit"        => $buttons
             );
         }
 
         $datatable = new Datatable($data, Datatable::DATATABLE_STUDY, $this->_getSession()->getFkProfile()->getName());
+        $viewModel = new ViewModel($datatable->getDatatable());
+        $viewModel->setVariable('user', $User);
+        return $viewModel;
+    }
+
+    public function indexCloseAction()
+    {
+        $data     = array();
+        $elements = $this->getRepository()->findBy(array("status" => true,"closeFlag" => 1), array("pkStudy" => 'desc'));
+        $User     = $this->_getSession();
+
+        foreach ($elements as $study)
+        {
+            switch ($this->_getSession()->getFkProfile()->getName())
+            {
+                case "Administrador":
+                    $buttons = '<a href="' . \Alae\Service\Helper::getVarsConfig("base_url") . '/study/edit/' . $study->getPkStudy() . '?state=close"><span class="form-datatable-lupa"></span></a>';
+                    break;
+                case "Director Estudio":
+                    $buttons = '<a href="' . \Alae\Service\Helper::getVarsConfig("base_url") . '/study/edit/' . $study->getPkStudy() . '?state=close"><span class="form-datatable-lupa"></span></a>';
+                    break;
+                case "Laboratorio":
+                    //CASO UGC MOSTRAR BOTON DE VER
+                case "UGC":
+                    $buttons = '<a href="' . \Alae\Service\Helper::getVarsConfig("base_url") . '/study/edit/' . $study->getPkStudy() . '?state=close"><span class="form-datatable-lupa"></span></a>';
+                    break;
+            }
+
+            $counterAnalyte = $this->counterAnalyte($study->getPkStudy());
+            //MUESTRA LOS DATOS EN PANTALLA
+            $data[]         = array(
+                "code"        => $study->getCode(),
+                "description" => $study->getDescription(),
+                "date"        => $study->getCreatedAt(),
+                "analyte"     => $counterAnalyte,
+                "observation" => $study->getObservation(),
+                "edit"        => $buttons
+            );
+        }
+
+        $datatable = new Datatable($data, Datatable::DATATABLE_STUDY_CLOSE, $this->_getSession()->getFkProfile()->getName());
         $viewModel = new ViewModel($datatable->getDatatable());
         $viewModel->setVariable('user', $User);
         return $viewModel;
@@ -270,9 +310,15 @@ class StudyController extends BaseController
             $createQcNumber  = $request->getPost('create-qc_number');
             $createUnit      = $request->getPost('create-unit');
             $createIs        = $request->getPost('create-is');
+            $createRetentionTime = $request->getPost('create-retention_TimeA');
+            $createRetentionTimeIS = $request->getPost('create-retention_TimeIS');
+            $createAccceptanceMargin = $request->getPost('create-acceptance_Margin');
             $createUse       = $request->getPost('create-use');
             $updateAnalyte   = $request->getPost('update-analyte');
             $updateAnalyteIs = $request->getPost('update-analyte_is');
+            $updateRetentionTime = $request->getPost('update-retention_TimeA');
+            $updateRetentionTimeIS = $request->getPost('update-retention_TimeIS');
+            $updateAccceptanceMargin = $request->getPost('update-acceptance_Margin');
             $updateCsNumber  = $request->getPost('update-cs_number');
             $updateQcNumber  = $request->getPost('update-qc_number');
             $updateIs        = $request->getPost('update-is');
@@ -296,6 +342,9 @@ class StudyController extends BaseController
                         $AnaStudy->setQcNumber($createQcNumber[$key]);
                         $AnaStudy->setFkUnit($Unit);
                         $AnaStudy->setInternalStandard($createIs[$key]);
+                        $AnaStudy->setRetentionTimeAnalyte($createRetentionTime[$key]);
+                        $AnaStudy->setRetentionTimeIS($createRetentionTimeIS[$key]);
+                        $AnaStudy->setAcceptanceMargin($createAccceptanceMargin[$key]);
                         $AnaStudy->setStatus(false);
                         $AnaStudy->setIsUsed((isset($createUse[$key]) ? true : false));
                         $AnaStudy->setFkUser($User);
@@ -303,7 +352,7 @@ class StudyController extends BaseController
                         $this->getEntityManager()->flush();
                         $this->transaction(
                             "Asociar analitos a estudio",
-                            sprintf('El usuario %1$s ha agrega el analito %2$s(%3$s) al estudio %4$s.<br>Patrón Interno (IS): %5$s, Núm CS: %6$s, Núm QC: %7$s, Unidades: %8$s, % var IS: %9$s, usar: %10$s',
+                            sprintf('El usuario %1$s ha agrega el analito %2$s(%3$s) al estudio %4$s.<br>Patrón Interno (IS): %5$s, Núm CS: %6$s, Núm QC: %7$s, Unidades: %8$s, % var IS: %9$s, Tiempo retención analito: %11$s,Tiempo retención IS: %12$s,Margen de aceptación: %13$s, usar: %10$s',
                                 $User->getUsername(),
                                 $Analyte->getName(),
                                 $Analyte->getShortening(),
@@ -313,7 +362,10 @@ class StudyController extends BaseController
                                 $createQcNumber[$key],
                                 $Unit->getName(),
                                 $createIs[$key],
-                                (isset($createUse[$key]) ? "S" : "N")
+                                (isset($createUse[$key]) ? "S" : "N"),
+                                $createAnalyte[$key],
+                                $createAnalyteIs[$key],
+                                $createRetentionTime[$key]
                             ),
                             false
                         );
@@ -335,10 +387,13 @@ class StudyController extends BaseController
                     {
                         try
                         {
-                            $older =  sprintf('Valores antiguos -> Analito: %6$s, Patrón Internos IS: %5$s, Núm CS: %1$s, Núm QC: %2$s, % var IS: %3$s, usar: %4$s<br>',
+                            $older =  sprintf('Valores antiguos -> Analito: %9$s, Patrón Internos IS: %8$s, Tiempo retención analito: %4$s,Tiempo retención IS: %5$s,Margen de aceptación: %6$s, Núm CS: %1$s, Núm QC: %2$s, % var IS: %3$s, usar: %7$s<br>',
                                 $AnaStudy->getCsNumber(),
                                 $AnaStudy->getQcNumber(),
                                 $AnaStudy->getInternalStandard(),
+                                $AnaStudy->getRetentionTimeAnalyte(),
+                                $AnaStudy->getRetentionTimeIS(),
+                                $AnaStudy->getAcceptanceMargin(),
                                 ($AnaStudy->getIsUsed() ? "S" : "N"),
                                 $AnaStudy->getFkAnalyteIs()->getShortening(),
                                 $AnaStudy->getFkAnalyte()->getShortening()
@@ -351,13 +406,16 @@ class StudyController extends BaseController
                             $AnaStudy->setCsNumber($updateCsNumber[$key]);
                             $AnaStudy->setQcNumber($updateQcNumber[$key]);
                             $AnaStudy->setInternalStandard($updateIs[$key]);
+                            $AnaStudy->setRetentionTimeAnalyte($updateRetentionTime[$key]);
+                            $AnaStudy->setRetentionTimeIS($updateRetentionTimeIS[$key]);
+                            $AnaStudy->setAcceptanceMargin($updateAccceptanceMargin[$key]);
                             $AnaStudy->setIsUsed(isset($updateUse[$key]) ? true : false);
                             $this->getEntityManager()->persist($AnaStudy);
                             $this->getEntityManager()->flush();
                             $this->transaction(
                                 "Edición de analitos asociados a estudio",
                                 sprintf('El usuario %1$s ha editado la información del analito %2$s(%3$s) en el estudio %4$s.<br>%5$s'
-                                        . 'Valores nuevos -> Analito: %11$s, Patrón Internos IS: %10$s, Núm CS: %6$s, Núm QC: %7$s, % var IS: %8$s, usar: %9$s',
+                                        . 'Valores nuevos -> Analito: %11$s, Patrón Internos IS: %10$s, Núm CS: %6$s, Núm QC: %7$s, % var IS: %8$s, Tiempo retención analito: %12$s,Tiempo retención IS: %13$s,Margen de aceptación: %14$s,usar: %9$s',
                                     $User->getUsername(),
                                     $AnaStudy->getFkAnalyte()->getName(),
                                     $AnaStudy->getFkAnalyte()->getShortening(),
@@ -368,7 +426,10 @@ class StudyController extends BaseController
                                     $updateIs[$key],
                                     (isset($updateUse[$key]) ? "S" : "N"),
                                     $AnalyteIs->getShortening(),
-                                    $Analyte->getShortening()
+                                    $Analyte->getShortening(),
+                                    $updateAnalyte[$key],
+                                    $updateAnalyteIs[$key],
+                                    $updateRetentionTime[$key]
                                 ),
                                 false
                             );
@@ -383,7 +444,14 @@ class StudyController extends BaseController
         }
 
         $data     = array();
-        $elements = $this->getRepository('\\Alae\\Entity\\AnalyteStudy')->findBy(array("fkStudy" => $Study->getPkStudy()));
+         //$elements = $this->getRepository('\\Alae\\Entity\\AnalyteStudy')->findBy(array("fkStudy" => $Study->getPkStudy()));
+
+        $query    = $this->getEntityManager()->createQuery("
+                                SELECT s
+                                FROM Alae\Entity\AnalyteStudy s, Alae\Entity\Analyte a
+                                WHERE s.fkAnalyte = a.pkAnalyte AND s.fkStudy = " .$Study->getPkStudy() ." 
+                                ORDER BY a.shortening ASC");
+                                $elements = $query->getResult();
 
         foreach ($elements as $anaStudy)
         {
@@ -391,7 +459,7 @@ class StudyController extends BaseController
 
             if ($anaStudy->getFkStudy()->getApprove())
             {
-                $buttons .= '<a href="' . \Alae\Service\Helper::getVarsConfig("base_url") . '/study/nominalconcentration/' . $anaStudy->getPkAnalyteStudy() . '"><span class="form-datatable-nominal"></span></a>';
+                $buttons .= '<a href="' . \Alae\Service\Helper::getVarsConfig("base_url") . '/study/nominalconcentration/' . $anaStudy->getPkAnalyteStudy() . '?state='.$_GET['state'].'"><span class="form-datatable-nominal"></span></a>';
             }
             elseif($this->_getSession()->isAdministrador() || $this->_getSession()->isDirectorEstudio() && !$anaStudy->getFkStudy()->getCloseFlag())
             {
@@ -401,9 +469,9 @@ class StudyController extends BaseController
 
             if($anaStudy->getFkStudy()->getApprove() && $anaStudy->getStatus())
             {
-                $buttons .= '<a href="' . \Alae\Service\Helper::getVarsConfig("base_url") . '/batch/list/' . $anaStudy->getPkAnalyteStudy() . '"><span class="form-datatable-batch"></span></a>';
+                $buttons .= '<a href="' . \Alae\Service\Helper::getVarsConfig("base_url") . '/batch/list/' . $anaStudy->getPkAnalyteStudy() . '?state='.$_GET['state'].'"><span class="form-datatable-batch"></span></a>';
             }
-
+    
             $data[] = array(
                 "analyte"    => $anaStudy->getFkAnalyte()->getShortening(),
                 "analyte_is" => $anaStudy->getFkAnalyteIs()->getShortening(),
@@ -411,6 +479,9 @@ class StudyController extends BaseController
                 "qc_number"  => $anaStudy->getQcNumber(),
                 "unit"       => $anaStudy->getFkUnit()->getName(),
                 "is"         => number_format($anaStudy->getInternalStandard(), 4, '.', ''),
+                "retention_TimeA" => number_format($anaStudy->getRetentionTimeAnalyte(), 4, '.', ''),
+                "retention_TimeIS" => number_format($anaStudy->getRetentionTimeIS(), 4, '.', ''),
+                "acceptance_Margin" => number_format($anaStudy->getAcceptanceMargin(), 4, '.', ''),
                 "use"        => $anaStudy->getIsUsed(),
                 "edit"       => $buttons
             );
@@ -418,7 +489,7 @@ class StudyController extends BaseController
 
         $isDuplicated = $Study->getApprove() && $this->_getSession()->isAdministrador() && !$Study->getCloseFlag();
 
-        $Analyte   = $this->getRepository('\\Alae\\Entity\\Analyte')->findBy(array("status" => true));
+        $Analyte   = $this->getRepository('\\Alae\\Entity\\Analyte')->findBy(array("status" => true), array('shortening' => 'ASC'));
         $Unit      = $this->getRepository('\\Alae\\Entity\\Unit')->findAll();
         $datatable = new Datatable($data, Datatable::DATATABLE_ANASTUDY, $this->_getSession()->getFkProfile()->getName());
         $viewModel = new ViewModel($datatable->getDatatable());
@@ -429,7 +500,18 @@ class StudyController extends BaseController
         $viewModel->setVariable('user', $this->_getSession());
         $viewModel->setVariable('isDuplicated',  $isDuplicated);
         $viewModel->setVariable('disabled', (($canEdit) ? '' : 'disabled=""'));
-		$viewModel->setVariable('mostrarConfirmar', $mostrarConfirmar);
+        $viewModel->setVariable('mostrarConfirmar', $mostrarConfirmar);
+        
+        if(isset($_GET['state']))
+        {
+            $state = $_GET['state'];
+        }
+        else
+        {
+            $state = 'open';
+        }
+        
+        $viewModel->setVariable('state', $state);
         return $viewModel;
     }
 
@@ -489,6 +571,7 @@ class StudyController extends BaseController
                     $User = $this->_getSession();
                     $Study->setApprove(true);
                     $Study->setFkUserApprove($User);
+                    $Study->setApprovedAt(new \DateTime('now'));
                     $this->getEntityManager()->persist($Study);
                     $this->getEntityManager()->flush();
                     $this->transaction(
@@ -774,6 +857,7 @@ class StudyController extends BaseController
         $viewModel->setVariable('User', $this->_getSession());
         $viewModel->setVariable('isUnlock', $counter == 0 ? true : false);
         $viewModel->setVariable('disabled', (!$AnaStudy->getStatus() && ($this->_getSession()->isAdministrador() || $this->_getSession()->isDirectorEstudio()) ? '' : 'disabled=""'));
+        $viewModel->setVariable('state', $_GET['state']);
         return $viewModel;
     }
 

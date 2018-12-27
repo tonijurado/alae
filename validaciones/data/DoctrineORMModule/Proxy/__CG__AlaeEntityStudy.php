@@ -64,10 +64,10 @@ class Study extends \Alae\Entity\Study implements \Doctrine\ORM\Proxy\Proxy
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'pkStudy', 'code', 'createdAt', 'updatedAt', 'approvedAt', 'description', 'observation', 'closeFlag', 'status', 'approve', 'duplicate', 'fkDilutionTree', 'fkUser', 'fkUserApprove', 'fkUserClose');
+            return array('__isInitialized__', 'pkStudy', 'code', 'createdAt', 'updatedAt', 'approvedAt', 'description', 'observation', 'closeFlag', 'status', 'validation', 'verification', 'approve', 'duplicate', 'fkDilutionTree', 'fkUser', 'fkUserApprove', 'fkUserClose');
         }
 
-        return array('__isInitialized__', 'pkStudy', 'code', 'createdAt', 'updatedAt', 'approvedAt', 'description', 'observation', 'closeFlag', 'status', 'approve', 'duplicate', 'fkDilutionTree', 'fkUser', 'fkUserApprove', 'fkUserClose');
+        return array('__isInitialized__', 'pkStudy', 'code', 'createdAt', 'updatedAt', 'approvedAt', 'description', 'observation', 'closeFlag', 'status', 'validation', 'verification', 'approve', 'duplicate', 'fkDilutionTree', 'fkUser', 'fkUserApprove', 'fkUserClose');
     }
 
     /**
@@ -373,6 +373,50 @@ class Study extends \Alae\Entity\Study implements \Doctrine\ORM\Proxy\Proxy
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setStatus', array($status));
 
         return parent::setStatus($status);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getValidation()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getValidation', array());
+
+        return parent::getValidation();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setValidation($validation)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setValidation', array($validation));
+
+        return parent::setValidation($validation);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getVerification()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getVerification', array());
+
+        return parent::getVerification();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setVerification($verification)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setVerification', array($verification));
+
+        return parent::setVerification($verification);
     }
 
     /**

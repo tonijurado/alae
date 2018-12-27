@@ -1,0 +1,92 @@
+<div id="logo">
+    <img src="<?php echo $this->basePath() ?>/img/alaepeq.png">
+</div>
+<div id="cerrar">
+    [<a href="<?php echo Alae\Service\Helper::getVarsConfig('base_url') . '/index/menu' ?>">regresar al menú</a>]
+</div>
+<div id="cuerpo" style="height:77%;">
+    <div id="create-study">
+        <div id="encab">
+            <h2>ficha del estudio</h2>
+        </div>
+        <div id="top" style="font-size:0.85em;">
+            <ul id="errorBox"><?php echo isset($error) ? $error : ""?></ul>
+            <form id="study-form" action="" method="POST">
+                <p>
+                    <label>Código:</label>
+                    <input type="text" name="code" value="">
+                    <label>Fecha creación:</label>
+                    <input class="centro" type="date" name="create_at" value="<?php echo date("Y-m-d"); ?>">
+                    <label>Arbol de Dilución:</label>
+                    <select name="dilution_tree">
+                        <option>1</option>
+                    </select>
+                </p>
+                <p>
+                    <label>Descripción:</label>
+                    <textarea name="description" rows="2" cols="50"></textarea>
+                </p>
+                <p>
+                    <label>Observaciones:</label>
+                    <textarea name="observation" rows="2" cols="50"></textarea>
+                </p>
+                <ul>
+                    <?php if ($user->isAdministrador() || $user->isDirectorEstudio()) : ?>
+                        <li>
+                            <input type="submit" class="btn" value="guardar" />
+                        </li>
+                    <?php endif; ?>
+                </ul>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    jQuery.validator.addMethod("regex", function (value, element, params) {
+        return this.optional(element) || /^[A-Z0-9]+(\-[0-9]+)?$/.test(value);
+    }, "Please enter a valid Rule");
+    $("#study-form").validate({
+        rules: {
+            code: {
+                required: true,
+                regex: true
+            },
+            create_at: {
+                required: true
+            },
+            description: {
+                required: true
+            },
+            observation: {
+                required: true
+            }
+        },
+        messages: {
+            code: {
+                required: "<strong>Código</strong> es requerido",
+                regex: "Por favor, introduzca un <strong>Código</strong> válido. Ejm: XXANE-YYYY"
+            },
+            create_at: {
+                required: "<strong>Fecha creación</strong> es requerido"
+            },
+            description: {
+                required: "<strong>Descripción</strong> es requerido"
+            },
+            observation: {
+                required: "<strong>Observaciones</strong> es requerido"
+            }
+        },
+        errorLabelContainer: "#errorBox",
+        wrapper: "li",
+        submitHandler: function(form){
+            answer = confirm("¿Desea guardar los cambios?");
+            if (answer === true){
+                form.submit();
+                return true;
+            }
+            else{
+                return false;
+            }
+        }
+    });
+</script>
