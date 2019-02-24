@@ -190,7 +190,16 @@ class CronController extends BaseController
         
         
         $array = explode("_", $file);
-        $stringAna = substr($array[1], 0, -4);
+        $pos = strpos($file, "_");
+        $pos = $pos + 1;
+        
+        $pos2 = strpos($file, ".");
+        
+        $stringAna2 = substr($file, $pos, $pos2);
+
+        $stringAna = substr($stringAna2, 0, -4);
+
+        //$stringAna = substr($array[1], 0, -4);
 
         $array2 = explode("_", $file);
 

@@ -23,6 +23,7 @@ class Datatable
     const DATATABLE_ANASTUDY     = 'analyte_study';
     const DATATABLE_BATCH        = 'batch';
     const DATATABLE_SAMPLE_BATCH = 'sample_batch';
+    const DATATABLE_VERIFICATION_SAMPLE_BATCH = 'verification_sample_batch';
     const DATATABLE_AUDIT_TRAIL  = 'audit';
     const DATATABLE_STUDY_CLOSE  = 'studyclose';
 
@@ -275,6 +276,26 @@ class Datatable
         );
     }
 
+    //COLUMNAS DEL SAMPLE VERIFICATION
+    protected function getverificationSampleBatchColumns()
+    {
+        $header = array("sample_name", "analyte_concentration");
+        $data   = $this->getData();
+
+        return array(
+            "data"     => (!empty($data)) ? json_encode($data) : 0,
+            "columns"  => json_encode(array(
+                array("key" => "sample_name", "label" => "Sample Name", "sortable" => true),
+                array("key" => "analyte_concentration", "label" => "Analyte concentration", "sortable" => true),
+                array("key" => "edit", "allowHTML" => true)
+            )),
+            "editable" => json_encode(array("analyte_concentration")),
+    
+            "header"   => json_encode($header),
+            "filters"  => $this->getFilters($header)
+        );
+    }
+
     //COLUMNAS DEL AUDIT
     protected function getAuditColumns()
     {
@@ -400,18 +421,21 @@ class Datatable
 	    case Datatable::DATATABLE_ADMIN:
 		$response = $this->getAdminColumns();
 		break;
-            case Datatable::DATATABLE_ANASTUDY:
-                $response = $this->getAnaStudyColumns();
-                break;
-            case Datatable::DATATABLE_BATCH:
-                $response = $this->getBatchColumns();
-                break;
-            case Datatable::DATATABLE_SAMPLE_BATCH:
-                $response = $this->getSampleBatchColumns();
-                break;
-            case Datatable::DATATABLE_AUDIT_TRAIL:
-                $response = $this->getAuditColumns();
-                break;
+        case Datatable::DATATABLE_ANASTUDY:
+            $response = $this->getAnaStudyColumns();
+            break;
+        case Datatable::DATATABLE_BATCH:
+            $response = $this->getBatchColumns();
+            break;
+        case Datatable::DATATABLE_SAMPLE_BATCH:
+            $response = $this->getSampleBatchColumns();
+            break;
+        case Datatable::DATATABLE_VERIFICATION_SAMPLE_BATCH:
+            $response = $this->getverificationSampleBatchColumns();
+            break;
+        case Datatable::DATATABLE_AUDIT_TRAIL:
+            $response = $this->getAuditColumns();
+            break;
         }
 
 	return $response;
@@ -452,6 +476,9 @@ class Datatable
 		$elements = '<span class="form-download-excel" onclick="excel(7);"></span>';
 		break;
 	    case Datatable::DATATABLE_SAMPLE_BATCH:
+                $elements = '<input value="" type="submit"/>';
+        break;
+        case Datatable::DATATABLE_VERIFICATION_SAMPLE_BATCH:
                 $elements = '<input value="" type="submit"/>';
 		break;
         }

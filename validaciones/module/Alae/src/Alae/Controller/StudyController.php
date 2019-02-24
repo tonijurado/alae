@@ -525,6 +525,7 @@ class StudyController extends BaseController
 
             if($anaStudy->getFkStudy()->getApprove() && $anaStudy->getStatus())
             {
+                $buttons .= '<a href="' . \Alae\Service\Helper::getVarsConfig("base_url") . '/study/sampleverification/' . $anaStudy->getPkAnalyteStudy() . '?state='.$state.'"><span class="form-datatable-change"></span></a>';
                 $buttons .= '<a href="' . \Alae\Service\Helper::getVarsConfig("base_url") . '/batch/list/' . $anaStudy->getPkAnalyteStudy() . '?state='.$state.'"><span class="form-datatable-batch"></span></a>';
             }
 
@@ -926,6 +927,108 @@ class StudyController extends BaseController
         return $viewModel;
     }
 
+    /*
+     * Función para ingresar las concentraciones nominacionales de los samples
+     */
+    public function sampleverificationAction()
+    {
+        $request = $this->getRequest();
+
+        $error = "";
+        $centi = 0;
+
+        if ($request->isPost())
+        {
+            
+            $updateConc = $request->getPost('update-analyte_concentration');
+            
+            if (!empty($updateConc))
+            {
+                $User = $this->_getSession();
+
+                foreach ($updateConc as $key => $value)
+                {
+                    
+                    $sampleBatch = $this->getRepository('\\Alae\\Entity\\SampleBatch')->find($key);
+                    
+                    if ($sampleBatch && $sampleBatch->getPkSampleBatch())
+                    {    
+                        $older = sprintf('Valores antiguos: Sample -> %1$s, Concentración -> %2$s',
+                            $sampleBatch->getSampleName(),
+                            $sampleBatch->getAnalyteConcentration()
+                        );
+                        
+                        $sampleBatch->setAnalyteConcentration($updateConc[$key]);
+                        $this->getEntityManager()->persist($sampleBatch);
+                        $this->getEntityManager()->flush();
+
+                        //INGRESO A AUDIT TRANSACTION
+                        $this->transaction(
+                            "Edición manual de muestras",
+                            sprintf('%1$s<br> Nuevo valor de concentración -> %2$s',
+                                $older,
+                                $updateConc[$key]
+                            ),
+                            false
+                        );
+                    }
+                }
+            }
+
+        }
+
+        $AnaStudy = $this->getRepository("\\Alae\\Entity\\AnalyteStudy")->find($this->getEvent()->getRouteMatch()->getParam('id'));
+        
+        $query    = $this->getEntityManager()->createQuery("
+            SELECT b
+            FROM Alae\Entity\Batch b
+            WHERE b.fkAnalyte = " . $AnaStudy->getFkAnalyte()->getPkAnalyte() . " AND b.fkStudy = " . $AnaStudy->getFkStudy()->getPkStudy() . "
+            ORDER BY b.fileName ASC");
+        $batch = $query->getResult();
+
+        $list    = array();
+        $pkBatch = array();
+        $data = array();
+        foreach ($batch as $Batch)
+        {
+            //OBTIENE LOS DATOS DEL REPORTE
+            $qb       = $this->getEntityManager()->createQueryBuilder();
+            $qb
+                    ->select('s.pkSampleBatch as PKSampleBatch', 's.sampleName as sampleName', 's.analyteConcentration','s.isConcentration')
+                    ->from('Alae\Entity\SampleBatch', 's')
+                    ->where("s.fkBatch = " . $Batch->getPkBatch() . " AND (s.sampleName LIKE '%NT%' OR s.sampleName LIKE '%BC%') ")
+                    ->groupBy('s.pkSampleBatch')
+                    ->orderBy('s.sampleName', 'ASC');
+            $elements = $qb->getQuery()->getResult();
+
+            if (count($elements) > 0)
+            {
+                
+                
+                foreach ($elements as $temp)
+                {
+                    $buttons = "";
+
+                    $buttons .= '<span class="form-datatable-change" onclick="changeElement(this, ' . $temp["PKSampleBatch"] . ');"></span>';
+
+                    $data[] = array(
+                        "sample_name"           => $temp["sampleName"],
+                        "analyte_concentration" => $temp["analyteConcentration"],
+                        "edit"                  => $buttons
+                    );
+                }
+            }
+        }
+
+        $datatable = new Datatable($data, Datatable::DATATABLE_VERIFICATION_SAMPLE_BATCH, $this->_getSession()->getFkProfile()->getName());
+        $viewModel = new ViewModel($datatable->getDatatable());
+        $viewModel->setVariable('AnaStudy', $AnaStudy);
+        $viewModel->setVariable('user', $this->_getSession());
+        $viewModel->setVariable('error', $error);
+        $viewModel->setVariable('state', $_GET['state']);
+        return $viewModel;
+    }
+
     //función para contar los analitos en un estudio
     protected function counterAnalyte($pkStudy)
     {
@@ -937,4 +1040,6 @@ class StudyController extends BaseController
         $response = $query->execute();
         return $response ? $query->getSingleScalarResult() : 0;
     }
+
+
 }

@@ -35,7 +35,6 @@ class VerificationController extends BaseController
     {
         if ($this->getEvent()->getRouteMatch()->getParam('id'))
         {
-
             $Batch = $this->getRepository()->find($this->getEvent()->getRouteMatch()->getParam('id'));
             
             for ($i = 4; $i < 12; $i++)
@@ -49,12 +48,18 @@ class VerificationController extends BaseController
             {
                 $this->V26($Batch);
             }
-
+            
             $this->V13_25($Batch);
 
             $response = $this->V12($Batch);
+            
             if ($response)
             {
+                return $this->redirect()->toRoute('verification', array(
+                    'controller' => 'verification',
+                    'action'     => 'error',
+                    'id'         => $Batch->getPkBatch()
+                ));
                 //$this->V13_25($Batch);
             }
             else

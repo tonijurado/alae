@@ -492,8 +492,6 @@ class ReportController extends BaseController
                     }
                 }
 
-                echo "prueba";die();
-
 
                 $viewModel = new ViewModel();
                 $viewModel->setTerminal(true);

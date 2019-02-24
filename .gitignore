@@ -29,3 +29,7 @@ extras/documentation
 
 #MisFiles
 *.txt
+
+/.history
+/.idea
+composer.json
