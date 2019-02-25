@@ -1029,6 +1029,143 @@ class StudyController extends BaseController
         return $viewModel;
     }
 
+    /*
+     * Función para ingresar las concentraciones nominacionales de los samples
+     */
+    public function verificationAction()
+    {
+        $request = $this->getRequest();
+
+        $error = "";
+        $centi = 0;
+
+        if ($request->isPost())
+        {
+            $createNames      = $request->getPost('create-name');
+            $createAssociated = $request->getPost('create-associated');
+
+            if (!empty($createNames))
+            {
+                foreach ($createNames as $key => $value)
+                {
+                    $sample = new \Alae\Entity\SampleVerification();
+                    $sample->setName($createNames[$key]);
+                    $sample->setAssociated($createAssociated[$key]);
+                    $this->getEntityManager()->persist($sample);
+                    $this->getEntityManager()->flush();
+                    $this->transaction(
+                        "Ingreso de nivel de concentración asociado",
+                        sprintf('Se ha ingresado el sample %1$s asociado a: %2$s',
+                            $sample->getName(),
+                            $sample->getAssociated()
+                        ),
+                        false
+                    );
+                            
+                }
+
+            }
+
+            $updateName = $request->getPost('update-name');
+            $updateAssociated = $request->getPost('update-associated');
+
+            if (!empty($updateName))
+            {
+                $User = $this->_getSession();
+
+                foreach ($updateName as $key => $value)
+                {
+                    
+                    $sampleVerification = $this->getRepository('\\Alae\\Entity\\SampleVerification')->find($key);
+                    
+                    if ($sampleVerification && $sampleVerification->getId())
+                    {    
+                        $older = sprintf('Valores antiguos: Sample -> %1$s, Association -> %2$s',
+                            $sampleVerification->getName(),
+                            $sampleVerification->getAssociated()
+                        );
+                        
+                        $sampleVerification->setName($updateName[$key]);
+                        $sampleVerification->setAssociated($updateAssociated[$key]);
+                        $this->getEntityManager()->persist($sampleVerification);
+                        $this->getEntityManager()->flush();
+
+                        //INGRESO A AUDIT TRANSACTION
+                        $this->transaction(
+                            "Edición de tabla de asociación",
+                            sprintf('%1$s<br> nombre -> %2$s, Asociación -> %3$s',
+                                $older,
+                                $updateName[$key],
+                                $updateAssociated[$key]
+                            ),
+                            false
+                        );
+                    }
+                }
+            }
+        }
+
+        $data     = array();
+        $elements = $this->getRepository("\\Alae\\Entity\\SampleVerification")->findAll();;
+        
+        //MOSTRAR LOS DATOS
+        foreach ($elements as $sample)
+        {
+
+            $buttons = "";
+            $buttons .= '<span class="form-datatable-change" onclick="changeElement(this, ' . $sample->getId() . ');"></span>';
+            $buttons .= '<span class="form-datatable-delete" onclick="removeElement(this, ' . $sample->getId() . ');"></span>';
+
+
+            $data[] = array(
+                "id"        => $sample->getId(),
+                "name"      => $sample->getName(),
+                "associated" => $sample->getAssociated(),
+                "edit"      => $buttons
+            );
+        }
+
+        $datatable = new Datatable($data, Datatable::DATATABLE_VERIFICATION_SAMPLE, $this->_getSession()->getFkProfile()->getName());
+        $viewModel = new ViewModel($datatable->getDatatable());
+        $viewModel->setVariable('user', $this->_getSession());
+        $viewModel->setVariable('error', $error);
+        return $viewModel;
+    }
+
+    public function deleteVerificationAction()
+    {
+        $request = $this->getRequest();
+
+        if ($request->isGet())
+        {
+            $sample = $this->getRepository('\\Alae\\Entity\\SampleVerification')->find($request->getQuery('pk'));
+
+            if ($sample && $sample->getId())
+            {
+                try
+                {
+                    //BORRA EL ESTUDIO
+                    $this->getEntityManager()->remove($sample);
+                    $this->getEntityManager()->flush();
+                    $this->transaction(
+                        "Eliminar asociación",
+                        sprintf('El usuario %1$s ha eliminado la asociación de %2$s con %3$s',
+                            $this->_getSession()->getUsername(),
+                            $sample->getName(),
+                            $sample->getAssociated()
+                        ),
+                        false
+                    );
+                    return new JsonModel(array("status" => true));
+                }
+                catch (Exception $e)
+                {
+                    exit;
+                }
+            }
+        }
+    }
+
     //función para contar los analitos en un estudio
     protected function counterAnalyte($pkStudy)
     {

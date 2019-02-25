@@ -24,6 +24,7 @@ class Datatable
     const DATATABLE_BATCH        = 'batch';
     const DATATABLE_SAMPLE_BATCH = 'sample_batch';
     const DATATABLE_VERIFICATION_SAMPLE_BATCH = 'verification_sample_batch';
+    const DATATABLE_VERIFICATION_SAMPLE = 'verification_sample';
     const DATATABLE_AUDIT_TRAIL  = 'audit';
     const DATATABLE_STUDY_CLOSE  = 'studyclose';
 
@@ -296,6 +297,27 @@ class Datatable
         );
     }
 
+        //COLUMNAS DEL SAMPLE VERIFICATION
+        protected function getverificationSampleColumns()
+        {
+            $header = array("id","name", "associated");
+            $data   = $this->getData();
+    
+            return array(
+                "data"     => (!empty($data)) ? json_encode($data) : 0,
+                "columns"  => json_encode(array(
+                    array("key" => "id", "label" => "Id", "sortable" => true),
+                    array("key" => "name", "label" => "Sample", "sortable" => true),
+                    array("key" => "associated", "label" => "Nivel de concentración asociado", "sortable" => true),
+                    array("key" => "edit", "allowHTML" => true)
+                )),
+                "editable" => json_encode(array("name", "associated")),
+        
+                "header"   => json_encode($header),
+                "filters"  => $this->getFilters($header)
+            );
+        }
+
     //COLUMNAS DEL AUDIT
     protected function getAuditColumns()
     {
@@ -433,6 +455,9 @@ class Datatable
         case Datatable::DATATABLE_VERIFICATION_SAMPLE_BATCH:
             $response = $this->getverificationSampleBatchColumns();
             break;
+        case Datatable::DATATABLE_VERIFICATION_SAMPLE:
+            $response = $this->getverificationSampleColumns();
+            break;
         case Datatable::DATATABLE_AUDIT_TRAIL:
             $response = $this->getAuditColumns();
             break;
@@ -480,6 +505,9 @@ class Datatable
         break;
         case Datatable::DATATABLE_VERIFICATION_SAMPLE_BATCH:
                 $elements = '<input value="" type="submit"/>';
+        break;
+        case Datatable::DATATABLE_VERIFICATION_SAMPLE:
+                $elements = '<span class="form-datatable-new"></span><input value="" type="submit"/>';
 		break;
         }
 

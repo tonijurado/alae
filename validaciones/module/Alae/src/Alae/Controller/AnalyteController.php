@@ -46,6 +46,7 @@ class AnalyteController extends BaseController
         {
             $createNames      = $request->getPost('create-name');
             $createShortnames = $request->getPost('create-shortname');
+            
             $updateNames      = $request->getPost('update-name');
             $updateShortnames = $request->getPost('update-shortname');
 

@@ -12,6 +12,16 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class SampleVerification
 {
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="id", type="bigint", nullable=false)
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     */
+    protected $id;
+
     /**
      * @var string
      *
@@ -26,6 +36,15 @@ class SampleVerification
      */
     protected $associated;
 
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
  
     public function getName()
     {
