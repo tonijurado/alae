@@ -525,8 +525,9 @@ class StudyController extends BaseController
 
             if($anaStudy->getFkStudy()->getApprove() && $anaStudy->getStatus())
             {
-                $buttons .= '<a href="' . \Alae\Service\Helper::getVarsConfig("base_url") . '/study/sampleverification/' . $anaStudy->getPkAnalyteStudy() . '?state='.$state.'"><span class="form-datatable-change"></span></a>';
                 $buttons .= '<a href="' . \Alae\Service\Helper::getVarsConfig("base_url") . '/batch/list/' . $anaStudy->getPkAnalyteStudy() . '?state='.$state.'"><span class="form-datatable-batch"></span></a>';
+                $buttons .= '<a href="' . \Alae\Service\Helper::getVarsConfig("base_url") . '/study/sampleverificationassociation/' . $anaStudy->getPkAnalyteStudy() . '?state='.$state.'"><span class="form-datatable-change" title="asociación"></span></a>';
+                $buttons .= '<a href="' . \Alae\Service\Helper::getVarsConfig("base_url") . '/study/sampleverification/' . $anaStudy->getPkAnalyteStudy() . '?state='.$state.'"><span class="form-datatable-change" title="verificación"></span></a>';
             }
 
             $min = $anaStudy->getRetention() - ($anaStudy->getAcceptance() * $anaStudy->getRetention() / 100);
@@ -1164,6 +1165,64 @@ class StudyController extends BaseController
                 }
             }
         }
+    }
+
+    public function sampleverificationassociationAction()
+    {
+        $request = $this->getRequest();
+
+        $error = "";
+        $centi = 0;
+
+        $AnaStudy = $this->getRepository("\\Alae\\Entity\\AnalyteStudy")->find($this->getEvent()->getRouteMatch()->getParam('id'));
+
+        $query    = $this->getEntityManager()->createQuery("
+            SELECT b
+            FROM Alae\Entity\Batch b
+            WHERE b.fkAnalyte = " . $AnaStudy->getFkAnalyte()->getPkAnalyte() . " AND b.fkStudy = " . $AnaStudy->getFkStudy()->getPkStudy() . "
+            ORDER BY b.fileName ASC");
+        $batch = $query->getResult();
+
+        $data     = array();
+
+                /*SELECT distinct v.NAME, v.associated FROM alae_sample_batch s 
+        JOIN alae_sample_verification v
+        ON s.sample_name LIKE CONCAT('', v.name ,'%')
+        WHERE s.fk_batch = 8271*/
+        foreach ($batch as $Batch)
+        {
+            $query  = $this->getEntityManager()->createQuery("
+            SELECT DISTINCT v.id as id, v.name as name, v.associated
+            FROM Alae\Entity\SampleBatch s, Alae\Entity\SampleVerification v
+            WHERE s.sampleName like CONCAT('', v.name ,'%')
+                AND s.fkBatch = " . $Batch->getPkBatch() . "
+            ORDER BY v.name");            
+            $elements = $query->getResult();
+
+            if (count($elements) > 0)
+            {
+                
+                
+                foreach ($elements as $temp)
+                {
+                    $buttons = "";
+
+                    $data[] = array(
+                        "name"       => $temp["name"],
+                        "associated" => $temp["associated"],
+                        "edit"                  => $buttons
+                    );
+                }
+            }
+        }
+
+        $datatable = new Datatable($data, Datatable::DATATABLE_VERIFICATION_SAMPLE_ASSOC, $this->_getSession()->getFkProfile()->getName());
+        $viewModel = new ViewModel($datatable->getDatatable());
+        $viewModel->setVariable('user', $this->_getSession());
+        $viewModel->setVariable('error', $error);
+        $viewModel->setVariable('AnaStudy', $AnaStudy);
+        $viewModel->setVariable('state', $_GET['state']);
+        return $viewModel;
     }
 
     //función para contar los analitos en un estudio

@@ -204,10 +204,14 @@ class CronController extends BaseController
         $array2 = explode("_", $file);
 
         $array3 = explode("-", $array2[0]);
+
+        $array4 = explode("+", $array3[1]);
+
+        //echo $array3[0]." ".$array3[1]." ".$stringAna." ".$array4[0];die();
         
         return array(
             "batch"   => $array3[0],
-            "study"   => $array3[1],
+            "study"   => $array4[0],
             "analyte" => $stringAna
             //"study"   => preg_replace("/(\+*\_(([a-zA-Z0-9](-|\.|,)?\s*)+|(\((\+|-)\)-[a-zA-Z0-9]+)))/", "", $array[1]),
             //"analyte" => preg_replace("/(([a-zA-Z0-9]+)?)\+*(\_)/", "", $string)
