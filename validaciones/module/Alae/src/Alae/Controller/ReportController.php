@@ -1097,8 +1097,8 @@ class ReportController extends BaseController
             {
                 $qb       = $this->getEntityManager()->createQueryBuilder();
                 $qb
-                        ->select('s.sampleName, s.sampleId, s.analytePeakName, s.sampleType, s.fileName, s.analytePeakArea, s.isPeakArea, s.areaRatio, s.analyteConcentration, s.calculatedConcentration, s.dilutionFactor, s.accuracy, s.useRecord,
-                     s.acquisitionDate, s.analyteIntegrationType, s.isIntegrationType, s.recordModified,
+                        ->select('s.sampleName, s.analytePeakName, s.sampleType, s.fileName, s.analytePeakArea, s.isPeakArea, s.areaRatio, s.analyteConcentration, s.calculatedConcentration, s.dilutionFactor, s.accuracy, s.useRecord,
+                     s.acquisitionDate, s.analyteRetentionTime, s.isRetentionTime, s.analyteIntegrationType, s.isIntegrationType, s.recordModified,
                     GROUP_CONCAT(DISTINCT p.codeError) as codeError,
                     GROUP_CONCAT(DISTINCT p.messageError) as messageError')
                         ->from('Alae\Entity\SampleBatch', 's')
@@ -1175,6 +1175,9 @@ class ReportController extends BaseController
                                 case "messageError":
                                     $value = str_replace(",", " // ", $value);
                                     $row1 .= htmlentities($value)."\t";
+                                    break;
+                                default:
+                                    $row1 .= $value."\t";
                                     break;
                             }
                         }
