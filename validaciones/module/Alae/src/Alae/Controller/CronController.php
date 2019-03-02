@@ -91,7 +91,7 @@ class CronController extends BaseController
                 ORDER BY s.code DESC")
             ->setMaxResults(1);
         $elements = $query->getResult();
-
+        
         if (count($elements) > 0)
         {
             
@@ -138,7 +138,8 @@ class CronController extends BaseController
                     {
                         
                         //if (preg_match("/^([a-zA-Z0-9]+-\d{4}(-[0-9]+)?)\+(M|O|R|X)[0-9]*\_(([a-zA-Z0-9](-|\.|,)?\s*)+|(\((\+|-)\)-[a-zA-Z0-9]+))\.txt$/i", $file))
-                        if (preg_match("/^([A-Z0-9]+(\-[0-9]{4}?)+[V]+([0-9]{2}?)?+(\_)+?(.)+(\.)+[t]+[x]+[t]$)/i", $file))
+                        //if (preg_match("/^([A-Z0-9]+(\-[0-9]{4}?)+[V]+([0-9]{2}?)?+(\_)+?(.)+(\.)+[t]+[x]+[t]$)/i", $file))
+                        if (preg_match("/^^([A-Z0-9]+(\-[0-9]{4}?)+[V]+([0-9]{2}?)?+[+]+[O]+([0-9]?)+([0-9]?)?(\_)+?(.)+(\.)+[t]+[x]+[t]$)/i", $file))
                         {
                             $this->validateFile($file);
                         }
@@ -257,7 +258,7 @@ class CronController extends BaseController
                 
                     if (is_null($Study))
                     {
-                        echo "EXPORT ERRÓNEO";
+                        echo "EXPORT ERRONEO. SIN ESTUDIO";
                     }
                     $this->execute(\Alae\Service\Verification::updateBatch("b.pkBatch = " . $Batch->getPkBatch(), "V1"));
                 }
@@ -265,7 +266,7 @@ class CronController extends BaseController
             else
             {
                 
-                echo "EXPORT ERRÓNEO";
+                echo "EXPORT ERRONEO. SIN SAMPLES";
                 $this->execute(\Alae\Service\Verification::updateBatch("b.pkBatch = " . $Batch->getPkBatch(), "V1"));
             }
         }
@@ -512,7 +513,7 @@ class CronController extends BaseController
 
         if ($count > 0)
         {
-            echo "ANALITO ERRÓNEO";
+            echo "ANALITO ERRONEO";
         }
         
 
@@ -526,7 +527,7 @@ class CronController extends BaseController
 
         if ($count > 0)
         {
-            echo "EXPORT ERRÓNEO";
+            echo "EXPORT ERRONEO. SIN SAMPLES";
         }
     }
 

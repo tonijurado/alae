@@ -289,7 +289,7 @@ class VerificationController extends BaseController
             $this->getEntityManager()->flush();
             $pkParameter[] = $sampleBatch->getPkSampleBatch();
         }
-
+        
         if(!$isValid && count($pkParameter) > 0)
         {
             $sql = "
@@ -457,9 +457,12 @@ class VerificationController extends BaseController
             {
                 $pkSampleBatch[] = $temp["pkSampleBatch"];
             }
-
-            $where = "s.pkSampleBatch IN (" . implode(",", $pkSampleBatch) . ")";
-            $this->error($where, $parameters[0]);
+            
+            if(count($pkSampleBatch) > 0)
+            {
+                $where = "s.pkSampleBatch IN (" . implode(",", $pkSampleBatch) . ")";
+                $this->error($where, $parameters[0]);
+            }
         }
 
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V6.2"));
@@ -478,9 +481,12 @@ class VerificationController extends BaseController
             {
                 $pkSampleBatch[] = $temp["pkSampleBatch"];
             }
-
-            $where = "s.pkSampleBatch IN (" . implode(",", $pkSampleBatch) . ")";
-            $this->error($where, $parameters[0]);
+            
+            if(count($pkSampleBatch) > 0)
+            {
+                $where = "s.pkSampleBatch IN (" . implode(",", $pkSampleBatch) . ")";
+                $this->error($where, $parameters[0]);
+            }
         }
     }
 
@@ -889,7 +895,7 @@ class VerificationController extends BaseController
             }
         }
 
-        if (!$isValid)
+        if (!$isValid && count($pkSampleBatch) > 0)
         {
             $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V16"));
             $where = "s.pkSampleBatch in (" . implode(",", $pkSampleBatch) . ") AND s.fkBatch = " . $Batch->getPkBatch();
@@ -1366,7 +1372,14 @@ class VerificationController extends BaseController
         WHERE s.sampleName LIKE 'CS" .$AnaStudy[0]->getCsNumber(). "%' AND s.useRecord = 1 AND s.fkBatch = " . $Batch->getPkBatch());
         $csMaxAceptadosTotal = $query->getSingleScalarResult();
 
-        $value      = ($csMaxTotal / $csMaxAceptadosTotal) * 100;
+        if($csMaxAceptadosTotal <= 0)
+        {
+            $value = 0;
+        }
+        else
+        {
+            $value = ($csMaxTotal / $csMaxAceptadosTotal) * 100;
+        }
 
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V29"));
 

@@ -168,7 +168,13 @@ th{font-family: Calibri; font-size:1.1em;color:#008B8B; border: 1px solid #008B8
     font-size: 0.9em;  
 }
 
-
+#centrado .txt{
+    text-indent:0px;
+    text-align: left;
+    list-style-image:url('../img/info.png'); 
+    outline: solid 1px #008B8B; 
+    font-size: 0.9em;  
+}
 
 .centro{text-align:center;}
 .izq{text-align:left;}
