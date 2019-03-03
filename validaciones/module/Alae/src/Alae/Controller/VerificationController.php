@@ -238,7 +238,7 @@ class VerificationController extends BaseController
 
         $function = 'V23';
         $this->$function($Batch);
-
+        
         $continue = $this->evaluation($Batch);
         
         if ($continue && is_null($Batch->getFkParameter()))
@@ -833,8 +833,14 @@ class VerificationController extends BaseController
             FROM Alae\Entity\SampleBatch s
             WHERE (s.sampleName LIKE 'CS%' OR s.sampleName LIKE 'QC%') AND (s.sampleName NOT LIKE  '%\*%' OR s.sampleName NOT LIKE  'HDQC%' OR s.sampleName NOT LIKE  'LDQC%') AND s.validFlag <> 0 AND s.useRecord = 1 AND s.fkBatch = " . $Batch->getPkBatch());
         $value = $query->getSingleScalarResult();
-        $Batch->setIsCsQcAcceptedAvg($value);
-
+        if($value)
+        {
+            $Batch->setIsCsQcAcceptedAvg($value);
+        }
+        else
+        {
+            $Batch->setIsCsQcAcceptedAvg(0);
+        }
         $this->getEntityManager()->persist($Batch);
         $this->getEntityManager()->flush();
     }
@@ -845,13 +851,18 @@ class VerificationController extends BaseController
      */
     protected function V15(\Alae\Entity\Batch $Batch)
     {
-        $value      = ($Batch->getCsAcceptedTotal() / $Batch->getCsTotal()) * 100;
-        $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V15"));
-
-        if ($value < $parameters[0]->getMinValue())
+        
+        if($Batch->getCsTotal() != 0)
         {
-            $where = "s.sampleName LIKE 'CS%' AND s.fkBatch = " . $Batch->getPkBatch();
-            $this->error($where, $parameters[0]);
+            echo "pr";die();
+            $value      = ($Batch->getCsAcceptedTotal() / $Batch->getCsTotal()) * 100;
+            $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V15"));
+
+            if ($value < $parameters[0]->getMinValue())
+            {
+                $where = "s.sampleName LIKE 'CS%' AND s.fkBatch = " . $Batch->getPkBatch();
+                $this->error($where, $parameters[0]);
+            }
         }
     }
 
@@ -928,13 +939,16 @@ class VerificationController extends BaseController
      */
     protected function V18(\Alae\Entity\Batch $Batch)
     {
-        $value      = ($Batch->getQcAcceptedTotal() / $Batch->getQcTotal()) * 100;
-        $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V18"));
-
-        if ($value < $parameters[0]->getMinValue())
+        if($Batch->getQcTotal() != 0)
         {
-            $where = "(s.sampleName NOT LIKE 'DQC%' AND s.sampleName LIKE 'QC%') AND s.fkBatch = " . $Batch->getPkBatch();
-            $this->error($where, $parameters[0]);
+            $value      = ($Batch->getQcAcceptedTotal() / $Batch->getQcTotal()) * 100;
+            $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V18"));
+
+            if ($value < $parameters[0]->getMinValue())
+            {
+                $where = "(s.sampleName NOT LIKE 'DQC%' AND s.sampleName LIKE 'QC%') AND s.fkBatch = " . $Batch->getPkBatch();
+                $this->error($where, $parameters[0]);
+            }
         }
     }
 
@@ -1018,12 +1032,16 @@ class VerificationController extends BaseController
             WHERE s.sampleName LIKE 'ZS%' AND s.validFlag <> 0 AND s.fkBatch = " . $Batch->getPkBatch()
         );
         $zs_accepted_total = $query->getSingleScalarResult();
-        $value             = ($zs_accepted_total / $zs_total) * 100;
-        $parameters        = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V20.2"));
-        if ($value < $parameters[0]->getMinValue())
+        
+        if($zs_accepted_total != 0)
         {
-            $where = "s.sampleName LIKE 'ZS%' AND s.fkBatch = " . $Batch->getPkBatch();
-            $this->error($where, $parameters[0]);
+            $value             = ($zs_accepted_total / $zs_total) * 100;
+            $parameters        = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V20.2"));
+            if ($value < $parameters[0]->getMinValue())
+            {
+                $where = "s.sampleName LIKE 'ZS%' AND s.fkBatch = " . $Batch->getPkBatch();
+                $this->error($where, $parameters[0]);
+            }
         }
     }
 
@@ -1034,16 +1052,26 @@ class VerificationController extends BaseController
     protected function V21(\Alae\Entity\Batch $Batch)
     {
         $query = $this->getEntityManager()->createQuery("
-            SELECT s.analyteConcentration
+            SELECT count(s.analyteConcentration)
             FROM Alae\Entity\SampleBatch s
             WHERE s.sampleName LIKE 'CS%' AND s.fkBatch = " . $Batch->getPkBatch() . "
-            ORDER BY s.sampleName DESC")
-            ->setMaxResults(1);
-        $analyteConcentration = $query->getSingleScalarResult();
+            ORDER BY s.sampleName DESC");
+            $counter = $query->getSingleScalarResult();
 
-        $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V21"));
-        $where = "s.sampleType = 'Unknown' AND s.calculatedConcentration > $analyteConcentration AND s.fkBatch = " . $Batch->getPkBatch();
-        $this->error($where, $parameters[0], array(), false);
+        if($counter > 0)
+        {
+            $query = $this->getEntityManager()->createQuery("
+                SELECT s.analyteConcentration
+                FROM Alae\Entity\SampleBatch s
+                WHERE s.sampleName LIKE 'CS%' AND s.fkBatch = " . $Batch->getPkBatch() . "
+                ORDER BY s.sampleName DESC")
+                ->setMaxResults(1);
+            $analyteConcentration = $query->getSingleScalarResult();
+
+            $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V21"));
+            $where = "s.sampleType = 'Unknown' AND s.calculatedConcentration > $analyteConcentration AND s.fkBatch = " . $Batch->getPkBatch();
+            $this->error($where, $parameters[0], array(), false);
+        }
     }
 
     /**
@@ -1344,14 +1372,17 @@ class VerificationController extends BaseController
             WHERE s.sampleName LIKE 'CS1%'  AND s.useRecord = 1 AND s.fkBatch = " . $Batch->getPkBatch());
         $cs1AceptadosTotal = $query->getSingleScalarResult();
 
-        $value      = ($cs1Total / $cs1AceptadosTotal) * 100;
-        
-        $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V28"));
-
-        if ($value < $parameters[0]->getMinValue())
+        if($cs1AceptadosTotal != 0)
         {
-            $where = "s.sampleName LIKE 'CS1%' AND s.fkBatch = " . $Batch->getPkBatch();
-            $this->error($where, $parameters[0]);
+            $value      = ($cs1Total / $cs1AceptadosTotal) * 100;
+            
+            $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V28"));
+
+            if ($value < $parameters[0]->getMinValue())
+            {
+                $where = "s.sampleName LIKE 'CS1%' AND s.fkBatch = " . $Batch->getPkBatch();
+                $this->error($where, $parameters[0]);
+            }
         }
 
         $AnaStudy = $this->getRepository("\\Alae\\Entity\\AnalyteStudy")->findBy(array(
@@ -1372,21 +1403,18 @@ class VerificationController extends BaseController
         WHERE s.sampleName LIKE 'CS" .$AnaStudy[0]->getCsNumber(). "%' AND s.useRecord = 1 AND s.fkBatch = " . $Batch->getPkBatch());
         $csMaxAceptadosTotal = $query->getSingleScalarResult();
 
-        if($csMaxAceptadosTotal <= 0)
-        {
-            $value = 0;
-        }
-        else
+        
+        if($csMaxAceptadosTotal != 0)
         {
             $value = ($csMaxTotal / $csMaxAceptadosTotal) * 100;
-        }
+    
+            $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V29"));
 
-        $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V29"));
-
-        if ($value < $parameters[0]->getMinValue())
-        {
-            $where = "s.sampleName LIKE 'CS" .$AnaStudy[0]->getCsNumber(). "%' AND s.fkBatch = " . $Batch->getPkBatch();
-            $this->error($where, $parameters[0]);
+            if ($value < $parameters[0]->getMinValue())
+            {
+                $where = "s.sampleName LIKE 'CS" .$AnaStudy[0]->getCsNumber(). "%' AND s.fkBatch = " . $Batch->getPkBatch();
+                $this->error($where, $parameters[0]);
+            }
         }
     }
 }
