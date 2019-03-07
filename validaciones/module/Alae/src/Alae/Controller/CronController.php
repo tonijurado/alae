@@ -237,6 +237,7 @@ class CronController extends BaseController
         //si el tamaño del archivo es mayor que el tamaño del parametro
         if($fileSize < $value)
         {
+            echo "FALLO EXPORT TAMAÑO.";
             $this->execute(\Alae\Service\Verification::updateBatch("b.pkBatch = " . $Batch->getPkBatch(), "V1.1"));
         }
         else
