@@ -854,7 +854,6 @@ class VerificationController extends BaseController
         
         if($Batch->getCsTotal() != 0)
         {
-            echo "pr";die();
             $value      = ($Batch->getCsAcceptedTotal() / $Batch->getCsTotal()) * 100;
             $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V15"));
 
