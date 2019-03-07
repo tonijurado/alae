@@ -139,7 +139,8 @@ class CronController extends BaseController
                         
                         //if (preg_match("/^([a-zA-Z0-9]+-\d{4}(-[0-9]+)?)\+(M|O|R|X)[0-9]*\_(([a-zA-Z0-9](-|\.|,)?\s*)+|(\((\+|-)\)-[a-zA-Z0-9]+))\.txt$/i", $file))
                         //if (preg_match("/^([A-Z0-9]+(\-[0-9]{4}?)+[V]+([0-9]{2}?)?+(\_)+?(.)+(\.)+[t]+[x]+[t]$)/i", $file))
-                        if (preg_match("/^([A-Z0-9]+(\-[0-9]{4}?)+[V]+([0-9]{2}?)?+[+]+[O]+([0-9]?)+([0-9]?)?(\_)+?(.)+(\.)+[t]+[x]+[t]$)/i", $file))
+                        //if (preg_match("/^([A-Z0-9]+(\-[0-9]{4}?)+[V]+([0-9]{2}?)?+[+]+[O]+([0-9]?)+([0-9]?)?(\_)+?(.)+(\.)+[t]+[x]+[t]$)/i", $file))
+                        if (preg_match("/^([a-zA-Z0-9]+-\d{4}+[V]{1}+([0-9]{2}?)?+(([+])(M|O|R|X)([0-9]?)([0-9]?))?)*\_(([a-zA-Z0-9](-|\.|,)?\s*)+|(\((\+|-)\)-[a-zA-Z0-9]+))\.txt$/i", $file))
                         {
                             $this->validateFile($file);
                         }
@@ -193,14 +194,13 @@ class CronController extends BaseController
         $array = explode("_", $file);
         $pos = strpos($file, "_");
         $pos = $pos + 1;
-        
         $pos2 = strpos($file, ".");
-        
+
         $stringAna2 = substr($file, $pos, $pos2);
 
         $stringAna = substr($stringAna2, 0, -4);
 
-        //$stringAna = substr($array[1], 0, -4);
+        $stringAna = substr($array[1], 0, -4);
 
         $array2 = explode("_", $file);
 
@@ -208,7 +208,7 @@ class CronController extends BaseController
 
         $array4 = explode("+", $array3[1]);
 
-        //echo $array3[0]." ".$array3[1]." ".$stringAna." ".$array4[0];die();
+        //echo $array3[0]." ".$stringAna." ".$array4[0];die();
         
         return array(
             "batch"   => $array3[0],
