@@ -229,23 +229,23 @@ class CronController extends BaseController
         //var_dump($data["data"][143][2]);
         
         
-        $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V1.1"));
+        $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V1"));
         $value      = $parameters[0]->getMinValue();
         $fileSize = $data["size"];
         
         $Batch = $this->saveBatch($fileName, $fileSize);
-        //si el tamaño del archivo es mayor que el tamaño del parametro
+        //si el tamaño del archivo es menor que el tamaño del parametro
         if($fileSize < $value)
         {
             echo "FALLO EXPORT TAMAÑO.";
-            $this->execute(\Alae\Service\Verification::updateBatch("b.pkBatch = " . $Batch->getPkBatch(), "V1.1"));
+            $this->execute(\Alae\Service\Verification::updateBatch("b.pkBatch = " . $Batch->getPkBatch(), "V1"));
         }
         else
         {    
+            
             if(count($data["data"]) > 0)
             {
                 $this->saveSampleBatch($data["headers"], $data['data'], $Batch);
-                
                 $this->batchVerify($Batch, $Analyte, $fileName);
 
                 if (!is_null($Analyte) && !is_null($Study))
@@ -260,16 +260,16 @@ class CronController extends BaseController
                     if (is_null($Study))
                     {
                         echo "EXPORT ERRONEO. SIN ESTUDIO";
+                        $this->execute(\Alae\Service\Verification::updateBatch("b.pkBatch = " . $Batch->getPkBatch(), "V2"));
                     }
-                    $this->execute(\Alae\Service\Verification::updateBatch("b.pkBatch = " . $Batch->getPkBatch(), "V1"));
                 }
             }
-            else
+            /*else
             {
                 
                 echo "EXPORT ERRONEO. SIN SAMPLES";
                 $this->execute(\Alae\Service\Verification::updateBatch("b.pkBatch = " . $Batch->getPkBatch(), "V1"));
-            }
+            }*/
         }
     }
 
@@ -500,36 +500,32 @@ class CronController extends BaseController
      */
     private function batchVerify($Batch, $Analyte, $fileName)
     {
-        
         $response = $this->explodeFile($fileName);
-
         $study = substr($response['study'], 0, 4);
-        
-        $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V2"));
+        $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V3"));
         $where = "s.analytePeakName <> '" . $response['analyte'] . "' AND s.fkBatch = " . $Batch->getPkBatch();
         $this->error($where, $fkParameter[0], array(), false);
 
-        $query = $this->getEntityManager()->createQuery("SELECT COUNT(s.pkSampleBatch) FROM Alae\Entity\SampleBatch s WHERE $where");
+        /*$query = $this->getEntityManager()->createQuery("SELECT COUNT(s.pkSampleBatch) FROM Alae\Entity\SampleBatch s WHERE $where");
         $count = $query->getSingleScalarResult();
 
         if ($count > 0)
         {
             echo "ANALITO ERRONEO";
-        }
+        }*/
         
-
-        $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V3"));
-        $fileName = $response['batch'] . "-" . $study;
+        $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V4"));
+        $fileName = $response['batch'] . "-" . $response['study'];
         $where = "s.fileName NOT LIKE '$fileName%' AND s.fkBatch = " . $Batch->getPkBatch();
         $this->error($where, $fkParameter[0], array(), false);
 
-        $query = $this->getEntityManager()->createQuery("SELECT COUNT(s.pkSampleBatch) FROM Alae\Entity\SampleBatch s WHERE $where");
+        /*$query = $this->getEntityManager()->createQuery("SELECT COUNT(s.pkSampleBatch) FROM Alae\Entity\SampleBatch s WHERE $where");
         $count = $query->getSingleScalarResult();
 
         if ($count > 0)
         {
             echo "EXPORT ERRONEO. SIN SAMPLES";
-        }
+        }*/
     }
 
     /*
