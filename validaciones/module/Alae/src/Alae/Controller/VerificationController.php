@@ -97,7 +97,7 @@ class VerificationController extends BaseController
                 {
                     $Batch = $this->getRepository()->find($request->getPost('id'));
                     $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => $valueR));
-                    if ($request->getPost('reason') == "V12.8")
+                    if ($valueR == "V12.8")
                     {
                         $this->evaluation($Batch, false, $parameters[0]);
                     }
