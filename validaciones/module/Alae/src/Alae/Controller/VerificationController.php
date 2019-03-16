@@ -65,6 +65,7 @@ class VerificationController extends BaseController
      */
     public function errorAction()
     {
+
         $request = $this->getRequest();
 
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.1"));
@@ -95,6 +96,7 @@ class VerificationController extends BaseController
             {
                 $this->evaluation($Batch, false, $parameters[0]);
             }
+            
 
             $where = "s.fkBatch = " . $Batch->getPkBatch() . "
                 AND (
@@ -113,7 +115,7 @@ class VerificationController extends BaseController
             $this->error($where, $parameters[0], array('regexp1' => '^CS[0-9]+(-[0-9]+)?$','regexp2' => '^QC[0-9]+(-[0-9]+)?$','regexp3' => '^((L|H)?DQC)[0-9]+(-[0-9]+)?$'), false);
             $this->V13_23($Batch);
         }
-
+        
         if ($this->getEvent()->getRouteMatch()->getParam('id'))
         {
             $Batch = $this->getRepository()->find($this->getEvent()->getRouteMatch()->getParam('id'));
@@ -272,7 +274,7 @@ class VerificationController extends BaseController
             $this->getEntityManager()->flush();
             $pkParameter[] = $sampleBatch->getPkSampleBatch();
         }
-        
+
         if(!$isValid && count($pkParameter) > 0)
         {
             $sql = "
@@ -282,10 +284,11 @@ class VerificationController extends BaseController
             $query = $this->getEntityManager()->createQuery($sql);
             $query->execute();
         }
+        
     }
 
     /**
-     * V4: Sample Type - SAMPLE TYPE ERRÓNEO
+     * V5: Sample Type - SAMPLE TYPE ERRÓNEO
      * @param \Alae\Entity\Batch $Batch
      */
     protected function V5(\Alae\Entity\Batch $Batch)

@@ -287,13 +287,13 @@ class ReportController extends BaseController
 
                     }
 
+                    //AND ((p.pkParameter BETWEEN 1 AND 8) OR (p.pkParameter BETWEEN 23 AND 29))
                     //GENERA LOS ERRORES
                     $query  = $this->getEntityManager()->createQuery("
                         SELECT DISTINCT(p.pkParameter) as pkParameter, p.messageError
                         FROM Alae\Entity\Error e, Alae\Entity\SampleBatch s, Alae\Entity\Parameter p
                         WHERE s.pkSampleBatch = e.fkSampleBatch
                             AND e.fkParameter = p.pkParameter
-                            AND ((p.pkParameter BETWEEN 1 AND 8) OR (p.pkParameter BETWEEN 23 AND 29))
                             AND s.fkBatch = " . $Batch->getPkBatch() . "
                         ORDER BY p.pkParameter");
                     $errors = $query->getResult();
@@ -369,6 +369,7 @@ class ReportController extends BaseController
         return $viewModel;*/
     }
 
+    //AND ((p.pkParameter BETWEEN 1 AND 8) OR (p.pkParameter BETWEEN 23 AND 29))
     /**
      * Resumen de lotes de un estudio
      * $_GET['id'] = pkStudy
@@ -403,7 +404,6 @@ class ReportController extends BaseController
                         FROM Alae\Entity\Error e, Alae\Entity\SampleBatch s, Alae\Entity\Parameter p
                         WHERE s.pkSampleBatch = e.fkSampleBatch
                             AND e.fkParameter = p.pkParameter
-                            AND ((p.pkParameter BETWEEN 1 AND 8) OR (p.pkParameter BETWEEN 23 AND 29))
                             AND s.fkBatch = " . $Batch->getPkBatch());
                     $elements = $query->getResult();
 
@@ -1187,13 +1187,13 @@ class ReportController extends BaseController
 
                     }
 
+                    //AND ((p.pkParameter BETWEEN 1 AND 8) OR (p.pkParameter BETWEEN 23 AND 29))
                     //GENERA LOS ERRORES
                     $query  = $this->getEntityManager()->createQuery("
                         SELECT DISTINCT(p.pkParameter) as pkParameter, p.messageError
                         FROM Alae\Entity\Error e, Alae\Entity\SampleBatch s, Alae\Entity\Parameter p
                         WHERE s.pkSampleBatch = e.fkSampleBatch
                             AND e.fkParameter = p.pkParameter
-                            AND ((p.pkParameter BETWEEN 1 AND 8) OR (p.pkParameter BETWEEN 23 AND 29))
                             AND s.fkBatch = " . $Batch->getPkBatch() . "
                         ORDER BY p.pkParameter");
                     $errors = $query->getResult();
