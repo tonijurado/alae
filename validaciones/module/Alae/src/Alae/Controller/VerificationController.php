@@ -340,6 +340,7 @@ class VerificationController extends BaseController
     /**
      * V6: Concentración nominal de CS/QC - CONCENTRACIÓN NOMINAL ERRÓNEA
      * @param \Alae\Entity\Batch $Batch
+	 * CambioToni sin importancia (comentario)
      */
     protected function V6(\Alae\Entity\Batch $Batch)
     {
