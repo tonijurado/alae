@@ -517,7 +517,7 @@ class CronController extends BaseController
 		/*
 		Notas de TONI - 17/03/2019
 			La v4 funciona bien si comprueba las primeras letras, por ejemplo, lote 002-3125V+01_MEM para estudio 001-3125V -> Salta V4 y perfecto
-			pero si se pasa el lote 001-3125V+09_MEM pero en la columna file_name pone 001-3125V01 la verificación V4 NO SALA y debería porque 
+			pero si se pasa el lote 001-3125V+09_MEM pero en la columna file_name pone 001-3125V01 la verificación V4 NO SALTA y debería porque 
 			como dice en el documento funcional, el nombre del archivo exportado debe contener los números de identificación del lote que aparezca en la columna 
 			FILE_NAME
 		*/
