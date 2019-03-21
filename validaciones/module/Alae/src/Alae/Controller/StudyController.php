@@ -1183,12 +1183,11 @@ class StudyController extends BaseController
             ORDER BY b.fileName ASC");
         $batch = $query->getResult();
 
-        $data     = array();
-
                 /*SELECT distinct v.NAME, v.associated FROM alae_sample_batch s 
         JOIN alae_sample_verification v
         ON s.sample_name LIKE CONCAT('', v.name ,'%')
         WHERE s.fk_batch = 8271*/
+        
         foreach ($batch as $Batch)
         {
             $query  = $this->getEntityManager()->createQuery("
@@ -1200,9 +1199,8 @@ class StudyController extends BaseController
             $elements = $query->getResult();
 
             if (count($elements) > 0)
-            {
-                
-                
+            {   
+                $data     = array();
                 foreach ($elements as $temp)
                 {
                     $buttons = "";

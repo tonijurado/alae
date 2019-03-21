@@ -423,6 +423,87 @@ class VerificationController extends BaseController
             $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V6"));
             $this->error($where, $fkParameter[0]);
         }
+
+        $elements = $this->getRepository("\\Alae\\Entity\\SampleVerification")->findAll();;
+        foreach ($elements as $sample)
+        {
+            $elements = $this->getRepository("\\Alae\\Entity\\AnalyteStudy")->findBy(array("fkStudy" => $Batch->getFkStudy(), "fkAnalyte" => $Batch->getFkAnalyte()));
+
+            $first = substr($sample->getAssociated(), 0, 2); 
+            $last = substr($sample->getAssociated(), -1); 
+            
+            if($first == 'CS')
+            {
+                $cs_values = explode(",", $AnaStudy->getCsValues());
+                $value = \Alae\Service\Conversion::conversion(
+                    $AnaStudy->getFkUnit()->getName(),
+                    $Batch->getAnalyteConcentrationUnits(),
+                    $cs_values[$last - 1]
+                );
+            }
+
+            if($first == 'QC')
+            {
+                $qc_values = explode(",", $AnaStudy->getQcValues());
+                $value = \Alae\Service\Conversion::conversion(
+                    $AnaStudy->getFkUnit()->getName(),
+                    $Batch->getAnalyteConcentrationUnits(),
+                    $qc_values[$last - 1]
+                );
+            }
+
+            if($sample->getAssociated() == 'HDQC')
+            {
+                $value = \Alae\Service\Conversion::conversion(
+                    $AnaStudy->getFkUnit()->getName(),
+                    $Batch->getAnalyteConcentrationUnits(),
+                    $AnaStudy->getHdqcValues()
+                );
+            }
+
+            if($sample->getAssociated() == 'LDQC')
+            {
+                $value = \Alae\Service\Conversion::conversion(
+                    $AnaStudy->getFkUnit()->getName(),
+                    $Batch->getAnalyteConcentrationUnits(),
+                    $AnaStudy->getLdqcValues()
+                );
+            }
+
+            if($sample->getAssociated() == 'LLQC')
+            {
+                $value = \Alae\Service\Conversion::conversion(
+                    $AnaStudy->getFkUnit()->getName(),
+                    $Batch->getAnalyteConcentrationUnits(),
+                    $AnaStudy->getLlqcValues()
+                );
+            }
+
+            if($sample->getAssociated() == 'ULQC')
+            {
+                $value = \Alae\Service\Conversion::conversion(
+                    $AnaStudy->getFkUnit()->getName(),
+                    $Batch->getAnalyteConcentrationUnits(),
+                    $AnaStudy->getUlqcValues()
+                );
+            }
+
+            $sample = $sample->getName();
+            /*if ($sample == 'PID')
+            {
+                $where = "s.sampleName LIKE '$sample%' AND s.analyteConcentration <> " . $value . " AND s.fkBatch = " . $Batch->getPkBatch();
+            
+                echo $where;
+                die();
+            }*/
+            
+            //echo $sample." ".$value;die();
+            $where = "s.sampleName LIKE '$sample%' AND s.analyteConcentration <> " . $value . " AND s.fkBatch = " . $Batch->getPkBatch();
+                    $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V6"));
+                    $this->error($where, $fkParameter[0]);
+
+        }
+        
     }
 
     /**
