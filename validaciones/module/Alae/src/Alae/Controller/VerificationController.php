@@ -950,15 +950,16 @@ class VerificationController extends BaseController
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V14.1"));
         $value      = $Batch->getIsCsQcAcceptedAvg() * ($parameters[0]->getMinValue() / 100);
 
-        $where = "(s.sampleName NOT LIKE 'BLK%' OR s.sampleName NOT LIKE 'SEL%') AND 
-        s.sampleType <> 'Solvent' AND s.isPeakArea < $value 
+        $where = "
+		(s.sampleName NOT LIKE 'BLK%' AND s.sampleName NOT LIKE 'SEL%') 
+		AND s.sampleType <> 'Solvent' AND s.isPeakArea < $value 
         AND s.fkBatch = " . $Batch->getPkBatch();
         $this->error($where, $parameters[0], array(), false);
 
         $parameters2 = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V14.2"));
         
         $where2 = "
-        (s.sampleName NOT LIKE 'BLK%' OR s.sampleName NOT LIKE 'SEL%')   
+        (s.sampleName NOT LIKE 'BLK%' AND s.sampleName NOT LIKE 'SEL%')   
         AND s.sampleType <> 'Solvent' AND s.isPeakArea < $value
         AND (s.sampleName LIKE 'CS%' OR s.sampleName LIKE 'CS%') 
         AND (s.sampleType = 'Standard' OR s.sampleType = 'Quality Control') 
