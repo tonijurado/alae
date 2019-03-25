@@ -297,7 +297,7 @@ CREATE TABLE IF NOT EXISTS `alae_analyte_study` (
   CONSTRAINT `alae_analyte_study_ibfk_5` FOREIGN KEY (`fk_user`) REFERENCES `alae_user` (`pk_user`)
 ) ENGINE=InnoDB AUTO_INCREMENT=396 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
--- Volcando datos para la tabla validaciones.alae_analyte_study: ~363 rows (aproximadamente)
+-- Volcando datos para la tabla validaciones.alae_analyte_study: ~336 rows (aproximadamente)
 /*!40000 ALTER TABLE `alae_analyte_study` DISABLE KEYS */;
 INSERT INTO `alae_analyte_study` (`pk_analyte_study`, `cs_number`, `qc_number`, `cs_values`, `qc_values`, `internal_standard`, `status`, `is_used`, `updated_at`, `fk_study`, `fk_analyte`, `fk_analyte_is`, `fk_unit`, `fk_user`, `fk_user_approve`, `hdqc_values`, `ldqc_values`, `llqc_values`, `ulqc_values`, `retention`, `acceptance`, `retention_is`, `acceptance_is`) VALUES
 	(16, 9, 4, '49.60,99.20,744.00,2232.00,14880.00,29760.00,44640.00,59520.00,74400.00', '199.20,37350.00,56025.00,7470.00', 50.0000, 1, 1, '2018-11-07 21:08:49', 18, 1, 3, 2, 9, 9, 747000.00, 112050.00, 0.00, 0.00, 0.0000, 0.0000, 0.0000, 0.0000),
@@ -661,8 +661,8 @@ INSERT INTO `alae_analyte_study` (`pk_analyte_study`, `cs_number`, `qc_number`, 
 	(390, 15, 6, NULL, NULL, 1.0000, 0, 0, '2019-02-20 23:43:14', 350, 202, 208, 1, 15, NULL, NULL, NULL, NULL, NULL, 1.0000, 1.0000, 1.0000, 1.0000),
 	(391, 15, 6, NULL, NULL, 1.0000, 0, 0, '2019-02-20 23:52:53', 351, 208, 207, 1, 15, NULL, NULL, NULL, NULL, NULL, 1.0000, 1.0000, 1.0000, 1.0000),
 	(392, 15, 6, NULL, NULL, 1.0000, 0, 0, '2019-02-21 00:06:25', 352, 16, 16, 1, 15, NULL, NULL, NULL, NULL, NULL, 1.0000, 1.0000, 1.0000, 1.0000),
-	(394, 8, 3, '99.60,199.20,996,3984.00,7968.00,11952.00,15936.00,19920.00', '300.60,6012.00,14028.00', 50.0000, 1, 1, '2019-03-25 16:45:49', 354, 146, 147, 2, 15, 15, 200400.00, 30060.00, 300.60, 19920.00, 0.0000, 0.0000, 0.0000, 0.0000),
-	(395, 8, 3, '99.60,199.2,996,3984.00,7968.00,11952,15936.00,19920', '300.60,6012.00,14028', 50.0000, 1, 1, '2019-03-25 16:45:55', 355, 146, 147, 2, 15, 15, 200400.00, 30060.00, 300.60, 19920.00, 1.6000, 20.0000, 1.5600, 20.0000);
+	(394, 8, 3, '99.60,199.20,996,3984.00,7968.00,11952.00,15936.00,19920.00', '300.60,6012.00,14028.00', 50.0000, 1, 1, '2019-03-25 17:37:08', 354, 146, 147, 2, 15, 15, 200400.00, 30060.00, 100.20, 19920.00, 0.0000, 0.0000, 0.0000, 0.0000),
+	(395, 8, 3, '99.60,199.2,996,3984.00,7968.00,11952,15936.00,19920', '300.60,6012.00,14028', 50.0000, 1, 1, '2019-03-25 17:37:12', 355, 146, 147, 2, 15, 15, 200400.00, 30060.00, 100.20, 19920.00, 1.6000, 20.0000, 1.5600, 20.0000);
 /*!40000 ALTER TABLE `alae_analyte_study` ENABLE KEYS */;
 
 -- Volcando estructura para tabla validaciones.alae_audit_session
@@ -1333,7 +1333,7 @@ CREATE TABLE IF NOT EXISTS `alae_sample_batch` (
   CONSTRAINT `alae_sample_batch_ibfk_1` FOREIGN KEY (`fk_batch`) REFERENCES `alae_batch` (`pk_batch`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10591 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
--- Volcando datos para la tabla validaciones.alae_sample_batch: ~3.591 rows (aproximadamente)
+-- Volcando datos para la tabla validaciones.alae_sample_batch: ~3.613 rows (aproximadamente)
 /*!40000 ALTER TABLE `alae_sample_batch` DISABLE KEYS */;
 INSERT INTO `alae_sample_batch` (`pk_sample_batch`, `sample_name`, `analyte_peak_name`, `sample_type`, `file_name`, `dilution_factor`, `analyte_peak_area`, `is_peak_name`, `is_peak_area`, `analyte_concentration`, `analyte_concentration_units`, `calculated_concentration`, `calculated_concentration_units`, `accuracy`, `use_record`, `valid_flag`, `is_used`, `code_error`, `parameters`, `created_at`, `updated_at`, `sample_id`, `sample_comment`, `set_number`, `acquisition_method`, `rack_type`, `rack_position`, `vial_position`, `plate_type`, `plate_position`, `weight_to_volume_ratio`, `sample_annotation`, `disposition`, `analyte_units`, `acquisition_date`, `analyte_peak_area_for_dad`, `analyte_peak_height`, `analyte_peak_height_for_dad`, `analyte_retention_time`, `analyte_expected_rt`, `analyte_rt_window`, `analyte_centroid_location`, `analyte_start_scan`, `analyte_start_time`, `analyte_stop_scan`, `analyte_stop_time`, `analyte_integration_type`, `analyte_signal_to_noise`, `analyte_peak_width`, `analyte_standar_query_status`, `analyte_mass_ranges`, `analyte_wavelength_ranges`, `height_ratio`, `analyte_annotation`, `analyte_channel`, `analyte_peak_width_at_50_height`, `analyte_slope_of_baseline`, `analyte_processing_alg`, `analyte_peak_asymmetry`, `is_units`, `is_peak_area_for_dad`, `is_peak_height`, `is_peak_height_for_dad`, `is_concentration`, `is_retention_time`, `is_expected_rt`, `is_rt_windows`, `is_centroid_location`, `is_start_scan`, `is_start_time`, `is_stop_scan`, `is_stop_time`, `is_integration_type`, `is_signal_to_noise`, `is_peak_width`, `is_mass_ranges`, `is_wavelength_ranges`, `is_channel`, `is_peak_width_al_50_height`, `is_slope_of_baseline`, `is_processing_alg`, `is_peak_asymemtry`, `record_modified`, `area_ratio`, `calculated_concentration_for_dad`, `relative_retention_time`, `response_factor`, `fk_batch`) VALUES
 	(7000, 'BLK-C-1a', 'MEM', 'Unknown', '007-3125VR1\\001.wiff', 1.0000, 347, 'MEM-d6', 59, 0.0000, 'pg/mL', 25506.1400, 'pg/mL', 0.0000, 0, 1, 1, NULL, NULL, '2019-03-24 22:50:43', '2019-03-24 22:50:43', 0, '', 0, 'MS07-MEM-01.dam', 'CStk1-01', 2, 1, 'VT54', 1, 0.0000, '', '', 'pg/mL', '2018-08-13 21:06:05', 'N/A', 86.3000, 'N/A', 1.6800, 1.6800, 30.0000, 1.6900, 97.0000, 1.6200, 106, 1.7700, 'Base To Base', 'N/A', 0.1520, 'N/A', '180.200/163.200 Da', 'N/A', 6.3000, '', 'N/A', 0.0646, 0.0000, 'Analyst Classic', 1.3500, 'ng/mL', 'N/A', 13.7000, 'N/A', 1.0000, 1.6800, 1.6400, 30.0000, 1.7000, 99, 1.6500, 105, 1.7500, 'Base To Base', 'N/A', 0.1010, '186.200/169.200 Da', 'N/A', 'N/A', 0.0580, -1370.0000, 'Analyst Classic', 2.4700, 0, 5.8736, 'N/A', 1.0000, 0.0000, 106),
@@ -4999,7 +4999,7 @@ CREATE TABLE IF NOT EXISTS `alae_study` (
   CONSTRAINT `alae_study_ibfk_3` FOREIGN KEY (`fk_user_close`) REFERENCES `alae_user` (`pk_user`)
 ) ENGINE=InnoDB AUTO_INCREMENT=356 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
--- Volcando datos para la tabla validaciones.alae_study: ~334 rows (aproximadamente)
+-- Volcando datos para la tabla validaciones.alae_study: ~365 rows (aproximadamente)
 /*!40000 ALTER TABLE `alae_study` DISABLE KEYS */;
 INSERT INTO `alae_study` (`pk_study`, `code`, `created_at`, `updated_at`, `approved_at`, `description`, `observation`, `close_flag`, `status`, `validation`, `verification`, `approve`, `duplicate`, `fk_user`, `fk_user_approve`, `fk_user_close`, `fk_dilution_tree`) VALUES
 	(18, '00ANE-1000', '2014-04-24 00:00:00', '2014-04-24 07:58:44', '0000-00-00 00:00:00', 'Análisis de muestras atorvastatina', 'Test OQ_DAE', 1, 1, 0, 0, 1, 0, 9, 9, NULL, 1),

@@ -359,9 +359,16 @@ class VerificationController extends BaseController
                         $AnaStudy->getFkUnit()->getName(),
                         $Batch->getAnalyteConcentrationUnits(),
                         $cs_values[$i - 1]
-                    );
+					);
+					
 
-                    $where = "s.sampleType LIKE 'CS" . $i . "%' AND s.analyteConcentration <> " . $value . " AND s.fkBatch = " . $Batch->getPkBatch();
+                    $where = "s.sampleName LIKE 'CS" . $i . "%' AND s.analyteConcentration <> " . $value . " AND s.fkBatch = " . $Batch->getPkBatch();
+						/*
+						if ($i == 7) 
+						{
+							echo '1-' . $AnaStudy->getCsNumber() . ' 2-' .	$cs_values. ' 3-' . $value . ' 4-' . $where; die();
+						} //**
+						*/
                     $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V6"));
                     $this->error($where, $fkParameter[0]);
                 }
@@ -389,7 +396,7 @@ class VerificationController extends BaseController
                 $AnaStudy->getLdqcValues()
             );
 
-            $where = "s.sampleName LIKE 'LDQC' AND s.analyteConcentration <> " . $valueLDQC . " AND s.fkBatch = " . $Batch->getPkBatch();
+            $where = "s.sampleName LIKE 'LDQC%' AND s.analyteConcentration <> " . $valueLDQC . " AND s.fkBatch = " . $Batch->getPkBatch();
             $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V6"));
             $this->error($where, $fkParameter[0]);
 
@@ -399,7 +406,7 @@ class VerificationController extends BaseController
                 $AnaStudy->getHdqcValues()
             );
 
-            $where = "s.sampleName LIKE 'HDQC' AND s.analyteConcentration <> " . $valueHDQC . " AND s.fkBatch = " . $Batch->getPkBatch();
+            $where = "s.sampleName LIKE 'HDQC%' AND s.analyteConcentration <> " . $valueHDQC . " AND s.fkBatch = " . $Batch->getPkBatch();
             $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V6"));
             $this->error($where, $fkParameter[0]);
 
@@ -409,7 +416,7 @@ class VerificationController extends BaseController
                 $AnaStudy->getLlqcValues()
             );
 
-            $where = "s.sampleName LIKE 'LLQC' AND s.analyteConcentration <> " . $valueLLQC . " AND s.fkBatch = " . $Batch->getPkBatch();
+            $where = "s.sampleName LIKE 'LLQC%' AND s.analyteConcentration <> " . $valueLLQC . " AND s.fkBatch = " . $Batch->getPkBatch();
             $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V6"));
             $this->error($where, $fkParameter[0]);
 
@@ -419,7 +426,7 @@ class VerificationController extends BaseController
                 $AnaStudy->getUlqcValues()
             );
 
-            $where = "s.sampleName LIKE 'ULQC' AND s.analyteConcentration <> " . $valueULQC . " AND s.fkBatch = " . $Batch->getPkBatch();
+            $where = "s.sampleName LIKE 'ULQC%' AND s.analyteConcentration <> " . $valueULQC . " AND s.fkBatch = " . $Batch->getPkBatch();
             $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V6"));
             $this->error($where, $fkParameter[0]);
         }
@@ -501,7 +508,7 @@ class VerificationController extends BaseController
             $where = "s.sampleName LIKE '$sample%' AND s.analyteConcentration <> " . $value . " AND s.fkBatch = " . $Batch->getPkBatch();
                     $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V6"));
                     $this->error($where, $fkParameter[0]);
-
+			//if ($sample == 'PID') { echo $sample." ".$value; die();} //** para borrar
         }
         
     }
