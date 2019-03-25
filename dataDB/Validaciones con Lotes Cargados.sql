@@ -297,7 +297,7 @@ CREATE TABLE IF NOT EXISTS `alae_analyte_study` (
   CONSTRAINT `alae_analyte_study_ibfk_5` FOREIGN KEY (`fk_user`) REFERENCES `alae_user` (`pk_user`)
 ) ENGINE=InnoDB AUTO_INCREMENT=396 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
--- Volcando datos para la tabla validaciones.alae_analyte_study: ~397 rows (aproximadamente)
+-- Volcando datos para la tabla validaciones.alae_analyte_study: ~308 rows (aproximadamente)
 /*!40000 ALTER TABLE `alae_analyte_study` DISABLE KEYS */;
 INSERT INTO `alae_analyte_study` (`pk_analyte_study`, `cs_number`, `qc_number`, `cs_values`, `qc_values`, `internal_standard`, `status`, `is_used`, `updated_at`, `fk_study`, `fk_analyte`, `fk_analyte_is`, `fk_unit`, `fk_user`, `fk_user_approve`, `hdqc_values`, `ldqc_values`, `llqc_values`, `ulqc_values`, `retention`, `acceptance`, `retention_is`, `acceptance_is`) VALUES
 	(16, 9, 4, '49.60,99.20,744.00,2232.00,14880.00,29760.00,44640.00,59520.00,74400.00', '199.20,37350.00,56025.00,7470.00', 50.0000, 1, 1, '2018-11-07 21:08:49', 18, 1, 3, 2, 9, 9, 747000.00, 112050.00, 0.00, 0.00, 0.0000, 0.0000, 0.0000, 0.0000),
@@ -702,9 +702,9 @@ CREATE TABLE IF NOT EXISTS `alae_audit_transaction` (
   PRIMARY KEY (`pk_audit_session`),
   KEY `fk_user` (`fk_user`),
   CONSTRAINT `alae_audit_transaction_ibfk_1` FOREIGN KEY (`fk_user`) REFERENCES `alae_user` (`pk_user`)
-) ENGINE=InnoDB AUTO_INCREMENT=14961 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=14962 DEFAULT CHARSET=utf8;
 
--- Volcando datos para la tabla validaciones.alae_audit_transaction: ~59 rows (aproximadamente)
+-- Volcando datos para la tabla validaciones.alae_audit_transaction: ~60 rows (aproximadamente)
 /*!40000 ALTER TABLE `alae_audit_transaction` DISABLE KEYS */;
 INSERT INTO `alae_audit_transaction` (`pk_audit_session`, `created_at`, `section`, `description`, `fk_user`) VALUES
 	(14902, '2019-03-02 18:24:24', 'Fin de sesiÃ³n', 'El usuario toni ha cerrado sesiÃ³n', 15),
@@ -765,7 +765,8 @@ INSERT INTO `alae_audit_transaction` (`pk_audit_session`, `created_at`, `section
 	(14957, '2019-03-24 20:10:08', 'Aprobación de concentraciones nominales', 'El usuario toni ha aprobado las concentraciones nominales del estudio 18ANE-3125V01<br>Concentración Nominal de los Estándares de Calibración: 99.60,199.2,996,3984.00,7968.00,11952,15936.00,19920<br>Concentración Nominal de los Controles de Calidad: 300.60,6012.00,14028<br>Concentración Nominal de los LDQC y HDQC, respectivamente: 30060.00, 200400.00', 15),
 	(14958, '2019-03-24 20:10:10', 'Ingreso concentraciones nominales', 'El usuario toni ha ingresado las concentraciones nominales del estudio 18ANE-3125V01<br>Analito: Memantine<br>Concentración Nominal de los Estándares de Calibración: 99.60,199.2,996,3984.00,7968.00,11952,15936.00,19920<br>Concentración Nominal de los Controles de Calidad: 300.60,6012.00,14028<br>Concentración Nominal de los LDQC y HDQC, respectivamente: 30060.00, 200400<br>Concentración Nominal de los LLQC y ULQC, respectivamente: 100.20, 19920.00', 15),
 	(14959, '2019-03-24 22:46:40', 'Inicio de sesión', 'El usuario toni ha iniciado sesión', 15),
-	(14960, '2019-03-24 23:08:34', 'Fin de sesión', 'El usuario toni ha cerrado sesión', 15);
+	(14960, '2019-03-24 23:08:34', 'Fin de sesión', 'El usuario toni ha cerrado sesión', 15),
+	(14961, '2019-03-25 08:51:26', 'Inicio de sesión', 'El usuario toni ha iniciado sesión', 15);
 /*!40000 ALTER TABLE `alae_audit_transaction` ENABLE KEYS */;
 
 -- Volcando estructura para tabla validaciones.alae_audit_transaction_error
@@ -830,59 +831,59 @@ CREATE TABLE IF NOT EXISTS `alae_batch` (
 -- Volcando datos para la tabla validaciones.alae_batch: ~53 rows (aproximadamente)
 /*!40000 ALTER TABLE `alae_batch` DISABLE KEYS */;
 INSERT INTO `alae_batch` (`pk_batch`, `serial`, `file_name`, `file_size`, `created_at`, `updated_at`, `valid_flag`, `accepted_flag`, `justification`, `validation_date`, `code_error`, `intercept`, `slope`, `correlation_coefficient`, `cs_total`, `qc_total`, `ldqc_total`, `hdqc_total`, `cs_accepted_total`, `qc_accepted_total`, `ldqc_accepted_total`, `hdqc_accepted_total`, `is_cs_qc_accepted_avg`, `analyte_concentration_units`, `calculated_concentration_units`, `fk_parameter`, `fk_analyte`, `fk_user`, `fk_study`) VALUES
-	(106, 7, '007-3125V+R1_MEM.txt', '76553', '2019-03-24 22:50:43', NULL, NULL, NULL, NULL, NULL, NULL, 0.00128, 0.00023, 0.9989, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(107, 6, '006-3125V+O1_MEM.txt', '76745', '2019-03-24 22:50:45', NULL, NULL, NULL, NULL, NULL, NULL, 0.00128, 0.00023, 0.9989, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(108, 3, '003-3125V01+O_MEM.txt', '53980', '2019-03-24 22:50:51', NULL, NULL, NULL, NULL, NULL, NULL, 0.00135, 0.0001, 0.9972, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(109, 3, '003-3125V01+O2_MEM.txt', '53980', '2019-03-24 22:50:57', NULL, NULL, NULL, NULL, NULL, NULL, 0.00135, 0.0001, 0.9972, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(110, 3, '003-3125V01+O1_MEM.txt', '53979', '2019-03-24 22:51:04', NULL, NULL, NULL, NULL, NULL, NULL, 0.00135, 0.0001, 0.9972, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(111, 3, '003-3125V+O_MEM.txt', '33503', '2019-03-24 22:51:13', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(112, 3, '003-3125V+O3_MEM.txt', '33503', '2019-03-24 22:51:19', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(113, 3, '003-3125V+O2_MEM.txt', '33504', '2019-03-24 22:51:26', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(114, 3, '003-3125V+O1_MEM.txt', '33503', '2019-03-24 22:51:33', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(115, 2, '002-3125V+O_MEM.txt', '33504', '2019-03-24 22:51:41', NULL, 0, NULL, NULL, '2019-03-24 22:51:59', NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(116, 2, '002-3125V+O1_MEM.txt', '76257', '2019-03-24 22:51:59', NULL, NULL, NULL, NULL, NULL, NULL, 0.00128, 0.00023, 0.9989, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(117, 1, '001-3125V_MEM.txt', '33504', '2019-03-24 22:52:22', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(118, 1, '001-3125V01+O_MEM.txt', '33373', '2019-03-24 22:52:33', NULL, NULL, NULL, NULL, NULL, NULL, 0.00273, 0.0000942, 0.9972, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(119, 1, '001-3125V01+O3_MEM.txt', '33372', '2019-03-24 22:52:44', NULL, NULL, NULL, NULL, NULL, NULL, 0.00273, 0.0000942, 0.9972, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(120, 1, '001-3125V01+O2_MEM.txt', '33373', '2019-03-24 23:08:38', NULL, NULL, NULL, NULL, NULL, NULL, 0.00273, 0.0000942, 0.9972, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(121, 1, '001-3125V01+O1_MEM.txt', '33373', '2019-03-24 23:08:51', NULL, 0, NULL, NULL, '2019-03-24 23:09:17', NULL, 0.00273, 0.0000942, 0.9972, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(122, 1, '001-3125V+O9_MEM.txt', '33976', '2019-03-24 23:09:17', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(123, 1, '001-3125V+O8_MEM.txt', '33972', '2019-03-24 23:09:32', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(124, 1, '001-3125V+O7_MEM.txt', '33380', '2019-03-24 23:09:47', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(125, 1, '001-3125V+O6_MEM.txt', '30912', '2019-03-24 23:10:02', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(126, 1, '001-3125V+O5_MEM.txt', '32896', '2019-03-24 23:10:17', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(127, 1, '001-3125V+O4_MEM.txt', '33504', '2019-03-24 23:10:33', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(128, 1, '001-3125V+O3_MEM.txt', '33914', '2019-03-24 23:10:50', NULL, 0, NULL, NULL, '2019-03-24 23:12:05', NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(129, 1, '001-3125V+O39_MEM.txt', '33490', '2019-03-24 23:12:06', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(130, 1, '001-3125V+O38_MEM.txt', '33498', '2019-03-24 23:12:24', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(131, 1, '001-3125V+O37_MEM.txt', '33997', '2019-03-24 23:12:43', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(132, 1, '001-3125V+O36_MEM.txt', '33997', '2019-03-24 23:13:04', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(133, 1, '001-3125V+O35_MEM.txt', '34000', '2019-03-24 23:13:24', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(134, 1, '001-3125V+O34_MEM.txt', '34000', '2019-03-24 23:13:46', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(135, 1, '001-3125V+O33_MEM.txt', '33993', '2019-03-24 23:14:08', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(136, 1, '001-3125V+O32_MEM.txt', '33993', '2019-03-24 23:14:30', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(137, 1, '001-3125V+O31_MEM.txt', '33997', '2019-03-24 23:14:53', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(138, 1, '001-3125V+O30_MEM.txt', '33997', '2019-03-24 23:15:17', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(139, 1, '001-3125V+O2_MEM.txt', '33852', '2019-03-24 23:15:42', NULL, 0, NULL, NULL, '2019-03-24 23:16:31', NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(140, 1, '001-3125V+O29_MEM.txt', '33508', '2019-03-24 23:16:32', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(141, 1, '001-3125V+O28_MEM.txt', '33508', '2019-03-24 23:16:57', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(142, 1, '001-3125V+O27_MEM.txt', '33505', '2019-03-24 23:17:26', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(143, 1, '001-3125V+O26_MEM.txt', '33508', '2019-03-24 23:17:57', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(144, 1, '001-3125V+O25_MEM.txt', '33504', '2019-03-24 23:18:24', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.7984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(145, 1, '001-3125V+O24_MEM.txt', '33505', '2019-03-24 23:18:53', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(146, 1, '001-3125V+O23_MEM.txt', '33505', '2019-03-24 23:19:22', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(147, 1, '001-3125V+O22_MEM.txt', '33501', '2019-03-24 23:19:51', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(148, 1, '001-3125V+O21_MEM.txt', '33505', '2019-03-24 23:20:21', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(149, 1, '001-3125V+O20_MEM.txt', '33506', '2019-03-24 23:20:55', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
+	(106, 7, '007-3125V+R1_MEM.txt', '76553', '2019-03-24 22:50:43', NULL, NULL, NULL, NULL, NULL, NULL, 0.00128, 0.00023, 0.9989, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(107, 6, '006-3125V+O1_MEM.txt', '76745', '2019-03-24 22:50:45', NULL, NULL, NULL, NULL, NULL, NULL, 0.00128, 0.00023, 0.9989, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(108, 3, '003-3125V01+O_MEM.txt', '53980', '2019-03-24 22:50:51', NULL, NULL, NULL, NULL, NULL, NULL, 0.00135, 0.0001, 0.9972, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(109, 3, '003-3125V01+O2_MEM.txt', '53980', '2019-03-24 22:50:57', NULL, NULL, NULL, NULL, NULL, NULL, 0.00135, 0.0001, 0.9972, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(110, 3, '003-3125V01+O1_MEM.txt', '53979', '2019-03-24 22:51:04', NULL, NULL, NULL, NULL, NULL, NULL, 0.00135, 0.0001, 0.9972, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(111, 3, '003-3125V+O_MEM.txt', '33503', '2019-03-24 22:51:13', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(112, 3, '003-3125V+O3_MEM.txt', '33503', '2019-03-24 22:51:19', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(113, 3, '003-3125V+O2_MEM.txt', '33504', '2019-03-24 22:51:26', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(114, 3, '003-3125V+O1_MEM.txt', '33503', '2019-03-24 22:51:33', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(115, 2, '002-3125V+O_MEM.txt', '33504', '2019-03-24 22:51:41', NULL, 0, NULL, NULL, '2019-03-24 22:51:59', NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(116, 2, '002-3125V+O1_MEM.txt', '76257', '2019-03-24 22:51:59', NULL, NULL, NULL, NULL, NULL, NULL, 0.00128, 0.00023, 0.9989, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(117, 1, '001-3125V_MEM.txt', '33504', '2019-03-24 22:52:22', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(118, 1, '001-3125V01+O_MEM.txt', '33373', '2019-03-24 22:52:33', NULL, NULL, NULL, NULL, NULL, NULL, 0.00273, 0.0000942, 0.9972, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(119, 1, '001-3125V01+O3_MEM.txt', '33372', '2019-03-24 22:52:44', NULL, NULL, NULL, NULL, NULL, NULL, 0.00273, 0.0000942, 0.9972, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(120, 1, '001-3125V01+O2_MEM.txt', '33373', '2019-03-24 23:08:38', NULL, NULL, NULL, NULL, NULL, NULL, 0.00273, 0.0000942, 0.9972, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(121, 1, '001-3125V01+O1_MEM.txt', '33373', '2019-03-24 23:08:51', NULL, 0, NULL, NULL, '2019-03-24 23:09:17', NULL, 0.00273, 0.0000942, 0.9972, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(122, 1, '001-3125V+O9_MEM.txt', '33976', '2019-03-24 23:09:17', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(123, 1, '001-3125V+O8_MEM.txt', '33972', '2019-03-24 23:09:32', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(124, 1, '001-3125V+O7_MEM.txt', '33380', '2019-03-24 23:09:47', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(125, 1, '001-3125V+O6_MEM.txt', '30912', '2019-03-24 23:10:02', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(126, 1, '001-3125V+O5_MEM.txt', '32896', '2019-03-24 23:10:17', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(127, 1, '001-3125V+O4_MEM.txt', '33504', '2019-03-24 23:10:33', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(128, 1, '001-3125V+O3_MEM.txt', '33914', '2019-03-24 23:10:50', NULL, 0, NULL, NULL, '2019-03-24 23:12:05', NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(129, 1, '001-3125V+O39_MEM.txt', '33490', '2019-03-24 23:12:06', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(130, 1, '001-3125V+O38_MEM.txt', '33498', '2019-03-24 23:12:24', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(131, 1, '001-3125V+O37_MEM.txt', '33997', '2019-03-24 23:12:43', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(132, 1, '001-3125V+O36_MEM.txt', '33997', '2019-03-24 23:13:04', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(133, 1, '001-3125V+O35_MEM.txt', '34000', '2019-03-24 23:13:24', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(134, 1, '001-3125V+O34_MEM.txt', '34000', '2019-03-24 23:13:46', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(135, 1, '001-3125V+O33_MEM.txt', '33993', '2019-03-24 23:14:08', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(136, 1, '001-3125V+O32_MEM.txt', '33993', '2019-03-24 23:14:30', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(137, 1, '001-3125V+O31_MEM.txt', '33997', '2019-03-24 23:14:53', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(138, 1, '001-3125V+O30_MEM.txt', '33997', '2019-03-24 23:15:17', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(139, 1, '001-3125V+O2_MEM.txt', '33852', '2019-03-24 23:15:42', NULL, 0, NULL, NULL, '2019-03-24 23:16:31', NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(140, 1, '001-3125V+O29_MEM.txt', '33508', '2019-03-24 23:16:32', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(141, 1, '001-3125V+O28_MEM.txt', '33508', '2019-03-24 23:16:57', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(142, 1, '001-3125V+O27_MEM.txt', '33505', '2019-03-24 23:17:26', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(143, 1, '001-3125V+O26_MEM.txt', '33508', '2019-03-24 23:17:57', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(144, 1, '001-3125V+O25_MEM.txt', '33504', '2019-03-24 23:18:24', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.7984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(145, 1, '001-3125V+O24_MEM.txt', '33505', '2019-03-24 23:18:53', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(146, 1, '001-3125V+O23_MEM.txt', '33505', '2019-03-24 23:19:22', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(147, 1, '001-3125V+O22_MEM.txt', '33501', '2019-03-24 23:19:51', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(148, 1, '001-3125V+O21_MEM.txt', '33505', '2019-03-24 23:20:21', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(149, 1, '001-3125V+O20_MEM.txt', '33506', '2019-03-24 23:20:55', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
 	(150, 1, '001-3125V+O1_MEM.txt', '2956', '2019-03-24 23:21:29', NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0.0000, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, NULL, NULL, 1, NULL, 1, NULL),
-	(151, 1, '001-3125V+O19_MEM.txt', '33508', '2019-03-24 23:21:30', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(152, 1, '001-3125V+O18_MEM.txt', '33506', '2019-03-24 23:22:06', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(153, 1, '001-3125V+O17_MEM.txt', '33500', '2019-03-24 23:22:45', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(154, 1, '001-3125V+O16_MEM.txt', '33498', '2019-03-24 23:23:28', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(155, 1, '001-3125V+O13_MEM.txt', '33504', '2019-03-24 23:24:14', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(156, 1, '001-3125V+O12_MEM.txt', '33501', '2019-03-24 23:24:59', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(157, 1, '001-3125V+O11_MEM.txt', '33973', '2019-03-24 23:25:51', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355),
-	(158, 1, '001-3125V+O10_MEM.txt', '33973', '2019-03-24 23:26:35', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 355);
+	(151, 1, '001-3125V+O19_MEM.txt', '33508', '2019-03-24 23:21:30', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(152, 1, '001-3125V+O18_MEM.txt', '33506', '2019-03-24 23:22:06', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(153, 1, '001-3125V+O17_MEM.txt', '33500', '2019-03-24 23:22:45', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(154, 1, '001-3125V+O16_MEM.txt', '33498', '2019-03-24 23:23:28', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(155, 1, '001-3125V+O13_MEM.txt', '33504', '2019-03-24 23:24:14', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(156, 1, '001-3125V+O12_MEM.txt', '33501', '2019-03-24 23:24:59', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(157, 1, '001-3125V+O11_MEM.txt', '33973', '2019-03-24 23:25:51', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354),
+	(158, 1, '001-3125V+O10_MEM.txt', '33973', '2019-03-24 23:26:35', NULL, NULL, NULL, NULL, NULL, NULL, 0.00238, 0.000231, 0.9984, 0, 0, 0, 0, 0, 0, 0, 0, 0.0000, 'pg/mL', 'pg/mL', NULL, 146, 1, 354);
 /*!40000 ALTER TABLE `alae_batch` ENABLE KEYS */;
 
 -- Volcando estructura para tabla validaciones.alae_error
@@ -4998,7 +4999,7 @@ CREATE TABLE IF NOT EXISTS `alae_study` (
   CONSTRAINT `alae_study_ibfk_3` FOREIGN KEY (`fk_user_close`) REFERENCES `alae_user` (`pk_user`)
 ) ENGINE=InnoDB AUTO_INCREMENT=356 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
--- Volcando datos para la tabla validaciones.alae_study: ~208 rows (aproximadamente)
+-- Volcando datos para la tabla validaciones.alae_study: ~269 rows (aproximadamente)
 /*!40000 ALTER TABLE `alae_study` DISABLE KEYS */;
 INSERT INTO `alae_study` (`pk_study`, `code`, `created_at`, `updated_at`, `approved_at`, `description`, `observation`, `close_flag`, `status`, `validation`, `verification`, `approve`, `duplicate`, `fk_user`, `fk_user_approve`, `fk_user_close`, `fk_dilution_tree`) VALUES
 	(18, '00ANE-1000', '2014-04-24 00:00:00', '2014-04-24 07:58:44', '0000-00-00 00:00:00', 'Análisis de muestras atorvastatina', 'Test OQ_DAE', 1, 1, 0, 0, 1, 0, 9, 9, NULL, 1),
