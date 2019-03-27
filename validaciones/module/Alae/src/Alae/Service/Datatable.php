@@ -331,7 +331,7 @@ class Datatable
                     array("key" => "associated", "label" => "Nivel de concentración asociado", "sortable" => true),
                     array("key" => "edit", "allowHTML" => true)
                 )),
-                "editable" => 0,
+                "editable" => json_encode(array("name", "associated")),
         
                 "header"   => json_encode($header),
                 "filters"  => $this->getFilters($header)
@@ -533,7 +533,7 @@ class Datatable
                 $elements = '<span class="form-datatable-new"></span><input value="" type="submit"/>';
         break;
         case Datatable::DATATABLE_VERIFICATION_SAMPLE_ASSOC:
-                $elements = '';
+        $elements = '<span class="form-datatable-new"></span><input value="" type="submit"/>';
 		break;
         }
 

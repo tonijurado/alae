@@ -1136,7 +1136,7 @@ class StudyController extends BaseController
     public function deleteVerificationAction()
     {
         $request = $this->getRequest();
-
+        
         if ($request->isGet())
         {
             $sample = $this->getRepository('\\Alae\\Entity\\SampleVerification')->find($request->getQuery('pk'));
@@ -1183,34 +1183,103 @@ class StudyController extends BaseController
             ORDER BY b.fileName ASC");
         $batch = $query->getResult();
 
+        if ($request->isPost())
+        {
+            $Study   = $this->getRepository()->find($AnaStudy->getFkStudy()->getPkStudy());
+            $createNames      = $request->getPost('create-name');
+            $createAssociated = $request->getPost('create-associated');
+
+            if (!empty($createNames))
+            {
+                foreach ($createNames as $key => $value)
+                {
+                    $sample = new \Alae\Entity\SampleVerification();
+                    $sample->setFkStudy($Study);
+                    $sample->setName($createNames[$key]);
+                    $sample->setAssociated($createAssociated[$key]);
+                    $this->getEntityManager()->persist($sample);
+                    $this->getEntityManager()->flush();
+                    $this->transaction(
+                        "Ingreso de nivel de concentración asociado",
+                        sprintf('En el Estudio %1$s Se ha ingresado el sample %2$s asociado a: %3$s',
+                            $Study->getCode(),
+                            $sample->getName(),
+                            $sample->getAssociated()
+                        ),
+                        false
+                    );
+                            
+                }
+
+            }
+
+            $updateName = $request->getPost('update-name');
+            $updateAssociated = $request->getPost('update-associated');
+
+            if (!empty($updateName))
+            {
+                $User = $this->_getSession();
+
+                foreach ($updateName as $key => $value)
+                {
+                    
+                    $sampleVerification = $this->getRepository('\\Alae\\Entity\\SampleVerification')->find($key);
+                    
+                    if ($sampleVerification && $sampleVerification->getId())
+                    {    
+                        $older = sprintf('Valores antiguos: Sample -> %1$s, Association -> %2$s',
+                            $sampleVerification->getName(),
+                            $sampleVerification->getAssociated()
+                        );
+                        
+                        $sampleVerification->setName($updateName[$key]);
+                        $sampleVerification->setAssociated($updateAssociated[$key]);
+                        $this->getEntityManager()->persist($sampleVerification);
+                        $this->getEntityManager()->flush();
+
+                        //INGRESO A AUDIT TRANSACTION
+                        $this->transaction(
+                            "Edición de tabla de asociación",
+                            sprintf('%1$s<br> Estudio: %2$s. Nombre -> %3$s, Asociación -> %4$s',
+                                $older,
+                                $Study->getCode(),
+                                $updateName[$key],
+                                $updateAssociated[$key]
+                            ),
+                            false
+                        );
+                    }
+                }
+            }
+        }
+
+        $query    = $this->getEntityManager()->createQuery("
+            SELECT v.id as id, v.name as name, v.associated as associated
+            FROM Alae\Entity\SampleVerification v
+            WHERE v.fkStudy = " . $AnaStudy->getFkStudy()->getPkStudy() . "
+            ORDER BY v.id ASC");
+        $elements = $query->getResult();
+
                 /*SELECT distinct v.NAME, v.associated FROM alae_sample_batch s 
         JOIN alae_sample_verification v
         ON s.sample_name LIKE CONCAT('', v.name ,'%')
         WHERE s.fk_batch = 8271*/
         
-        foreach ($batch as $Batch)
-        {
-            $query  = $this->getEntityManager()->createQuery("
-            SELECT DISTINCT v.id as id, v.name as name, v.associated
-            FROM Alae\Entity\SampleBatch s, Alae\Entity\SampleVerification v
-            WHERE s.sampleName like CONCAT('', v.name ,'%')
-                AND s.fkBatch = " . $Batch->getPkBatch() . "
-            ORDER BY v.name");            
-            $elements = $query->getResult();
+        $data     = array();
+        if (count($elements) > 0)
+        {   
+            foreach ($elements as $temp)
+            {
+                $buttons = "";
+                $buttons .= '<span class="form-datatable-change" onclick="changeElement(this, ' . $temp["id"] . ');"></span>';
+                $buttons .= '<span class="form-datatable-delete" onclick="removeElement(this, ' . $temp["id"] . ');"></span>';
 
-            if (count($elements) > 0)
-            {   
-                $data     = array();
-                foreach ($elements as $temp)
-                {
-                    $buttons = "";
 
-                    $data[] = array(
-                        "name"       => $temp["name"],
-                        "associated" => $temp["associated"],
-                        "edit"                  => $buttons
-                    );
-                }
+                $data[] = array(
+                    "name"       => $temp["name"],
+                    "associated" => $temp["associated"],
+                    "edit"                  => $buttons
+                );
             }
         }
 
