@@ -15,7 +15,7 @@
  * 	4.- Aprobación, duplicación y cierre de estudios
  * 	5.- Aprobación y desbloqueo de concentraciones nominales
  * @author Maria Quiroz
-   Fecha de creación: 16/05/2014
+ * Fecha de creación: 16/05/2014
  */
 
 namespace Alae\Controller;
@@ -202,6 +202,26 @@ class StudyController extends BaseController
                         ),
                         false
                     );
+
+                    $query    = $this->getEntityManager()->createQuery("
+                        SELECT v.name as name, v.associated as associated
+                        FROM Alae\Entity\SampleVerification v");
+                    $elements = $query->getResult();
+
+                    if (count($elements) > 0)
+                    {   
+                        foreach ($elements as $temp)
+                        {
+                            $studyVerification = new \Alae\Entity\SampleVerificationStudy();
+                            $studyVerification->setName($temp["name"]);
+                            $studyVerification->setassociated($temp["associated"]);
+                            $studyVerification->setFkStudy($Study);
+                            $this->getEntityManager()->persist($studyVerification);
+                            $this->getEntityManager()->flush();
+                            
+                        }
+                    }
+
                     return $this->redirect()->toRoute('study', array(
                         'controller' => 'study',
                         'action'     => 'edit',
@@ -1167,6 +1187,40 @@ class StudyController extends BaseController
         }
     }
 
+    public function deleteVerificationAssociationAction()
+    {
+        $request = $this->getRequest();
+        
+        if ($request->isGet())
+        {
+            $sample = $this->getRepository('\\Alae\\Entity\\SampleVerificationStudy')->find($request->getQuery('pk'));
+
+            if ($sample && $sample->getId())
+            {
+                try
+                {
+                    //BORRA EL ESTUDIO
+                    $this->getEntityManager()->remove($sample);
+                    $this->getEntityManager()->flush();
+                    $this->transaction(
+                        "Eliminar asociación",
+                        sprintf('El usuario %1$s ha eliminado la asociación de %2$s con %3$s',
+                            $this->_getSession()->getUsername(),
+                            $sample->getName(),
+                            $sample->getAssociated()
+                        ),
+                        false
+                    );
+                    return new JsonModel(array("status" => true));
+                }
+                catch (Exception $e)
+                {
+                    exit;
+                }
+            }
+        }
+    }
+
     public function sampleverificationassociationAction()
     {
         $request = $this->getRequest();
@@ -1193,7 +1247,7 @@ class StudyController extends BaseController
             {
                 foreach ($createNames as $key => $value)
                 {
-                    $sample = new \Alae\Entity\SampleVerification();
+                    $sample = new \Alae\Entity\SampleVerificationStudy();
                     $sample->setFkStudy($Study);
                     $sample->setName($createNames[$key]);
                     $sample->setAssociated($createAssociated[$key]);
@@ -1223,7 +1277,7 @@ class StudyController extends BaseController
                 foreach ($updateName as $key => $value)
                 {
                     
-                    $sampleVerification = $this->getRepository('\\Alae\\Entity\\SampleVerification')->find($key);
+                    $sampleVerification = $this->getRepository('\\Alae\\Entity\\SampleVerificationStudy')->find($key);
                     
                     if ($sampleVerification && $sampleVerification->getId())
                     {    
@@ -1255,7 +1309,7 @@ class StudyController extends BaseController
 
         $query    = $this->getEntityManager()->createQuery("
             SELECT v.id as id, v.name as name, v.associated as associated
-            FROM Alae\Entity\SampleVerification v
+            FROM Alae\Entity\SampleVerificationStudy v
             WHERE v.fkStudy = " . $AnaStudy->getFkStudy()->getPkStudy() . "
             ORDER BY v.id ASC");
         $elements = $query->getResult();
@@ -1271,9 +1325,12 @@ class StudyController extends BaseController
             foreach ($elements as $temp)
             {
                 $buttons = "";
-                $buttons .= '<span class="form-datatable-change" onclick="changeElement(this, ' . $temp["id"] . ');"></span>';
-                $buttons .= '<span class="form-datatable-delete" onclick="removeElement(this, ' . $temp["id"] . ');"></span>';
-
+                if (!$AnaStudy->getFkStudy()->getCloseFlag())
+                {
+                    $buttons .= '<span class="form-datatable-change" onclick="changeElement(this, ' . $temp["id"] . ');"></span>';
+                    $buttons .= '<span class="form-datatable-delete" onclick="removeElement(this, ' . $temp["id"] . ');"></span>';
+    
+                }
 
                 $data[] = array(
                     "name"       => $temp["name"],
@@ -1283,7 +1340,14 @@ class StudyController extends BaseController
             }
         }
 
-        $datatable = new Datatable($data, Datatable::DATATABLE_VERIFICATION_SAMPLE_ASSOC, $this->_getSession()->getFkProfile()->getName());
+        if (!$AnaStudy->getFkStudy()->getCloseFlag())
+        {
+            $datatable = new Datatable($data, Datatable::DATATABLE_VERIFICATION_SAMPLE_ASSOC, $this->_getSession()->getFkProfile()->getName());
+        }
+        else
+        {
+            $datatable = new Datatable($data, Datatable::DATATABLE_VERIFICATION_SAMPLE_ASSOC_R, $this->_getSession()->getFkProfile()->getName());    
+        }
         $viewModel = new ViewModel($datatable->getDatatable());
         $viewModel->setVariable('user', $this->_getSession());
         $viewModel->setVariable('error', $error);

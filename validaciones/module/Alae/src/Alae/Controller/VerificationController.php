@@ -431,7 +431,7 @@ class VerificationController extends BaseController
             $this->error($where, $fkParameter[0]);
         }
 
-        $elements = $this->getRepository("\\Alae\\Entity\\SampleVerification")->findBy(array("fkStudy" => $Batch->getFkStudy()));
+        $elements = $this->getRepository("\\Alae\\Entity\\SampleVerificationStudy")->findBy(array("fkStudy" => $Batch->getFkStudy()));
         
         foreach ($elements as $sample)
         {

@@ -26,6 +26,7 @@ class Datatable
     const DATATABLE_VERIFICATION_SAMPLE_BATCH = 'verification_sample_batch';
     const DATATABLE_VERIFICATION_SAMPLE = 'verification_sample';
     const DATATABLE_VERIFICATION_SAMPLE_ASSOC = 'verification_sample_assoc';
+    const DATATABLE_VERIFICATION_SAMPLE_ASSOC_R = 'verification_sample_assoc_r';
     const DATATABLE_AUDIT_TRAIL  = 'audit';
     const DATATABLE_STUDY_CLOSE  = 'studyclose';
 
@@ -481,6 +482,9 @@ class Datatable
         case Datatable::DATATABLE_VERIFICATION_SAMPLE_ASSOC:
             $response = $this->getverificationSampleAssocColumns();
             break;
+            case Datatable::DATATABLE_VERIFICATION_SAMPLE_ASSOC_R:
+            $response = $this->getverificationSampleAssocColumns();
+            break;
         case Datatable::DATATABLE_AUDIT_TRAIL:
             $response = $this->getAuditColumns();
             break;
@@ -533,7 +537,10 @@ class Datatable
                 $elements = '<span class="form-datatable-new"></span><input value="" type="submit"/>';
         break;
         case Datatable::DATATABLE_VERIFICATION_SAMPLE_ASSOC:
-        $elements = '<span class="form-datatable-new"></span><input value="" type="submit"/>';
+            $elements = '<span class="form-datatable-new"></span><input value="" type="submit"/>';
+        break;
+        case Datatable::DATATABLE_VERIFICATION_SAMPLE_ASSOC_R:
+            $elements = '';
 		break;
         }
 
