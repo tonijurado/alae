@@ -188,6 +188,7 @@ class VerificationController extends BaseController
                     SELECT COUNT(e.fkParameter)
                     FROM Alae\Entity\Error e, Alae\Entity\SampleBatch s
                     WHERE s.pkSampleBatch = e.fkSampleBatch
+                        AND (e.fkParameter <> 50)
                         AND s.fkBatch = " . $Batch->getPkBatch());
                 $errors = $query->getSingleScalarResult();
                 $status = $errors > 0 ? false : true;
