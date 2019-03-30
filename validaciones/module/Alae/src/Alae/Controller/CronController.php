@@ -522,8 +522,16 @@ class CronController extends BaseController
 			FILE_NAME
 		*/
         $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V4"));
-        $fileName = $response['batch'] . "-" . $response['study'];
-        $where = "s.fileName NOT LIKE '$fileName%' AND s.fkBatch = " . $Batch->getPkBatch();
+		//Original        $fileName = $response['batch'] . "-" . $response['study'];
+		//original        $where = "s.fileName NOT LIKE '$fileName%' AND s.fkBatch = " . $Batch->getPkBatch();
+
+		/*Toni: 30/03/2019
+			Para solucionar unos errores de V4 he contatenado al $filename un caracter "\"
+			así no hay confusión entre 001-3125V\001 y 001-3125V01\001
+		*/
+		
+        $fileName = $response['batch'] . "-" . $response['study'] . "\\\\";	 	
+		$where = "s.fileName NOT LIKE '$fileName%' AND s.fkBatch = " . $Batch->getPkBatch();
         $this->error($where, $fkParameter[0], array(), false);
 
         /*$query = $this->getEntityManager()->createQuery("SELECT COUNT(s.pkSampleBatch) FROM Alae\Entity\SampleBatch s WHERE $where");
