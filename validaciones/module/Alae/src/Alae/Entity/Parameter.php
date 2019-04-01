@@ -71,6 +71,13 @@ class Parameter
      */
     protected $typeParam;
 
+        /**
+     * @var boolean
+     *
+     * @ORM\Column(name="status", type="boolean", nullable=false)
+     */
+    protected $status;
+
     /**
      * @var \Alae\Entity\User
      *

@@ -186,10 +186,11 @@ class VerificationController extends BaseController
                 //AND ((e.fkParameter BETWEEN 1 AND 8) OR (e.fkParameter BETWEEN 23 AND 29))
                 $query = $this->getEntityManager()->createQuery("
                     SELECT COUNT(e.fkParameter)
-                    FROM Alae\Entity\Error e, Alae\Entity\SampleBatch s
+                    FROM Alae\Entity\Error e, Alae\Entity\SampleBatch s, Alae\Entity\Parameter p
                     WHERE s.pkSampleBatch = e.fkSampleBatch
-                        AND (e.fkParameter <> 50)
-                        AND s.fkBatch = " . $Batch->getPkBatch());
+                        AND p.status = 'on'
+                        AND s.fkBatch = " . $Batch->getPkBatch() ."
+                        AND p.pkParameter = e.fkParameter");
                 $errors = $query->getSingleScalarResult();
                 $status = $errors > 0 ? false : true;
             }
