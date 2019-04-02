@@ -283,6 +283,10 @@ class VerificationController extends BaseController
             $pkParameter[] = $sampleBatch->getPkSampleBatch();
         }
 
+		//*******
+		//NO DEBERÍA RECHAZAR UN LOTE SI TODOS LOS pkParameter tienen status = 0
+		//*******
+				
         if(!$isValid && count($pkParameter) > 0)
         {
             $sql = "

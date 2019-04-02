@@ -294,11 +294,11 @@ class ReportController extends BaseController
                         FROM Alae\Entity\Error e, Alae\Entity\SampleBatch s, Alae\Entity\Parameter p
                         WHERE s.pkSampleBatch = e.fkSampleBatch
                             AND e.fkParameter = p.pkParameter 
-							AND (p.pkParameter <> 50) 
+							AND (p.status = 1) 
                             AND s.fkBatch = " . $Batch->getPkBatch() . "
                         ORDER BY p.pkParameter");
 						
-					//Toni: En el Select ANTERIOR la fila AND (p.pkParameter<>50) determina que ese parametro (50)
+					//Toni: En el Select ANTERIOR la fila AND (p.status = 1) ) determina que ese parametro 
 					//NO DEBE DAR EL LOTE COMO RECHAZADO. Esto lo hace ya en verificationControler, 
 					//pero también lo quito aquí para que no salga en el Report 2.
 					// He hecho lo mismo en el REPORT 3
@@ -413,10 +413,10 @@ class ReportController extends BaseController
                         FROM Alae\Entity\Error e, Alae\Entity\SampleBatch s, Alae\Entity\Parameter p
                         WHERE s.pkSampleBatch = e.fkSampleBatch
                             AND e.fkParameter = p.pkParameter
-							AND (p.pkParameter <> 50) 
+							AND (p.status = 1) 
                             AND s.fkBatch = " . $Batch->getPkBatch());
 						
-					//Toni: En el Select ANTERIOR la fila AND (p.pkParameter<>50) determina que ese parametro (50)
+					//Toni: En el Select ANTERIOR la fila AND (p.status = 1)  determina que ese parametro 
 					//NO DEBE DAR EL LOTE COMO RECHAZADO. Esto lo hace ya en verificationControler, 
 					//pero también lo quito aquí para que no salga en el Report 2.
 					// He hecho lo mismo en el REPORT 2							

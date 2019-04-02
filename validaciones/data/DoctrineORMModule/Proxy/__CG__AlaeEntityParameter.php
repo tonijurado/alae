@@ -64,10 +64,10 @@ class Parameter extends \Alae\Entity\Parameter implements \Doctrine\ORM\Proxy\Pr
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'pkParameter', 'rule', 'verification', 'minValue', 'maxValue', 'codeError', 'messageError', 'typeParam', 'fkUser');
+            return array('__isInitialized__', 'pkParameter', 'rule', 'verification', 'minValue', 'maxValue', 'codeError', 'messageError', 'typeParam', 'status', 'fkUser');
         }
 
-        return array('__isInitialized__', 'pkParameter', 'rule', 'verification', 'minValue', 'maxValue', 'codeError', 'messageError', 'typeParam', 'fkUser');
+        return array('__isInitialized__', 'pkParameter', 'rule', 'verification', 'minValue', 'maxValue', 'codeError', 'messageError', 'typeParam', 'status', 'fkUser');
     }
 
     /**
