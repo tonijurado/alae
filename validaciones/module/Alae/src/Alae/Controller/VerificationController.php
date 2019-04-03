@@ -188,12 +188,13 @@ class VerificationController extends BaseController
                     SELECT COUNT(e.fkParameter)
                     FROM Alae\Entity\Error e, Alae\Entity\SampleBatch s, Alae\Entity\Parameter p
                     WHERE s.pkSampleBatch = e.fkSampleBatch
-                        AND p.status = 'on'
+                        AND p.status = 1
                         AND s.fkBatch = " . $Batch->getPkBatch() ."
                         AND p.pkParameter = e.fkParameter");
                 $errors = $query->getSingleScalarResult();
                 $status = $errors > 0 ? false : true;
             }
+            
             $Batch->setValidFlag($status);
             $Batch->setValidationDate(new \DateTime('now'));
             $Batch->setFkUser($this->_getSession());
@@ -281,8 +282,8 @@ class VerificationController extends BaseController
             $this->getEntityManager()->persist($Error);
             $this->getEntityManager()->flush();
 
-            $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("pkParameter" => $fkParameter, "status" => true));
-            if($parameters)
+           
+            if(!$fkParameter->getStatus())
             {
                 $pkParameter[] = $sampleBatch->getPkSampleBatch();
             }
