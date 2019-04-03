@@ -281,7 +281,7 @@ class VerificationController extends BaseController
             $this->getEntityManager()->persist($Error);
             $this->getEntityManager()->flush();
 
-            $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("pkParameter" => $fkParameter, "status" => false));
+            $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("pkParameter" => $fkParameter, "status" => true));
             if($parameters)
             {
                 $pkParameter[] = $sampleBatch->getPkSampleBatch();
