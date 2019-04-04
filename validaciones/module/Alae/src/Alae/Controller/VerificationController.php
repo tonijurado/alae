@@ -926,14 +926,14 @@ class VerificationController extends BaseController
         $query = $this->getEntityManager()->createQuery("
             SELECT COUNT(s.pkSampleBatch)
             FROM Alae\Entity\SampleBatch s
-            WHERE s.sampleName LIKE 'CS%' AND s.sampleName NOT LIKE  '%\*%' AND s.validFlag <> 0 AND s.fkBatch = " . $Batch->getPkBatch());
+            WHERE s.sampleName LIKE 'CS%' AND s.sampleName NOT LIKE  '%\*%' AND s.useRecord <> 0 AND s.fkBatch = " . $Batch->getPkBatch());
         $value = $query->getSingleScalarResult();
         $Batch->setCsAcceptedTotal($value);
 
         $query = $this->getEntityManager()->createQuery("
             SELECT COUNT(s.pkSampleBatch)
             FROM Alae\Entity\SampleBatch s
-            WHERE s.sampleName LIKE 'QC%' AND s.sampleName NOT LIKE  '%\*%' AND s.validFlag <> 0 AND s.fkBatch = " . $Batch->getPkBatch());
+            WHERE s.sampleName LIKE 'QC%' AND s.sampleName NOT LIKE  '%\*%' AND s.useRecord <> 0 AND s.fkBatch = " . $Batch->getPkBatch());
         $value = $query->getSingleScalarResult();
         $Batch->setQcAcceptedTotal($value);
 
@@ -981,9 +981,9 @@ class VerificationController extends BaseController
         $where2 = "
         (s.sampleName NOT LIKE 'BLK%' AND s.sampleName NOT LIKE 'SEL%')   
         AND s.sampleType <> 'Solvent' AND s.isPeakArea < $value
-        AND (s.sampleName LIKE 'CS%' OR s.sampleName LIKE 'CS%') 
+        AND (s.sampleName LIKE 'CS%' OR s.sampleName LIKE 'QC%') 
         AND (s.sampleType = 'Standard' OR s.sampleType = 'Quality Control') 
-        AND s.useRecord = 0
+        AND s.useRecord = 1
         AND s.fkBatch = " . $Batch->getPkBatch();
         $this->error($where2, $parameters2[0], array(), false);
     }
@@ -1208,7 +1208,8 @@ class VerificationController extends BaseController
         {
             $value      = ($Batch->getQcAcceptedTotal() / $Batch->getQcTotal()) * 100;
             $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V21"));
-
+			//echo "value: " . $value . " / QCAcceptedTotal = " . $Batch->getQcAcceptedTotal() . " / QCTotal = " . $Batch->getQcTotal() ;
+			//die();
             if ($value < $parameters[0]->getMinValue())
             {
                 $where = "(s.sampleName NOT LIKE 'DQC%' AND s.sampleName LIKE 'QC%') AND s.fkBatch = " . $Batch->getPkBatch();
@@ -1243,7 +1244,7 @@ class VerificationController extends BaseController
             $query                 = $this->getEntityManager()->createQuery("
                 SELECT COUNT(s.pkSampleBatch)
                 FROM Alae\Entity\SampleBatch s
-                WHERE s.sampleName LIKE '" . $qc['sample_name'] . "%' AND s.sampleName NOT LIKE '%*%' AND s.validFlag = 1 AND s.fkBatch = " . $Batch->getPkBatch()
+                WHERE s.sampleName LIKE '" . $qc['sample_name'] . "%' AND s.sampleName NOT LIKE '%*%' AND s.useRecord = 0 AND s.fkBatch = " . $Batch->getPkBatch()
             );
             $qc_not_accepted_total = $query->getSingleScalarResult();
 

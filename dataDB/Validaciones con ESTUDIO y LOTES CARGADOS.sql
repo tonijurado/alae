@@ -13,6 +13,9 @@
 
 
 -- Volcando estructura de base de datos para validaciones
+
+DROP DATABASE `validaciones`;
+
 CREATE DATABASE IF NOT EXISTS `validaciones` /*!40100 DEFAULT CHARACTER SET utf8 */;
 USE `validaciones`;
 
@@ -297,7 +300,7 @@ CREATE TABLE IF NOT EXISTS `alae_analyte_study` (
   CONSTRAINT `alae_analyte_study_ibfk_5` FOREIGN KEY (`fk_user`) REFERENCES `alae_user` (`pk_user`)
 ) ENGINE=InnoDB AUTO_INCREMENT=397 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
--- Volcando datos para la tabla validaciones.alae_analyte_study: ~404 rows (aproximadamente)
+-- Volcando datos para la tabla validaciones.alae_analyte_study: ~375 rows (aproximadamente)
 /*!40000 ALTER TABLE `alae_analyte_study` DISABLE KEYS */;
 INSERT INTO `alae_analyte_study` (`pk_analyte_study`, `cs_number`, `qc_number`, `cs_values`, `qc_values`, `internal_standard`, `status`, `is_used`, `updated_at`, `fk_study`, `fk_analyte`, `fk_analyte_is`, `fk_unit`, `fk_user`, `fk_user_approve`, `hdqc_values`, `ldqc_values`, `llqc_values`, `ulqc_values`, `retention`, `acceptance`, `retention_is`, `acceptance_is`) VALUES
 	(16, 9, 4, '49.60,99.20,744.00,2232.00,14880.00,29760.00,44640.00,59520.00,74400.00', '199.20,37350.00,56025.00,7470.00', 50.0000, 1, 1, '2018-11-07 21:08:49', 18, 1, 3, 2, 9, 9, 747000.00, 112050.00, 0.00, 0.00, 0.0000, 0.0000, 0.0000, 0.0000),
@@ -923,7 +926,7 @@ CREATE TABLE IF NOT EXISTS `alae_error` (
   CONSTRAINT `alae_error_ibfk_2` FOREIGN KEY (`fk_sample_batch`) REFERENCES `alae_sample_batch` (`pk_sample_batch`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2141 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
--- Volcando datos para la tabla validaciones.alae_error: ~643 rows (aproximadamente)
+-- Volcando datos para la tabla validaciones.alae_error: ~395 rows (aproximadamente)
 /*!40000 ALTER TABLE `alae_error` DISABLE KEYS */;
 INSERT INTO `alae_error` (`pk_error`, `fk_parameter`, `fk_sample_batch`) VALUES
 	(1623, 4, 13467),
@@ -1478,10 +1481,10 @@ INSERT INTO `alae_parameter` (`pk_parameter`, `rule`, `verification`, `min_value
 	(10, 'V9.1', 'Accuracy (Sample Name + Rx*)', -15, 15, 'O', 'V9.1 - (Sample Name + Rx*) ACCURACY FUERA DE RANGO', 1, 1, 1),
 	(11, 'V9.2', 'Use record = 0 ( Sample Name + Rx* )', 0, 0, 'O', 'V9.2 - Sample Name + Rx*  USE RECORD NO VALIDO', 1, 1, 1),
 	(12, 'V9.3', 'Que tanto V 9.1 como V 9.2 se cumplan', 0, 0, 'O', 'V9.3 - QRC NO VÁLIDO', 1, 1, 1),
-	(13, 'V10.1', 'Accuracy (CS1)', 80, 120, 'O', 'V10.1 - NO CUMPLE ACCURACY', 1, 1, 1),
-	(14, 'V10.2', 'Accuracy (CS2-CSx)', 85, 115, 'O', 'V10.2 - NO CUMPLE ACCURACY', 1, 1, 1),
-	(15, 'V10.3', 'Accuracy (QC)', 85, 115, 'O', 'V10.3 - NO CUMPLE ACCURACY', 1, 1, 1),
-	(16, 'V10.4', 'TZ', 90, 110, 'O', 'V10.4 - NO CUMPLE ACCURACY', 1, 1, 1),
+	(13, 'V10.1', 'Accuracy (CS1)', 80, 120, 'O', 'V10.1 - NO CUMPLE ACCURACY', 1, 0, 1),
+	(14, 'V10.2', 'Accuracy (CS2-CSx)', 85, 115, 'O', 'V10.2 - NO CUMPLE ACCURACY', 1, 0, 1),
+	(15, 'V10.3', 'Accuracy (QC)', 85, 115, 'O', 'V10.3 - NO CUMPLE ACCURACY', 1, 0, 1),
+	(16, 'V10.4', 'TZ', 90, 110, 'O', 'V10.4 - NO CUMPLE ACCURACY', 1, 0, 1),
 	(17, 'V11', 'Revisión del dilution factor en HDQC / LDQC', 0, 0, 'O', 'V11- FACTOR DILUCIÓN ERRÓNEO', 1, 1, 1),
 	(18, 'V12', 'Use record (CS/QC/DQC)', 0, 0, NULL, NULL, 1, 1, 1),
 	(19, 'V15.1', 'Selección manual de los CS válidos', 0, 0, NULL, NULL, 1, 1, 1),
@@ -1510,7 +1513,7 @@ INSERT INTO `alae_parameter` (`pk_parameter`, `rule`, `verification`, `min_value
 	(42, 'V25', 'Basal cuantificable (Unknown) (J)', 0, 0, 'J', 'V25 - Basal cuantificable', 1, 1, 1),
 	(43, 'V13.1', 'Tiempo de retención (C2)', 0, 0, 'C2', 'V13.1 - Tiempo de retención inaceptable', 1, 1, 1),
 	(44, 'V13.2', 'LOTE NO VÁLIDO Use Record Erróneo CS/QC (C2)', 0, 0, 'C2', 'V13.2- LOTE NO VÁLIDO Use record Erróneo', 1, 1, 1),
-	(46, 'V10.5', 'Accuracy DQC (LDQC y HDQC)', 85, 115, 'O', 'V10.5 - NO CUMPLE ACCURACY', 1, 1, 1),
+	(46, 'V10.5', 'Accuracy DQC (LDQC y HDQC)', 85, 115, 'O', 'V10.5 - NO CUMPLE ACCURACY', 1, 0, 1),
 	(47, 'V19.1', '>=50% de los CS1', 50, 0, NULL, 'V19.1 - LOTE RECHAZADO (50% CS1)', 1, 1, 1),
 	(48, 'V19.2', '>=50% de los CS8 o superior', 50, 0, NULL, 'V19.2 - LOTE RECHAZADO (50% CS8 o superior)', 1, 1, 1),
 	(49, 'V7.1', 'Replicados CS (mínimo)', 2, 0, NULL, 'V7.1 - REPLICADOS INSUFICIENTES', 1, 1, 1),
@@ -5339,7 +5342,7 @@ CREATE TABLE IF NOT EXISTS `alae_study` (
   CONSTRAINT `alae_study_ibfk_3` FOREIGN KEY (`fk_user_close`) REFERENCES `alae_user` (`pk_user`)
 ) ENGINE=InnoDB AUTO_INCREMENT=357 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
--- Volcando datos para la tabla validaciones.alae_study: ~431 rows (aproximadamente)
+-- Volcando datos para la tabla validaciones.alae_study: ~286 rows (aproximadamente)
 /*!40000 ALTER TABLE `alae_study` DISABLE KEYS */;
 INSERT INTO `alae_study` (`pk_study`, `code`, `created_at`, `updated_at`, `approved_at`, `description`, `observation`, `close_flag`, `status`, `validation`, `verification`, `approve`, `duplicate`, `fk_user`, `fk_user_approve`, `fk_user_close`, `fk_dilution_tree`) VALUES
 	(18, '00ANE-1000', '2014-04-24 00:00:00', '2014-04-24 07:58:44', '0000-00-00 00:00:00', 'Análisis de muestras atorvastatina', 'Test OQ_DAE', 1, 1, 0, 0, 1, 0, 9, 9, NULL, 1),
@@ -5884,3 +5887,8 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`alae`@`localhost` SQL SECURITY DEFINER VIEW 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+
+-- Ponemos a 0 el parametro de V15.1
+UPDATE alae_parameter
+SET  `status`= 0
+WHERE `pk_parameter` >= 19 AND `pk_parameter` <= 22;
