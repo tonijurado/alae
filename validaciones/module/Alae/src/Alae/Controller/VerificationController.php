@@ -261,7 +261,7 @@ class VerificationController extends BaseController
      */
     protected function error($where, $fkParameter, $parameters = array(), $isValid = true)
     {
-        
+
         $sql = "
             SELECT s
             FROM Alae\Entity\SampleBatch s
@@ -292,7 +292,7 @@ class VerificationController extends BaseController
 		//*******
 		//NO DEBERÍA RECHAZAR UN LOTE SI TODOS LOS pkParameter tienen status = 0
 		//*******
-				
+		//$contadorParameter = count($pkParameter); echo $contadorParameter . "-" . $fkParameter; die();		
         if(!$isValid && count($pkParameter) > 0)
         {
             $sql = "
@@ -302,6 +302,24 @@ class VerificationController extends BaseController
             $query = $this->getEntityManager()->createQuery($sql);
             $query->execute();
         }
+
+        /*
+         * DEBE MARCAR COMO MALA validFlag = 0 las muestras que pasan por error.
+         * Al pasar muestras que NO anulan lote, no se marcan como erróneas y las verificaciones del número de CS válido o QC válidos
+         * o muestras consecutivas erróneas no funcionan bien.
+         *
+            $sql = "
+                UPDATE Alae\Entity\SampleBatch s
+                SET s.validFlag = 0
+                WHERE $where";
+            $query = $this->getEntityManager()->createQuery($sql);
+            $query->execute();    
+
+
+         /* 
+          * FIN DE LA PRUEBA DE TONI PARA MARCAR COMO validFlag = 0 las muestras que entrar en error
+          */
+
         
     }
 
@@ -716,7 +734,7 @@ class VerificationController extends BaseController
             }
 
             $centi92 = "N";
-            if($useRecord == 0)
+            if($useRecord == 1) //Cambio de 0 a 1 y verificacion ok.
             {
                 $centi92 = "S";
                 $where = "s.sampleName = '" . $injName . "' AND s.fkBatch = " . $Batch->getPkBatch();
@@ -744,8 +762,10 @@ class VerificationController extends BaseController
     {
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.1"));
         $where      = "(s.sampleName LIKE 'CS1%' OR s.sampleName LIKE 'LLOQ%' OR s.sampleName LIKE 'LLQC%') AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.fkBatch = " . $Batch->getPkBatch();
+                //echo $where;
+                //die();
         $this->error($where, $parameters[0], array(), false);
-
+            
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.2"));
         $where      = "REGEXP(s.sampleName, :regexp) = 1 AND s.sampleName NOT LIKE 'CS1%' AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.fkBatch = " . $Batch->getPkBatch();
         //$this->error($where, $parameters[0], array('regexp' => '^CS[0-9]+(-[0-9]+)?$'), false);
@@ -1068,6 +1088,10 @@ class VerificationController extends BaseController
             "fkStudy" => $Batch->getFkStudy()
         ));
 
+        /*
+            Esta verificación es correcta, pero lo que ocurre es que las muestras que NO anulan lote, tienen el ValidFlag de la muestra como 1
+            y debería ser 0
+        */
         for ($i = 2; $i <= $AnaStudy[0]->getCsNumber(); $i++)
         {
             $query         = $this->getEntityManager()->createQuery("
@@ -1076,6 +1100,7 @@ class VerificationController extends BaseController
                 WHERE (s.sampleName LIKE 'CS" . $i . "%' OR s.sampleName LIKE 'CS" . ($i - 1) . "%') AND s.fkBatch = " . $Batch->getPkBatch() . "
                 ORDER BY s.sampleName ASC"
             );
+
             $results       = $query->getResult();
 
             $pkSampleBatch = array();
@@ -1126,7 +1151,7 @@ class VerificationController extends BaseController
 		/* Cambio de TONI para controlar los DIV/0 en caso de que cs1AceptadosTotal sea 0*/
         if($cs1AceptadosTotal != 0)
         {
-            $value      = ($cs1Total / $cs1AceptadosTotal) * 100;
+            $value      = ($cs1AceptadosTotal / $cs1Total) * 100;
 		}
 		else
 		{
@@ -1164,7 +1189,7 @@ class VerificationController extends BaseController
         /* CAMBIO DE TONI PARA CONTROLAR LOS DIV/0 en caso que no haya ningún CSMAXAceptado*/
         if($csMaxAceptadosTotal != 0)
         {
-		    $value = ($csMaxTotal / $csMaxAceptadosTotal) * 100;
+		    $value = ($csMaxAceptadosTotal / $csMaxTotal) * 100;
 		}
 		else
 		{

@@ -521,7 +521,10 @@ class CronController extends BaseController
 			como dice en el documento funcional, el nombre del archivo exportado debe contener los números de identificación del lote que aparezca en la columna 
 			FILE_NAME
 		*/
-        $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V4"));
+
+// *** Anulamos temporalmente la V4 según NATALIA día 05-04-2019. Para activarlo, deberemos quitar los comentarios "//***" (4 lineas en total)
+
+// ***        $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V4"));
 		//Original        $fileName = $response['batch'] . "-" . $response['study'];
 		//original        $where = "s.fileName NOT LIKE '$fileName%' AND s.fkBatch = " . $Batch->getPkBatch();
 
@@ -530,9 +533,10 @@ class CronController extends BaseController
 			así no hay confusión entre 001-3125V\001 y 001-3125V01\001
 		*/
 		
-        $fileName = $response['batch'] . "-" . $response['study'] . "\\\\";	 	
-		$where = "s.fileName NOT LIKE '$fileName%' AND s.fkBatch = " . $Batch->getPkBatch();
-        $this->error($where, $fkParameter[0], array(), false);
+// ***        $fileName = $response['batch'] . "-" . $response['study'] . "\\\\";	 	
+// ***		$where = "s.fileName NOT LIKE '$fileName%' AND s.fkBatch = " . $Batch->getPkBatch();
+
+// ***        $this->error($where, $fkParameter[0], array(), false);
 
         /*$query = $this->getEntityManager()->createQuery("SELECT COUNT(s.pkSampleBatch) FROM Alae\Entity\SampleBatch s WHERE $where");
         $count = $query->getSingleScalarResult();

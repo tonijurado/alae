@@ -11,11 +11,9 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
-
--- Volcando estructura de base de datos para validaciones
-
 DROP DATABASE `validaciones`;
 
+-- Volcando estructura de base de datos para validaciones
 CREATE DATABASE IF NOT EXISTS `validaciones` /*!40100 DEFAULT CHARACTER SET utf8 */;
 USE `validaciones`;
 
@@ -300,7 +298,7 @@ CREATE TABLE IF NOT EXISTS `alae_analyte_study` (
   CONSTRAINT `alae_analyte_study_ibfk_5` FOREIGN KEY (`fk_user`) REFERENCES `alae_user` (`pk_user`)
 ) ENGINE=InnoDB AUTO_INCREMENT=397 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
--- Volcando datos para la tabla validaciones.alae_analyte_study: ~375 rows (aproximadamente)
+-- Volcando datos para la tabla validaciones.alae_analyte_study: ~364 rows (aproximadamente)
 /*!40000 ALTER TABLE `alae_analyte_study` DISABLE KEYS */;
 INSERT INTO `alae_analyte_study` (`pk_analyte_study`, `cs_number`, `qc_number`, `cs_values`, `qc_values`, `internal_standard`, `status`, `is_used`, `updated_at`, `fk_study`, `fk_analyte`, `fk_analyte_is`, `fk_unit`, `fk_user`, `fk_user_approve`, `hdqc_values`, `ldqc_values`, `llqc_values`, `ulqc_values`, `retention`, `acceptance`, `retention_is`, `acceptance_is`) VALUES
 	(16, 9, 4, '49.60,99.20,744.00,2232.00,14880.00,29760.00,44640.00,59520.00,74400.00', '199.20,37350.00,56025.00,7470.00', 50.0000, 1, 1, '2018-11-07 21:08:49', 18, 1, 3, 2, 9, 9, 747000.00, 112050.00, 0.00, 0.00, 0.0000, 0.0000, 0.0000, 0.0000),
@@ -926,7 +924,7 @@ CREATE TABLE IF NOT EXISTS `alae_error` (
   CONSTRAINT `alae_error_ibfk_2` FOREIGN KEY (`fk_sample_batch`) REFERENCES `alae_sample_batch` (`pk_sample_batch`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2141 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
--- Volcando datos para la tabla validaciones.alae_error: ~395 rows (aproximadamente)
+-- Volcando datos para la tabla validaciones.alae_error: ~518 rows (aproximadamente)
 /*!40000 ALTER TABLE `alae_error` DISABLE KEYS */;
 INSERT INTO `alae_error` (`pk_error`, `fk_parameter`, `fk_sample_batch`) VALUES
 	(1623, 4, 13467),
@@ -1477,20 +1475,20 @@ INSERT INTO `alae_parameter` (`pk_parameter`, `rule`, `verification`, `min_value
 	(6, 'V6', 'Concentración nominal de CS/QC', 2, 0, NULL, 'V6 - CONCENTRACIÓN NOMINAL ERRÓNEA', 1, 1, 1),
 	(7, 'V7.2', 'Replicados QC (mínimo)', 2, 0, NULL, 'V7.2 - REPLICADOS INSUFICIENTES', 1, 1, 1),
 	(8, 'V8', 'Sample Name repetido', 0, 0, NULL, 'V8 - SAMPLE NAME REPETIDO', 1, 1, 1),
-	(9, 'V9', 'Búsqueda de Muestras reinyectadas', 0, 0, NULL, NULL, 1, 1, 1),
-	(10, 'V9.1', 'Accuracy (Sample Name + Rx*)', -15, 15, 'O', 'V9.1 - (Sample Name + Rx*) ACCURACY FUERA DE RANGO', 1, 1, 1),
-	(11, 'V9.2', 'Use record = 0 ( Sample Name + Rx* )', 0, 0, 'O', 'V9.2 - Sample Name + Rx*  USE RECORD NO VALIDO', 1, 1, 1),
-	(12, 'V9.3', 'Que tanto V 9.1 como V 9.2 se cumplan', 0, 0, 'O', 'V9.3 - QRC NO VÁLIDO', 1, 1, 1),
+	(9, 'V9', 'Búsqueda de Muestras reinyectadas', 0, 0, NULL, NULL, 1, 0, 1),
+	(10, 'V9.1', 'Diferencia Ratio (Rx*)', -15, 15, 'O', 'V9.1 - (Sample Name + Rx*) NO VÁLIDO', 1, 0, 1),
+	(11, 'V9.2', 'Use record = 0 ( Sample Name + Rx* )', 0, 0, 'O', 'V9.2 - Sample Name + Rx*  USE RECORD NO VALIDO', 1, 0, 1),
+	(12, 'V9.3', 'Que tanto V 9.1 como V 9.2 se cumplan', 0, 0, 'O', 'V9.3 - QRC NO VÁLIDO', 1, 0, 1),
 	(13, 'V10.1', 'Accuracy (CS1)', 80, 120, 'O', 'V10.1 - NO CUMPLE ACCURACY', 1, 0, 1),
 	(14, 'V10.2', 'Accuracy (CS2-CSx)', 85, 115, 'O', 'V10.2 - NO CUMPLE ACCURACY', 1, 0, 1),
 	(15, 'V10.3', 'Accuracy (QC)', 85, 115, 'O', 'V10.3 - NO CUMPLE ACCURACY', 1, 0, 1),
 	(16, 'V10.4', 'TZ', 90, 110, 'O', 'V10.4 - NO CUMPLE ACCURACY', 1, 0, 1),
 	(17, 'V11', 'Revisión del dilution factor en HDQC / LDQC', 0, 0, 'O', 'V11- FACTOR DILUCIÓN ERRÓNEO', 1, 1, 1),
 	(18, 'V12', 'Use record (CS/QC/DQC)', 0, 0, NULL, NULL, 1, 1, 1),
-	(19, 'V15.1', 'Selección manual de los CS válidos', 0, 0, NULL, NULL, 1, 1, 1),
-	(20, 'V15.2', 'Interf. Analito en BLK', 20, 0, 'O', 'V15.2 - BLK NO CUMPLE', 1, 1, 1),
-	(21, 'V15.3', 'Interf. IS en BLK', 5, 0, 'O', 'V15.3 - BLK NO CUMPLE', 1, 1, 1),
-	(22, 'V15.4', 'Interf. Analito en ZS', 20, 0, 'O', 'V15.4 - ZS NO CUMPLE', 1, 1, 1),
+	(19, 'V15.1', 'Selección manual de los CS válidos', 0, 0, NULL, NULL, 1, 0, 1),
+	(20, 'V15.2', 'Interf. Analito en BLK', 20, 0, 'O', 'V15.2 - BLK NO CUMPLE', 1, 0, 1),
+	(21, 'V15.3', 'Interf. IS en BLK', 5, 0, 'O', 'V15.3 - BLK NO CUMPLE', 1, 0, 1),
+	(22, 'V15.4', 'Interf. Analito en ZS', 20, 0, 'O', 'V15.4 - ZS NO CUMPLE', 1, 0, 1),
 	(23, 'V17', '75% CS', 75, 0, NULL, 'V17 - LOTE RECHAZADO (75% CS)', 1, 1, 1),
 	(24, 'V18', 'CS consecutivos', 0, 0, NULL, 'V18 - LOTE RECHAZADO (CS CONSECUTIVOS)', 1, 1, 1),
 	(25, 'V20', 'r < 0.99', 99, 0, NULL, 'V20 - LOTE RECHAZADO (r< 0.99)', 1, 1, 1),
@@ -1498,17 +1496,17 @@ INSERT INTO `alae_parameter` (`pk_parameter`, `rule`, `verification`, `min_value
 	(27, 'V22', '50% de cada nivel de QC', 50, 0, NULL, 'V22 - LOTE RECHAZADO (50% QCx)', 1, 1, 1),
 	(28, 'V23.1', '50% BLK', 50, 0, NULL, 'V23.1 - LOTE RECHAZADO (INTERF. BLK)', 1, 1, 1),
 	(29, 'V23.2', '50% ZS', 50, 0, 'C1', 'V23.2 - LOTE RECHAZADO (INTERF. ZS)', 1, 1, 1),
-	(30, 'V21???', 'Conc. (unknown) > ULOQ ( E )', 0, 0, 'E', 'V21 - CONC. SUPERIOR AL ULOQ', 1, 1, 1),
+	(30, 'V21???', 'Conc. (unknown) > ULOQ ( E )', 0, 0, 'E', 'V21 - CONC. SUPERIOR AL ULOQ', 1, 0, 1),
 	(31, 'V22???', 'Variabilidad IS (unknown) ( H )', 0, 0, 'H', 'V22 - VARIABILIDAD IS', 1, 1, 1),
 	(32, 'V14.2', 'CS y QC (Sample Type=Standard o Quality Control) rechazadas por el motivo B2', 5, 0, NULL, 'V14.2 - LOTE NO VÁLIDO + USE RECORD ERRÓNEO', 1, 1, 1),
 	(33, 'V24', 'Fuera rango recta truncada ( F )', 0, 0, 'F', 'V24 - FUERA DE RANGO/RECTA TRUNCADA', 1, 1, 1),
-	(34, 'V12.1', NULL, 0, 0, 'O', 'V12 - No cumple S/N', 0, 1, 1),
-	(35, 'V12.2', NULL, 0, 0, 'A', 'V12 - Muestra perdida durante la extracción', 0, 1, 1),
-	(36, 'V12.3', NULL, 0, 0, 'B', 'V12 - Error de extracción', 0, 1, 1),
-	(37, 'V12.4', NULL, 0, 0, 'B', 'V12 - Respuesta IS inferior al 5%', 0, 1, 1),
-	(38, 'V12.5', NULL, 0, 0, 'C1', 'V12 - Problemas de cromatografía', 0, 1, 1),
-	(39, 'V12.6', NULL, 0, 0, 'C2', 'V12 - Tiempo de retención inaceptable', 0, 1, 1),
-	(40, 'V12.7', NULL, 0, 0, 'D', 'V12 - Fallo técnico de equipo / software', 0, 1, 1),
+	(34, 'V12.1', NULL, 0, 0, 'O', 'V12 - No cumple S/N', 0, 0, 1),
+	(35, 'V12.2', NULL, 0, 0, 'A', 'V12 - Muestra perdida durante la extracción', 0, 0, 1),
+	(36, 'V12.3', NULL, 0, 0, 'B', 'V12 - Error de extracción', 0, 0, 1),
+	(37, 'V12.4', NULL, 0, 0, 'B', 'V12 - Respuesta IS inferior al 5%', 0, 0, 1),
+	(38, 'V12.5', NULL, 0, 0, 'C1', 'V12 - Problemas de cromatografía', 0, 0, 1),
+	(39, 'V12.6', NULL, 0, 0, 'C2', 'V12 - Tiempo de retención inaceptable', 0, 0, 1),
+	(40, 'V12.7', NULL, 0, 0, 'D', 'V12 - Fallo técnico de equipo / software', 0, 0, 1),
 	(41, 'V12.8', NULL, 0, 0, NULL, 'V12 - Use Record Erróneo', 0, 1, 1),
 	(42, 'V25', 'Basal cuantificable (Unknown) (J)', 0, 0, 'J', 'V25 - Basal cuantificable', 1, 1, 1),
 	(43, 'V13.1', 'Tiempo de retención (C2)', 0, 0, 'C2', 'V13.1 - Tiempo de retención inaceptable', 1, 1, 1),
@@ -1634,7 +1632,7 @@ CREATE TABLE IF NOT EXISTS `alae_sample_batch` (
   CONSTRAINT `alae_sample_batch_ibfk_1` FOREIGN KEY (`fk_batch`) REFERENCES `alae_batch` (`pk_batch`)
 ) ENGINE=InnoDB AUTO_INCREMENT=17058 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
--- Volcando datos para la tabla validaciones.alae_sample_batch: ~3.613 rows (aproximadamente)
+-- Volcando datos para la tabla validaciones.alae_sample_batch: ~3.591 rows (aproximadamente)
 /*!40000 ALTER TABLE `alae_sample_batch` DISABLE KEYS */;
 INSERT INTO `alae_sample_batch` (`pk_sample_batch`, `sample_name`, `analyte_peak_name`, `sample_type`, `file_name`, `dilution_factor`, `analyte_peak_area`, `is_peak_name`, `is_peak_area`, `analyte_concentration`, `analyte_concentration_units`, `calculated_concentration`, `calculated_concentration_units`, `accuracy`, `use_record`, `valid_flag`, `is_used`, `code_error`, `parameters`, `created_at`, `updated_at`, `sample_id`, `sample_comment`, `set_number`, `acquisition_method`, `rack_type`, `rack_position`, `vial_position`, `plate_type`, `plate_position`, `weight_to_volume_ratio`, `sample_annotation`, `disposition`, `analyte_units`, `acquisition_date`, `analyte_peak_area_for_dad`, `analyte_peak_height`, `analyte_peak_height_for_dad`, `analyte_retention_time`, `analyte_expected_rt`, `analyte_rt_window`, `analyte_centroid_location`, `analyte_start_scan`, `analyte_start_time`, `analyte_stop_scan`, `analyte_stop_time`, `analyte_integration_type`, `analyte_signal_to_noise`, `analyte_peak_width`, `analyte_standar_query_status`, `analyte_mass_ranges`, `analyte_wavelength_ranges`, `height_ratio`, `analyte_annotation`, `analyte_channel`, `analyte_peak_width_at_50_height`, `analyte_slope_of_baseline`, `analyte_processing_alg`, `analyte_peak_asymmetry`, `is_units`, `is_peak_area_for_dad`, `is_peak_height`, `is_peak_height_for_dad`, `is_concentration`, `is_retention_time`, `is_expected_rt`, `is_rt_windows`, `is_centroid_location`, `is_start_scan`, `is_start_time`, `is_stop_scan`, `is_stop_time`, `is_integration_type`, `is_signal_to_noise`, `is_peak_width`, `is_mass_ranges`, `is_wavelength_ranges`, `is_channel`, `is_peak_width_al_50_height`, `is_slope_of_baseline`, `is_processing_alg`, `is_peak_asymemtry`, `record_modified`, `area_ratio`, `calculated_concentration_for_dad`, `relative_retention_time`, `response_factor`, `fk_batch`) VALUES
 	(13467, 'BLK-C-1a', 'MEM', 'Unknown', '007-3125VR1\\001.wiff', 1.0000, 347, 'MEM-d6', 59, 0.0000, 'pg/mL', 25506.1400, 'pg/mL', 0.0000, 0, 0, 1, NULL, NULL, '2019-04-02 11:43:17', '2019-04-02 11:43:17', 0, '', 0, 'MS07-MEM-01.dam', 'CStk1-01', 2, 1, 'VT54', 1, 0.0000, '', '', 'pg/mL', '2018-08-13 21:06:05', 'N/A', 86.3000, 'N/A', 1.6800, 1.6800, 30.0000, 1.6900, 97.0000, 1.6200, 106, 1.7700, 'Base To Base', 'N/A', 0.1520, 'N/A', '180.200/163.200 Da', 'N/A', 6.3000, '', 'N/A', 0.0646, 0.0000, 'Analyst Classic', 1.3500, 'ng/mL', 'N/A', 13.7000, 'N/A', 1.0000, 1.6800, 1.6400, 30.0000, 1.7000, 99, 1.6500, 105, 1.7500, 'Base To Base', 'N/A', 0.1010, '186.200/169.200 Da', 'N/A', 'N/A', 0.0580, -1370.0000, 'Analyst Classic', 2.4700, 0, 5.8736, 'N/A', 1.0000, 0.0000, 208),
@@ -5342,7 +5340,7 @@ CREATE TABLE IF NOT EXISTS `alae_study` (
   CONSTRAINT `alae_study_ibfk_3` FOREIGN KEY (`fk_user_close`) REFERENCES `alae_user` (`pk_user`)
 ) ENGINE=InnoDB AUTO_INCREMENT=357 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
--- Volcando datos para la tabla validaciones.alae_study: ~286 rows (aproximadamente)
+-- Volcando datos para la tabla validaciones.alae_study: ~333 rows (aproximadamente)
 /*!40000 ALTER TABLE `alae_study` DISABLE KEYS */;
 INSERT INTO `alae_study` (`pk_study`, `code`, `created_at`, `updated_at`, `approved_at`, `description`, `observation`, `close_flag`, `status`, `validation`, `verification`, `approve`, `duplicate`, `fk_user`, `fk_user_approve`, `fk_user_close`, `fk_dilution_tree`) VALUES
 	(18, '00ANE-1000', '2014-04-24 00:00:00', '2014-04-24 07:58:44', '0000-00-00 00:00:00', 'Análisis de muestras atorvastatina', 'Test OQ_DAE', 1, 1, 0, 0, 1, 0, 9, 9, NULL, 1),
@@ -5887,8 +5885,3 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`alae`@`localhost` SQL SECURITY DEFINER VIEW 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-
--- Ponemos a 0 el parametro de V15.1
-UPDATE alae_parameter
-SET  `status`= 0
-WHERE `pk_parameter` >= 19 AND `pk_parameter` <= 22;
