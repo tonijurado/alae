@@ -1247,11 +1247,14 @@ class VerificationController extends BaseController
                 WHERE s.sampleName LIKE '" . $qc['sample_name'] . "%' AND s.sampleName NOT LIKE '%*%' AND s.useRecord = 0 AND s.fkBatch = " . $Batch->getPkBatch()
             );
             $qc_not_accepted_total = $query->getSingleScalarResult();
-
+                
+                
             $value      = ($qc_not_accepted_total / $qc_total) * 100;
+
+
             $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V22"));
 
-            if ($value < $parameters[0]->getMinValue())
+            if ($value > $parameters[0]->getMinValue())
             {
                 $where = "s.sampleName LIKE '" . $qc['sample_name'] . "%' AND s.sampleName NOT LIKE '%R%' AND s.fkBatch = " . $Batch->getPkBatch();
                 $this->error($where, $parameters[0]);
