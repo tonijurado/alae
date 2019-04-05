@@ -283,10 +283,10 @@ class VerificationController extends BaseController
             $this->getEntityManager()->flush();
 
            
-            if($fkParameter->getStatus())
-            {
+//            if($fkParameter->getStatus())
+//            {
                 $pkParameter[] = $sampleBatch->getPkSampleBatch();
-            }
+//            }
         }
 
 		//*******
