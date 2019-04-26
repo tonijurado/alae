@@ -185,7 +185,7 @@ class CronController extends BaseController
         $fileSize = $data["size"];
         $Batch = $this->saveBatch($fileName, $fileSize);
         //si el tamaño del archivo es mayor que el tamaño del parametro
-        if($fileSize > $value)
+        if($fileSize < $value)
         {
             $this->execute(\Alae\Service\Verification::updateBatch("b.pkBatch = " . $Batch->getPkBatch(), "V1.1"));
         }
