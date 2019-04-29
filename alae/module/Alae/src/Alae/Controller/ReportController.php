@@ -331,7 +331,8 @@ class ReportController extends BaseController
                     //$page      = $this->render('acua/report/r2page', $data);
                     $viewModel->setVariable('batch', $Batch);
                     $viewModel->setVariable('tr1', $tr1);
-                    $viewModel->setVariable('dataIS', $dataIS);
+                    
+                    //$viewModel->setVariable('dataIS', $dataIS);
                     $viewModel->setVariable('tr2', $tr2);
                     $viewModel->setVariable('tr3', $tr3);
                     $viewModel->setVariable('tr4', $tr4);
