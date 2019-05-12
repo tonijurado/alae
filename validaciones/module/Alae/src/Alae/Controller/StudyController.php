@@ -958,9 +958,11 @@ class StudyController extends BaseController
         $error = "";
         $centi = 0;
 
+        $AnaStudy = $this->getRepository("\\Alae\\Entity\\AnalyteStudy")->find($this->getEvent()->getRouteMatch()->getParam('id'));
+
         if ($request->isPost())
         {
-            
+            $Study   = $this->getRepository()->find($AnaStudy->getFkStudy()->getPkStudy());
             $updateConc = $request->getPost('update-analyte_concentration');
             
             if (!empty($updateConc))
@@ -969,29 +971,44 @@ class StudyController extends BaseController
 
                 foreach ($updateConc as $key => $value)
                 {
-                    
                     $sampleBatch = $this->getRepository('\\Alae\\Entity\\SampleBatch')->find($key);
                     
-                    if ($sampleBatch && $sampleBatch->getPkSampleBatch())
-                    {    
-                        $older = sprintf('Valores antiguos: Sample -> %1$s, Concentración -> %2$s',
-                            $sampleBatch->getSampleName(),
-                            $sampleBatch->getAnalyteConcentration()
-                        );
-                        
-                        $sampleBatch->setAnalyteConcentration($updateConc[$key]);
-                        $this->getEntityManager()->persist($sampleBatch);
-                        $this->getEntityManager()->flush();
+                    $samplename = substr($sampleBatch->getsampleName(), 0, -1);
 
-                        //INGRESO A AUDIT TRANSACTION
-                        $this->transaction(
-                            "Edición manual de muestras",
-                            sprintf('%1$s<br> Nuevo valor de concentración -> %2$s',
-                                $older,
-                                $updateConc[$key]
-                            ),
-                            false
-                        );
+                    $batch = $sampleBatch->getFkBatch()->getPkBatch();
+                    
+                    $query      = $this->getEntityManager()->createQuery("
+                    SELECT s.pkSampleBatch FROM Alae\Entity\SampleBatch s
+                    WHERE s.sampleName LIKE '%". $samplename . "%' AND s.fkBatch = " . $batch);
+                    $samples   = $query->getResult();
+                    
+                    foreach ($samples as $sample)
+                    {
+                        $sampleBatch2 = $this->getRepository('\\Alae\\Entity\\SampleBatch')->find($sample["pkSampleBatch"]);
+                    
+
+                        if ($sampleBatch2 && $sampleBatch2->getPkSampleBatch())
+                        {    
+                            $older = sprintf('Valores antiguos: Sample -> %1$s, Concentración -> %2$s',
+                                $sampleBatch2->getSampleName(),
+                                $sampleBatch2->getAnalyteConcentration()
+                            );
+                            
+                            $sampleBatch2->setAnalyteConcentration($updateConc[$key]);
+                            $this->getEntityManager()->persist($sampleBatch2);
+                            $this->getEntityManager()->flush();
+
+                            //INGRESO A AUDIT TRANSACTION
+                            $this->transaction(
+                                "Edición manual de muestras",
+                                sprintf('Estudio: %1$s<br> %2$s <br> Nuevo valor de concentración -> %3$s',
+                                    $Study->getCode(),
+                                    $older,
+                                    $updateConc[$key]
+                                ),
+                                false
+                            );
+                        }
                     }
                 }
             }
@@ -1017,7 +1034,7 @@ class StudyController extends BaseController
             $qb
                     ->select('s.pkSampleBatch as PKSampleBatch', 's.sampleName as sampleName', 's.analyteConcentration','s.isConcentration')
                     ->from('Alae\Entity\SampleBatch', 's')
-                    ->where("s.fkBatch = " . $Batch->getPkBatch() . " AND (s.sampleName LIKE '%NT%' OR s.sampleName LIKE '%BC%') ")
+                    ->where("s.fkBatch = " . $Batch->getPkBatch() . " AND (s.sampleName LIKE '%NT%' OR s.sampleName LIKE '%BC%') AND (s.sampleName LIKE '%1')  ")
                     ->groupBy('s.pkSampleBatch')
                     ->orderBy('s.sampleName', 'ASC');
             $elements = $qb->getQuery()->getResult();
@@ -1029,9 +1046,10 @@ class StudyController extends BaseController
                 foreach ($elements as $temp)
                 {
                     $buttons = "";
-
-                    $buttons .= '<span class="form-datatable-change" onclick="changeElement(this, ' . $temp["PKSampleBatch"] . ');"></span>';
-
+                    if (!$AnaStudy->getFkStudy()->getCloseFlag())
+                    {
+                        $buttons .= '<span class="form-datatable-change" onclick="changeElement(this, ' . $temp["PKSampleBatch"] . ');"></span>';
+                    }
                     $data[] = array(
                         "sample_name"           => $temp["sampleName"],
                         "analyte_concentration" => $temp["analyteConcentration"],
@@ -1041,7 +1059,15 @@ class StudyController extends BaseController
             }
         }
 
-        $datatable = new Datatable($data, Datatable::DATATABLE_VERIFICATION_SAMPLE_BATCH, $this->_getSession()->getFkProfile()->getName());
+        if (!$AnaStudy->getFkStudy()->getCloseFlag())
+        {
+            $datatable = new Datatable($data, Datatable::DATATABLE_VERIFICATION_SAMPLE_BATCH, $this->_getSession()->getFkProfile()->getName());
+        }
+        else
+        {
+            $datatable = new Datatable($data, Datatable::DATATABLE_VERIFICATION_SAMPLE_BATCH_R, $this->_getSession()->getFkProfile()->getName());
+        }
+
         $viewModel = new ViewModel($datatable->getDatatable());
         $viewModel->setVariable('AnaStudy', $AnaStudy);
         $viewModel->setVariable('user', $this->_getSession());
