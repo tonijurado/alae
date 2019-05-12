@@ -8,12 +8,10 @@
             <hr/>
             <ul>
                 <?php if ($user->isAdministrador()) : ?>
-                    <li><a href="<?php echo $this->basePath() ?>/analyte/index">Analitos</a></li>
                     <li><a href="<?php echo $this->basePath() ?>/study/index">Estudios abiertos</a></li>
                     <li><a href="<?php echo $this->basePath() ?>/study/indexClose">Estudios cerrados</a></li>
                     <li><a href="<?php echo $this->basePath() ?>/report/index">Estad&iacute;sticas</a></li>
                     <li><a href="<?php echo $this->basePath() ?>/batch/unfilled">Lotes sin asignar</a></li>
-                    <li><a href="<?php echo $this->basePath() ?>/user/admin">Administración de Usuarios (*)</a></li>
                     <li><a href="<?php echo $this->basePath() ?>/parameter/index">Parametrizaci&oacute;n (*)</a></li>
                     <li><a href="<?php echo $this->basePath() ?>/study/verification">Parametrizaci&oacute;n Asociaci&oacute;n de muestras</a></li>
                     <li><a href="<?php echo $this->basePath() ?>/report/audit">Audit Trail</a></li>
@@ -36,7 +34,6 @@
                     <li><a href="<?php echo $this->basePath() ?>/index/logout">Salir de ALAE</a></li>
                 <?php endif; ?>
                 <?php if ($user->isSustancias()) : ?>
-                    <li><a href="<?php echo $this->basePath() ?>/analyte/index">Analitos</a></li>
                     <li><a href="<?php echo $this->basePath() ?>/report/audit">Audit Trail</a></li>
                     <li><a href="<?php echo $this->basePath() ?>/index/logout">Salir de ALAE</a></li>
                 <?php endif; ?>
