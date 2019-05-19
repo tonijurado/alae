@@ -22,6 +22,7 @@ class Datatable
     const DATATABLE_ADMIN        = 'admin';
     const DATATABLE_ANASTUDY     = 'analyte_study';
     const DATATABLE_BATCH        = 'batch';
+    const DATATABLE_BATCH_NOMINAL = 'batch_nominal';
     const DATATABLE_SAMPLE_BATCH = 'sample_batch';
     const DATATABLE_VERIFICATION_SAMPLE_BATCH = 'verification_sample_batch';
     const DATATABLE_VERIFICATION_SAMPLE_BATCH_R = 'verification_sample_batch_r';
@@ -235,7 +236,7 @@ class Datatable
     //COLUMNAS DEL LOTE
     protected function getBatchColumns()
     {
-        $header = array("batch", "filename","filesize", "create_at", "valid_flag", "validation_date", "result", "modify", "accepted_flag", "justification");
+        $header = array("batch", "filename","filesize", "create_at", "nominal", "valid_flag", "validation_date", "result", "modify", "accepted_flag", "justification");
         $data   = $this->getData();
 
         return array(
@@ -245,6 +246,7 @@ class Datatable
                 array("key" => "filename", "label" => "Archivo", "sortable" => true),
                 array("key" => "filesize", "label" => "Tamaño", "sortable" => true),
                 array("key" => "create_at", "label" => "Importado el", "sortable" => true),
+                array("key" => "nominal", "label" => "Valor nominal", "sortable" => false, "allowHTML" => true),
                 array("key" => "valid_flag", "label" => "Validar", "sortable" => false, "allowHTML" => true),
                 array("key" => "validation_date", "label" => "Validado el", "sortable" => true),
                 array("key" => "result", "label" => "Resultado", "sortable" => true),
@@ -252,7 +254,7 @@ class Datatable
                 array("key" => "accepted_flag", "label" => "Válido ADM", "sortable" => true),
                 array("key" => "justification", "label" => "Justificar Modificación", "sortable" => false)
             )),
-            "editable" => json_encode(array("accepted_flag", "justification")),
+            "editable" => json_encode(array("nominal","accepted_flag", "justification")),
             "header"   => json_encode($header),
             "filters"  => $this->getFilters($header)
         );
@@ -275,6 +277,25 @@ class Datatable
                 array("key" => "edit", "allowHTML" => true)
             )),
             "editable" => 0,
+            "header"   => json_encode($header),
+            "filters"  => $this->getFilters($header)
+        );
+    }
+
+    protected function getBatchNominalColumns()
+    {
+        $header = array("id", "sample_name", "analyte_concentration");
+        $data   = $this->getData();
+
+        return array(
+            "data"     => (!empty($data)) ? json_encode($data) : 0,
+            "columns"  => json_encode(array(
+                array("key" => "id", "label" => "Id", "sortable" => true),
+                array("key" => "sample_name", "label" => "Sample", "sortable" => true),
+                array("key" => "analyte_concentration", "label" => "Value", "sortable" => true),
+                array("key" => "edit", "allowHTML" => true)
+            )),
+            "editable" => json_encode(array("name", "analyte_concentration")),
             "header"   => json_encode($header),
             "filters"  => $this->getFilters($header)
         );
@@ -471,6 +492,9 @@ class Datatable
         case Datatable::DATATABLE_BATCH:
             $response = $this->getBatchColumns();
             break;
+        case Datatable::DATATABLE_BATCH_NOMINAL:
+            $response = $this->getBatchNominalColumns();
+            break;
         case Datatable::DATATABLE_SAMPLE_BATCH:
             $response = $this->getSampleBatchColumns();
             break;
@@ -522,16 +546,19 @@ class Datatable
 	    case Datatable::DATATABLE_ADMIN:
 		$elements = '<span class="form-download-excel" onclick="excel(6);"></span>';
 		break;
-            case Datatable::DATATABLE_ANASTUDY:
-                $elements = '<span class="form-datatable-new"></span>';
-                break;
-            case Datatable::DATATABLE_BATCH:
-                $elements = '<input value="" type="submit"/>';
-                break;
-            case Datatable::DATATABLE_AUDIT_TRAIL:
+        case Datatable::DATATABLE_ANASTUDY:
+            $elements = '<span class="form-datatable-new"></span>';
+            break;
+        case Datatable::DATATABLE_BATCH:
+            $elements = '<input value="" type="submit"/>';
+            break;
+        case Datatable::DATATABLE_AUDIT_TRAIL:
 		$elements = '<span class="form-download-excel" onclick="excel(7);"></span>';
 		break;
-	    case Datatable::DATATABLE_SAMPLE_BATCH:
+        case Datatable::DATATABLE_BATCH_NOMINAL:
+                $elements = '<input value="" type="submit"/>';
+        break;
+        case Datatable::DATATABLE_SAMPLE_BATCH:
                 $elements = '<input value="" type="submit"/>';
         break;
         case Datatable::DATATABLE_VERIFICATION_SAMPLE_BATCH:

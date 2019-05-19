@@ -166,6 +166,7 @@ class BatchController extends BaseController
                 }
                 if($this->_getSession()->isAdministrador() || $this->_getSession()->isDirectorEstudio() || $this->_getSession()->isLaboratorio())
                 {
+                    $nominal = is_null($batch->getValidFlag()) ? '<a href="' . \Alae\Service\Helper::getVarsConfig("base_url") . '/batch/nominal/' . $batch->getPkBatch() . '?state='.$state. '" class="btn" type="button"><span class="btn-validate"></span>Valor nominal</a>' : "";
                     $validation = is_null($batch->getValidFlag()) ? '<a href="' . \Alae\Service\Helper::getVarsConfig("base_url") . '/verification/index/' . $batch->getPkBatch() . '?state='.$state. '" class="btn" type="button"><span class="btn-validate"></span>validar</a>' : "";
                 }
             }
@@ -175,6 +176,7 @@ class BatchController extends BaseController
                 "filename"        => $batch->getFileName(),
                 "filesize"        => $batch->getFileSize(),
                 "create_at"       => $batch->getCreatedAt(),
+                "nominal"         => $nominal,
                 "valid_flag"      => $validation,
                 "validation_date" => $batch->getValidationDate(),
                 "result"          => is_null($batch->getValidFlag()) ? "" : ($batch->getValidFlag() ? "VÁLIDO" : "NO VÁLIDO"),
@@ -189,6 +191,93 @@ class BatchController extends BaseController
         $viewModel->setVariable('AnaStudy', $AnaStudy);
         $viewModel->setVariable('user', $this->_getSession());
         $viewModel->setVariable('state', $state);
+        return $viewModel;
+    }
+
+    public function nominalAction()
+    {
+        echo "prueba";
+        $error = "";
+        $request = $this->getRequest();
+        if(isset($_GET['state']))
+        {
+            $state = $_GET['state'];
+        }
+        else
+        {
+            $state = 'open';
+        }
+        if ($this->getEvent()->getRouteMatch()->getParam('id'))
+        {
+            $Batch = $this->getRepository()->find($this->getEvent()->getRouteMatch()->getParam('id'));
+            $AnaStudy = $this->getRepository("\\Alae\\Entity\\AnalyteStudy")->findBy(array(
+                "fkAnalyte" => $Batch->getFkAnalyte(),
+                "fkStudy" => $Batch->getFkStudy()
+            ));
+        }
+
+        if ($request->isPost())
+        {
+            $updateAnalyteConcentration = $request->getPost('update-analyte_concentration');
+            if (!empty($updateAnalyteConcentration))
+            {
+                foreach ($updateAnalyteConcentration as $key => $value)
+                {
+                    $batchNominal = $this->getRepository('\\Alae\\Entity\\BatchNominal')->find($key);
+
+                    if ($batchNominal && $batchNominal->getId())
+                    {
+
+                        $older = sprintf('Valores antiguos: Value -> %1$s',
+                            $batchNominal->getAnalyteConcentration()
+                        );
+
+                        $batchNominal->setAnalyteConcentration($updateAnalyteConcentration[$key]);
+                        $this->getEntityManager()->persist($batchNominal);
+                        $this->getEntityManager()->flush();
+
+                        $this->transaction(
+                            "Edición de valor nominal",
+                            sprintf('%1$s<br> Estudio: %2$s. Sample -> %3$s, Valor -> %4$s',
+                                $older,
+                                $AnaStudy[0]->getFkStudy()->getCode(),
+                                $batchNominal->getSampleName(),
+                                $updateAnalyteConcentration[$key]
+                            ),
+                            false
+                        );
+                    }
+                }
+            }
+        }
+
+        $query   = $this->getEntityManager()->createQuery("
+            SELECT n.id, n.sampleName, n.analyteConcentration
+            FROM Alae\Entity\BatchNominal n
+            WHERE n.fkBatch = " . $Batch->getPkBatch());
+
+        $data     = array();
+        $elements = $query->getResult();
+        foreach ($elements as $nominal)
+        {
+            $buttons = "";
+            $buttons .= '<span class="form-datatable-change" onclick="changeElement(this, ' . $nominal["id"] . ');"></span>';
+            $data[] = array(
+                "id"    => $nominal['id'],
+                "sample_name"    => $nominal['sampleName'],
+                "analyte_concentration"  => $nominal['analyteConcentration'],
+                "edit"                  => $buttons
+            );
+        }
+
+        $datatable = new \Alae\Service\Datatable($data, \Alae\Service\Datatable::DATATABLE_BATCH_NOMINAL, $this->_getSession()->getFkProfile()->getName());
+        $viewModel = new ViewModel($datatable->getDatatable());
+        $viewModel->setVariable('AnaStudy', $AnaStudy);
+        $viewModel->setVariable('Batch', $Batch);
+        $viewModel->setVariable('state', $state);
+        $viewModel->setVariable('user', $this->_getSession());
+        $viewModel->setVariable('error', $error);
+        $viewModel->setVariable('pkBatch', $Batch->getPkBatch());
         return $viewModel;
     }
 }
