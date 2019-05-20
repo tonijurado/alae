@@ -541,6 +541,17 @@ class VerificationController extends BaseController
                     $this->error($where, $fkParameter[0]);
 			//if ($sample == 'PID') { echo $sample." ".$value; die();} //** para borrar
         }
+
+        $elements = $this->getRepository("\\Alae\\Entity\\BatchNominal")->findBy(array("fkBatch" => $Batch->getPkBatch()));
+
+        foreach ($elements as $nominal)
+        {
+            $sample = $nominal->getSampleName()."-1";
+            $value = $nominal->getAnalyteConcentration();
+            $where = "s.sampleName = '$sample' AND s.analyteConcentration <> " . $value . " AND s.fkBatch = " . $Batch->getPkBatch();
+                    $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V6"));
+                    $this->error($where, $fkParameter[0]);
+        }
         
     }
 

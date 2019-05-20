@@ -246,6 +246,7 @@ class CronController extends BaseController
             if(count($data["data"]) > 0)
             {
                 $this->saveSampleBatch($data["headers"], $data['data'], $Batch);
+                $this->saveBatchNominal($Batch);
                 $this->batchVerify($Batch, $Analyte, $fileName);
 
                 if (!is_null($Analyte) && !is_null($Study))
@@ -576,6 +577,37 @@ class CronController extends BaseController
                 $this->getEntityManager()->flush();
             }
         }
+    }
+
+    /*
+     * Función para almacenar información en la tabla BatchNominal
+     */
+    private function saveBatchNominal($Batch)
+    {
+        $qb       = $this->getEntityManager()->createQueryBuilder();
+            $qb
+                    ->select('s.pkSampleBatch as PKSampleBatch', 's.sampleName as sampleName', 's.analyteConcentration','s.isConcentration')
+                    ->from('Alae\Entity\SampleBatch', 's')
+                    ->where("s.fkBatch = " . $Batch->getPkBatch() . " AND (s.sampleName LIKE '%NT%' OR s.sampleName LIKE '%BC%') AND (s.sampleName LIKE '%1')  ")
+                    ->groupBy('s.pkSampleBatch')
+                    ->orderBy('s.sampleName', 'ASC');
+            $elements = $qb->getQuery()->getResult();
+
+            if (count($elements) > 0)
+            {
+                foreach ($elements as $temp)
+                {
+                    $BatchNominal = new \Alae\Entity\BatchNominal();
+
+                    $samplename = substr($temp["sampleName"], 0, -2);
+                    $BatchNominal->setFkBatch($Batch);
+                    $BatchNominal->setSampleName($samplename);
+                    
+                    $this->getEntityManager()->persist($BatchNominal);
+                    $this->getEntityManager()->flush();
+                }
+            }
+
     }
 
     /*
