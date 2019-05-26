@@ -546,9 +546,11 @@ class VerificationController extends BaseController
 
         foreach ($elements as $nominal)
         {
-            $sample = $nominal->getSampleName()."-1";
+            //$sample = $nominal->getSampleName()."-1";
+            $sample = $nominal->getSampleName();
             $value = $nominal->getAnalyteConcentration();
-            $where = "s.sampleName = '$sample' AND s.analyteConcentration <> " . $value . " AND s.fkBatch = " . $Batch->getPkBatch();
+            //$where = "s.sampleName = '$sample' AND s.analyteConcentration <> " . $value . " AND s.fkBatch = " . $Batch->getPkBatch();
+            $where = "s.sampleName LIKE '$sample%' AND s.analyteConcentration <> " . $value . " AND s.fkBatch = " . $Batch->getPkBatch();
                     $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V6"));
                     $this->error($where, $fkParameter[0]);
         }
