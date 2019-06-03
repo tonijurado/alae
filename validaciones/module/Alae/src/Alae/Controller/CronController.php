@@ -83,11 +83,14 @@ class CronController extends BaseController
     {
         $response = $this->explodeFile($fileName);
         $this->_Study   = $this->_Analyte = null;
-        
+        //Linea WHERE original de la busqueda de abajo
+        // WHERE s.code LIKE  '%" . $response['study'] . "%' AND s.closeFlag = 0 AND s.approve = 1
+        //echo "'%" . $response['study'] . "+" . "%'";
+        //die();
         $query = $this->getEntityManager()->createQuery("
                 SELECT s
                 FROM Alae\Entity\Study s
-                WHERE s.code LIKE  '%" . $response['study'] . "%' AND s.closeFlag = 0 AND s.approve = 1
+                    WHERE s.code LIKE  '%" . $response['study'] ."' AND s.closeFlag = 0 AND s.approve = 1
                 ORDER BY s.code DESC")
             ->setMaxResults(1);
         $elements = $query->getResult();
