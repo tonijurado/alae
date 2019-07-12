@@ -351,7 +351,30 @@ class VerificationController extends BaseController
                     $this->error($where, $fkParameter[0]);
                 }
             }
+
+            //Agregamos el 11-07-2019 también el código para verificar las concentraciones nominales de LDQC, HDQC, LLQC y UDQC - Toni (copiado de ALAE2 V5)
+            $valueLDQC = \Alae\Service\Conversion::conversion(
+                $AnaStudy->getFkUnit()->getName(),
+                $Batch->getAnalyteConcentrationUnits(),
+                $AnaStudy->getLdqcValues()
+            );
+
+            $where = "s.sampleName LIKE 'LDQC%' AND s.analyteConcentration <> " . $valueLDQC . " AND s.fkBatch = " . $Batch->getPkBatch();
+            $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V5"));
+            $this->error($where, $fkParameter[0]);
+
+            $valueHDQC = \Alae\Service\Conversion::conversion(
+                $AnaStudy->getFkUnit()->getName(),
+                $Batch->getAnalyteConcentrationUnits(),
+                $AnaStudy->getHdqcValues()
+            );
+
+            $where = "s.sampleName LIKE 'HDQC%' AND s.analyteConcentration <> " . $valueHDQC . " AND s.fkBatch = " . $Batch->getPkBatch();
+            $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V5"));
+            $this->error($where, $fkParameter[0]);
+
         }
+            //Fin del agregado el 11-07-2019 del control de Concentración nominal de LDQC, HDQC, LLQC y ULQD - Toni            
 
 
     }
