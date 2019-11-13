@@ -88,40 +88,6 @@ class VerificationController extends BaseController
         $min5 = $parameters[0]->getMinValue();
         $max5 = $parameters[0]->getMaxValue();
 
-        if ($request->isPost())
-        {
-            $reasons = $request->getPost('reason');
-            if (!empty($reasons))
-            {
-                foreach ($reasons as $keyR => $valueR)
-                {
-                    $Batch = $this->getRepository()->find($request->getPost('id'));
-                    $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => $valueR));
-                    if ($valueR == "V12.8")
-                    {
-                        $this->evaluation($Batch, false, $parameters[0]);
-                    }
-                    
-                    $where = "s.fkBatch = " . $Batch->getPkBatch() . "
-                        AND (
-                            ((s.sampleName LIKE 'CS1%' OR s.sampleName LIKE 'LLOQ%' OR s.sampleName LIKE 'LLQC%') AND s.accuracy NOT BETWEEN " . $min1  . " AND " . $max1 . " AND s.useRecord = 1)
-                            OR (REGEXP(s.sampleName, :regexp1) = 1 AND s.sampleName NOT LIKE 'CS1%' AND s.accuracy NOT BETWEEN " . $min2 . " AND " . $max2 . " AND s.useRecord = 1)
-                            OR (REGEXP(s.sampleName, :regexp2) = 1 AND s.accuracy NOT BETWEEN " . $min3 . " AND " . $max3 . " AND s.useRecord = 1)
-                            OR (s.sampleName LIKE 'TZ%' AND s.accuracy NOT BETWEEN " . $min4 . " AND " . $max4 . " AND s.useRecord = 1)
-                            OR (REGEXP(s.sampleName, :regexp3) = 1 AND s.accuracy NOT BETWEEN " . $min5 . " AND " . $max5 . " AND s.useRecord = 1)
-                            OR ((s.sampleName LIKE 'CS1%' OR s.sampleName LIKE 'LLOQ%' OR s.sampleName LIKE 'LLQC%') AND s.accuracy BETWEEN " . $min1  . " AND " . $max1 . " AND s.useRecord = 0)
-                            OR (REGEXP(s.sampleName, :regexp1) = 1 AND s.sampleName NOT LIKE 'CS1%' AND s.accuracy BETWEEN " . $min2 . " AND " . $max2 . " AND s.useRecord = 0)
-                            OR (REGEXP(s.sampleName, :regexp2) = 1 AND s.accuracy BETWEEN " . $min3 . " AND " . $max3 . " AND s.useRecord = 0)
-                            OR (s.sampleName LIKE 'TZ%' AND s.accuracy BETWEEN " . $min4 . " AND " . $max4 . " AND s.useRecord = 0)
-                            OR (REGEXP(s.sampleName, :regexp3) = 1 AND s.accuracy BETWEEN " . $min5 . " AND " . $max5 . " AND s.useRecord = 0)
-                        )";
-
-                    $this->error($where, $parameters[0], array('regexp1' => '^CS[0-9]+(-[0-9]+)?$','regexp2' => '^QC[0-9]+(-[0-9]+)?$','regexp3' => '^((L|H)?DQC)[0-9]+(-[0-9]+)?$'), false);
-                    $this->V13_23($Batch);
-                }
-            }
-        }
-        
         if ($this->getEvent()->getRouteMatch()->getParam('id'))
         {
             $Batch = $this->getRepository()->find($this->getEvent()->getRouteMatch()->getParam('id'));
@@ -150,6 +116,54 @@ class VerificationController extends BaseController
 
         $data     = array();
         $elements = $query->getResult();
+
+        if ($request->isPost())
+        {
+            /*$reasons = $request->getPost('reason');
+            if (!empty($reasons))
+            {
+                foreach ($reasons as $keyR => $valueR)
+                {*/
+                    $Batch = $this->getRepository()->find($request->getPost('id'));
+                    /*$parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => $valueR));
+                    if ($valueR == "V12.8")
+                    {
+                        $this->evaluation($Batch, false, $parameters[0]);
+                    }*/
+                    $Batch = $this->getRepository()->find($request->getPost('id'));
+
+                    //TRATAMIENTO DE FILA DE LA PANTALLA EMERGENTE
+                    foreach ($elements as $sampleBatchReason)
+                    {
+                        $pkSampleBatch = $sampleBatchReason['pkSampleBatch'];
+                        $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => $request->getPost('reason_'.$pkSampleBatch)));
+                        if ($request->getPost('reason_'.$pkSampleBatch) == "V12.8")
+                        {
+                            $this->evaluation($Batch, false, $parameters[0]);
+                        }
+                    
+                        $where = "s.fkBatch = " . $Batch->getPkBatch() . "
+                        AND s.pkSampleBatch = " . $pkSampleBatch . "
+                        AND (
+                                ((s.sampleName LIKE 'CS1%' OR s.sampleName LIKE 'LLOQ%' OR s.sampleName LIKE 'LLQC%') AND s.accuracy NOT BETWEEN " . $min1  . " AND " . $max1 . " AND s.useRecord = 1)
+                                OR (REGEXP(s.sampleName, :regexp1) = 1 AND s.sampleName NOT LIKE 'CS1%' AND s.accuracy NOT BETWEEN " . $min2 . " AND " . $max2 . " AND s.useRecord = 1)
+                                OR (REGEXP(s.sampleName, :regexp2) = 1 AND s.accuracy NOT BETWEEN " . $min3 . " AND " . $max3 . " AND s.useRecord = 1)
+                                OR (s.sampleName LIKE 'TZ%' AND s.accuracy NOT BETWEEN " . $min4 . " AND " . $max4 . " AND s.useRecord = 1)
+                                OR (REGEXP(s.sampleName, :regexp3) = 1 AND s.accuracy NOT BETWEEN " . $min5 . " AND " . $max5 . " AND s.useRecord = 1)
+                                OR ((s.sampleName LIKE 'CS1%' OR s.sampleName LIKE 'LLOQ%' OR s.sampleName LIKE 'LLQC%') AND s.accuracy BETWEEN " . $min1  . " AND " . $max1 . " AND s.useRecord = 0)
+                                OR (REGEXP(s.sampleName, :regexp1) = 1 AND s.sampleName NOT LIKE 'CS1%' AND s.accuracy BETWEEN " . $min2 . " AND " . $max2 . " AND s.useRecord = 0)
+                                OR (REGEXP(s.sampleName, :regexp2) = 1 AND s.accuracy BETWEEN " . $min3 . " AND " . $max3 . " AND s.useRecord = 0)
+                                OR (s.sampleName LIKE 'TZ%' AND s.accuracy BETWEEN " . $min4 . " AND " . $max4 . " AND s.useRecord = 0)
+                                OR (REGEXP(s.sampleName, :regexp3) = 1 AND s.accuracy BETWEEN " . $min5 . " AND " . $max5 . " AND s.useRecord = 0)
+                            )";
+
+                        $this->error($where, $parameters[0], array('regexp1' => '^CS[0-9]+(-[0-9]+)?$','regexp2' => '^QC[0-9]+(-[0-9]+)?$','regexp3' => '^((L|H)?DQC)[0-9]+(-[0-9]+)?$'), false);
+                        $this->V13_23($Batch);
+                    }
+                //}
+            //}
+        }
+
         foreach ($elements as $sampleBatch)
         {
             $data[] = array(
@@ -157,7 +171,7 @@ class VerificationController extends BaseController
                 "sample_name" => $sampleBatch['sampleName'],
                 "accuracy"    => $sampleBatch['accuracy'],
                 "use_record"  => $sampleBatch['useRecord'],
-                "reason"      => $this->getReason()
+                "reason"      => $this->getReason($sampleBatch['pkSampleBatch'])
             );
         }
 
@@ -210,7 +224,7 @@ class VerificationController extends BaseController
     /*
      * Retornar el listado de Reason
      */
-    protected function getReason()
+    protected function getReason($id)
     {
         $elements = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("typeParam" => false));
         $options  = "";
@@ -218,7 +232,8 @@ class VerificationController extends BaseController
         {
             $options .= sprintf('<option value="%1$s">%2$s</option>', $Parameter->getRule(), $Parameter->getMessageError());
         }
-        return '<select name="reason[]" style="width:100%;">'.$options.'</select>';
+        return '<select name="reason_'.$id.'" style="width:100%;">'.$options.'</select>';
+        //return '<select name="reason[]" style="width:100%;">'.$options.'</select>';
     }
 
     /**
