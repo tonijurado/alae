@@ -5,7 +5,7 @@
  * Verificaciones de 4 - 24
  *
  * @author Maria Quiroz
- * Fecha de creación: 18/05/2014
+ * Fecha de creación: 18/05/2014 - EL FICHERO CORRESPONDE A LAS VERIFICACIONES DE ALAE 1 - 
  */
 
 namespace Alae\Controller;

@@ -344,8 +344,17 @@ class VerificationController extends BaseController
      */
     protected function V5(\Alae\Entity\Batch $Batch)
     {
+
+        // En el siguiente WHERE, Toni añade las 3 primeras lineas de condiciones según los comentarios de Natalia del mail del 08 de diciembre de 2020
+        // donde se especifica que las muestras SEL, SEL-NT y cualquier otra SEL que haya, ZS-BC y ZS-NT deben ser 'Unknown'
+         
         $where = "
         (
+
+            (s.sampleName LIKE '%SEL%' AND s.sampleType <> 'Unknown') OR
+            (s.sampleName LIKE '%ZS-BC%' AND s.sampleType <> 'Unknown') OR
+            (s.sampleName LIKE '%ZS-NT%' AND s.sampleType <> 'Unknown') OR
+
             (s.sampleName LIKE 'BLK%' AND s.sampleType <> 'Blank') OR
             (s.sampleName LIKE 'CS%' AND s.sampleType <> 'Standard') OR
             (s.sampleName LIKE '%QC%' AND s.sampleType <> 'Quality Control') OR
@@ -920,7 +929,9 @@ class VerificationController extends BaseController
             $min_is = $AnaStudy[0]->getRetentionIs() - ($AnaStudy[0]->getAcceptanceIs() * $AnaStudy[0]->getRetentionIs() / 100);
             $max_is = $AnaStudy[0]->getRetentionIs() + ($AnaStudy[0]->getAcceptanceIs() * $AnaStudy[0]->getRetentionIs() / 100);
 
-            $where = " (s.sampleType != 'Solvent' AND s.analyteRetentionTime NOT BETWEEN $min AND $max OR 
+            // Toni: Añado al condicional $where la condicion de que no evalue SampleName BLK según mail y nota de NATALIA del 8 de diciembre de 2019
+
+            $where = " (s.sampleName <> 'BLK' AND s.sampleType != 'Solvent' AND s.analyteRetentionTime NOT BETWEEN $min AND $max OR 
                         s.isRetentionTime NOT BETWEEN $min_is AND $max_is)
                     AND s.fkBatch = " . $Batch->getPkBatch();
             
