@@ -347,13 +347,13 @@ class VerificationController extends BaseController
 
         // En el siguiente WHERE, Toni añade las 3 primeras lineas de condiciones según los comentarios de Natalia del mail del 08 de diciembre de 2020
         // donde se especifica que las muestras SEL, SEL-NT y cualquier otra SEL que haya, ZS-BC y ZS-NT deben ser 'Unknown'
-    /*
+         
         $where = "
         (
 
-            (s.sampleName LIKE 'SEL%' AND s.sampleType <> 'Blank') OR
-            (s.sampleName LIKE 'ZS-BC%' AND s.sampleType <> 'Unknown') OR
-            (s.sampleName LIKE 'ZS-NT%' AND s.sampleType <> 'Unknown') OR
+            (s.sampleName LIKE '%SEL%' AND s.sampleType <> 'Unknown') OR
+            (s.sampleName LIKE '%ZS-BC%' AND s.sampleType <> 'Unknown') OR
+            (s.sampleName LIKE '%ZS-NT%' AND s.sampleType <> 'Unknown') OR
 
             (s.sampleName LIKE 'BLK%' AND s.sampleType <> 'Blank') OR
             (s.sampleName LIKE 'CS%' AND s.sampleType <> 'Standard') OR
@@ -370,7 +370,6 @@ class VerificationController extends BaseController
             (s.sampleName LIKE '%SLP%' AND s.sampleType <> 'Quality Control') OR
             (s.sampleName LIKE '%PID%' AND s.sampleType <> 'Quality Control') OR
             (s.sampleName LIKE '%LLOQ%' AND s.sampleType <> 'Quality Control') OR
-            (s.sampleName LIKE '%ME%' AND s.sampleType <> 'Quality Control') OR
             (REGEXP(s.sampleName, :regexp1) = 1 AND s.sampleType <> 'Solvent') OR
             (REGEXP(s.sampleName, :regexp2) = 1 AND s.sampleType <> 'Unknown') OR
             (s.sampleName LIKE '%EGC%' AND s.sampleType <> 'Solvent') OR
@@ -378,40 +377,9 @@ class VerificationController extends BaseController
             (s.sampleName LIKE '%SCAx%' AND s.sampleType <> 'Unknown') OR
             (s.sampleName LIKE '%SCBx%' AND s.sampleType <> 'Unknown') OR
             (s.sampleName LIKE '%ULOQ%' AND s.sampleType <> 'Unknown') OR
-            (s.sampleName LIKE '%RSQC%' AND s.sampleType <> 'Unknown') 
+            (s.sampleName LIKE '%RSQC1%' AND s.sampleType <> 'Unknown') OR
+            (s.sampleName LIKE '%RSQC3%' AND s.sampleType <> 'Unknown')
         ) AND s.fkBatch = " . $Batch->getPkBatch();
-    */
-        //Toni: 14/01/2020 Cambiamos el enfoque de $Where. El objetivo es identificar las muestras de la tabla de los requerimientos
-
-        $where = "
-        (
-            s.sampleType = 'Blank' AND (s.sampleName NOT LIKE 'BLK%' AND 
-                                        s.sampleName NOT LIKE 'SEL%' AND 
-                                        s.sampleName NOT LIKE 'ZS-%') OR
-            s.sampleType = 'Standard' AND (s.sampleName NOT LIKE 'CS%') OR
-            s.sampleType = 'Solvent' AND (s.sampleName NOT LIKE 'REC%' AND 
-                                          s.sampleName NOT LIKE 'FM%' AND 
-                                          s.sampleName NOT LIKE 'EGC%' AND
-                                          s.sampleName NOT LIKE 'ES%') OR
-            s.sampleType = 'Quality Control' AND (s.sampleName NOT LIKE 'QC%' AND
-                                                  s.sampleName NOT LIKE 'LLQC% AND
-                                                  s.sampleName NOT LIKE 'ULQC% AND
-                                                  s.sampleName NOT LIKE 'LDQC% AND
-                                                  s.sampleName NOT LIKE 'HDQC% AND
-                                                  s.sampleName NOT LIKE 'TZ% AND
-                                                  s.sampleName NOT LIKE 'ME% AND
-                                                  s.sampleName NOT LIKE 'FT% AND
-                                                  s.sampleName NOT LIKE 'ST% AND
-                                                  s.sampleName NOT LIKE 'LT% AND
-                                                  s.sampleName NOT LIKE 'PP% AND
-                                                  s.sampleName NOT LIKE 'SLP% AND
-                                                  s.sampleName NOT LIKE 'PID% AND
-                                                  s.sampleName NOT LIKE 'LLOQ%) OR
-            s.sampleName = 'ZS_BC%' AND (s.sampleType <> 'Unknown') OR
-            s.sampleName = 'ZS_NT%' AND (s.sampleType <> 'Unknown')
-
-        ) AND s.fkBatch = " .$Batch->getPkBatch();
-
         $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V5"));
         $this->error(
             $where,
@@ -942,8 +910,8 @@ class VerificationController extends BaseController
     {
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V13.1"));
         $parameters2 = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V13.2"));
-
-        //Toni: 14-01-2020 Agregamos v13.3 que estaba en el documento de usr
+    
+        //Toni: 14/1/2020 Agregamos la V13.3
         $parameters3 = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V13.3"));
         
         $AnaStudy = $this->getRepository("\\Alae\\Entity\\AnalyteStudy")->findBy(array(
@@ -981,13 +949,6 @@ class VerificationController extends BaseController
                     AND s.fkBatch = " . $Batch->getPkBatch();
             
             $this->error($where2, $parameters2[0], array(), false);
-            
-            //Toni: 14/1/2020 - Agrego condición 13.3 para descargar muestras con analytePeakArea = 0 OR isPeakArea = 0
-            $where3 = " (s.analytePeakArea = 0 OR s.isPeakArea = 0) 
-                        AND s.fkBatch = " . $Batch->getPkBatch();
-
-            $this->error($where3, $parameters3[0], array(), false);
-        
         }
     }
 
@@ -1072,11 +1033,8 @@ class VerificationController extends BaseController
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V14.1"));
         $value      = $Batch->getIsCsQcAcceptedAvg() * ($parameters[0]->getMinValue() / 100);
 
-        //21.01.2020 - Según mail de Natalia, cambiamos requisito: CO-BL, CC-BL y LL-BL por CO_BLK, CC_BLK y LL_BLK
-
         $where = "
-        (s.sampleName NOT LIKE 'BLK%' AND s.sampleName NOT LIKE 'SEL%' AND 
-        s.sampleName NOT LIKE 'CO_BLK%' AND s.sampleName NOT LIKE 'CC_BLK%' AND s.sampleName NOT LIKE 'LL_BLK%') 
+		(s.sampleName NOT LIKE 'BLK%' AND s.sampleName NOT LIKE 'SEL%') 
 		AND s.sampleType <> 'Solvent' AND s.isPeakArea < $value 
         AND s.fkBatch = " . $Batch->getPkBatch();
         $this->error($where, $parameters[0], array(), false);
@@ -1084,9 +1042,10 @@ class VerificationController extends BaseController
         $parameters2 = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V14.2"));
         
         $where2 = "
-        (s.sampleName NOT LIKE 'BLK%' AND s.sampleName NOT LIKE 'SEL%' AND 
-        s.sampleName NOT LIKE 'CO_BLK%' AND s.sampleName NOT LIKE 'CC_BLK%' AND s.sampleName NOT LIKE 'LL_BLK%')   
+        (s.sampleName NOT LIKE 'BLK%' AND s.sampleName NOT LIKE 'SEL%')   
         AND s.sampleType <> 'Solvent' AND s.isPeakArea < $value
+        AND (s.sampleName LIKE 'CS%' OR s.sampleName LIKE 'QC%') 
+        AND (s.sampleType = 'Standard' OR s.sampleType = 'Quality Control') 
         AND s.useRecord = 1
         AND s.fkBatch = " . $Batch->getPkBatch();
         $this->error($where2, $parameters2[0], array(), false);
