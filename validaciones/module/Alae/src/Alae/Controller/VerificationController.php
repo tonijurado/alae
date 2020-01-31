@@ -276,18 +276,21 @@ class VerificationController extends BaseController
      */
     protected function error($where, $fkParameter, $parameters = array(), $isValid = true)
     {
-
+        //echo 'paso1';
         $sql = "
             SELECT s
             FROM Alae\Entity\SampleBatch s
             WHERE $where";
         
         $query = $this->getEntityManager()->createQuery($sql);
+        //echo '- Paso2 - countParameters = ' . count($parameters);
         if(count($parameters) > 0)
             foreach ($parameters as $key => $value)
+                //echo $key . '-' . $value;
                 $query->setParameter($key, $value);
+                //echo $query;
         $elements = $query->getResult();
-
+        //echo $elements . '-'; //************* */
         $pkParameter = array();
         foreach($elements as $sampleBatch)
         {
@@ -347,7 +350,7 @@ class VerificationController extends BaseController
 
         // En el siguiente WHERE, Toni añade las 3 primeras lineas de condiciones según los comentarios de Natalia del mail del 08 de diciembre de 2020
         // donde se especifica que las muestras SEL, SEL-NT y cualquier otra SEL que haya, ZS-BC y ZS-NT deben ser 'Unknown'
-    /*
+        /*
         $where = "
         (
 
@@ -380,47 +383,57 @@ class VerificationController extends BaseController
             (s.sampleName LIKE '%ULOQ%' AND s.sampleType <> 'Unknown') OR
             (s.sampleName LIKE '%RSQC%' AND s.sampleType <> 'Unknown') 
         ) AND s.fkBatch = " . $Batch->getPkBatch();
-    */
+        */
         //Toni: 14/01/2020 Cambiamos el enfoque de $Where. El objetivo es identificar las muestras de la tabla de los requerimientos
-
+        
         $where = "
         (
-            s.sampleType = 'Blank' AND (s.sampleName NOT LIKE 'BLK%' AND 
+            (s.sampleType = 'Blank' AND (s.sampleName NOT LIKE 'BLK%' AND 
                                         s.sampleName NOT LIKE 'SEL%' AND 
-                                        s.sampleName NOT LIKE 'ZS-%') OR
-            s.sampleType = 'Standard' AND (s.sampleName NOT LIKE 'CS%') OR
-            s.sampleType = 'Solvent' AND (s.sampleName NOT LIKE 'REC%' AND 
+                                        s.sampleName NOT LIKE 'ZS-%') 
+            )
+                                        OR
+
+            (s.sampleType = 'Standard' AND (s.sampleName NOT LIKE 'CS%') 
+            )
+                                        OR
+            (s.sampleType = 'Solvent' AND (s.sampleName NOT LIKE 'REC%' AND 
                                           s.sampleName NOT LIKE 'FM%' AND 
                                           s.sampleName NOT LIKE 'EGC%' AND
-                                          s.sampleName NOT LIKE 'ES%') OR
-            s.sampleType = 'Quality Control' AND (s.sampleName NOT LIKE 'QC%' AND
-                                                  s.sampleName NOT LIKE 'LLQC% AND
-                                                  s.sampleName NOT LIKE 'ULQC% AND
-                                                  s.sampleName NOT LIKE 'LDQC% AND
-                                                  s.sampleName NOT LIKE 'HDQC% AND
-                                                  s.sampleName NOT LIKE 'TZ% AND
-                                                  s.sampleName NOT LIKE 'ME% AND
-                                                  s.sampleName NOT LIKE 'FT% AND
-                                                  s.sampleName NOT LIKE 'ST% AND
-                                                  s.sampleName NOT LIKE 'LT% AND
-                                                  s.sampleName NOT LIKE 'PP% AND
-                                                  s.sampleName NOT LIKE 'SLP% AND
-                                                  s.sampleName NOT LIKE 'PID% AND
-                                                  s.sampleName NOT LIKE 'LLOQ%) OR
-            s.sampleName = 'ZS_BC%' AND (s.sampleType <> 'Unknown') OR
-            s.sampleName = 'ZS_NT%' AND (s.sampleType <> 'Unknown')
+                                          s.sampleName NOT LIKE 'ES%')
+            ) 
+                                        OR
+            (s.sampleType = 'Quality Control' AND (s.sampleName NOT LIKE 'QC%' AND
+                                                  s.sampleName NOT LIKE 'LLQC%' AND
+                                                  s.sampleName NOT LIKE 'ULQC%' AND
+                                                  s.sampleName NOT LIKE 'LDQC%' AND
+                                                  s.sampleName NOT LIKE 'HDQC%' AND
+                                                  s.sampleName NOT LIKE 'TZ%' AND
+                                                  s.sampleName NOT LIKE 'ME%' AND
+                                                  s.sampleName NOT LIKE 'FT%' AND
+                                                  s.sampleName NOT LIKE 'ST%' AND
+                                                  s.sampleName NOT LIKE 'LT%' AND
+                                                  s.sampleName NOT LIKE 'PP%' AND
+                                                  s.sampleName NOT LIKE 'SLP%' AND
+                                                  s.sampleName NOT LIKE 'PID%' AND
+                                                  s.sampleName NOT LIKE 'LLOQ%')
+            )
+                                        OR
+            (s.sampleName = 'ZS_BC%' AND (s.sampleType <> 'Unknown')) 
+                                        OR
+            (s.sampleName = 'ZS_NT%' AND (s.sampleType <> 'Unknown'))
 
-        ) AND s.fkBatch = " .$Batch->getPkBatch();
+        ) AND s.fkBatch = " . $Batch->getPkBatch();
+        
+        
 
         $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V5"));
-        $this->error(
-            $where,
-            $fkParameter[0],
-            array(
+        //echo 'V5 antes this ' . $where;
+        
+        $this->error($where, $fkParameter[0], array(
                 "regexp1" => "^REC|FM$",
-                "regexp2" => "^[0-9]+(-)[0-9]+\.[0-9]+$"
-            )
-        );
+                "regexp2" => "^[0-9]+(-)[0-9]+\.[0-9]+$")
+            );
     }
 
     /**
