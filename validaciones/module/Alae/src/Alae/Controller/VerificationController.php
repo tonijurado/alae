@@ -430,10 +430,7 @@ class VerificationController extends BaseController
         $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V5"));
         //echo 'V5 antes this ' . $where;
         
-        $this->error($where, $fkParameter[0], array(
-                "regexp1" => "^REC|FM$",
-                "regexp2" => "^[0-9]+(-)[0-9]+\.[0-9]+$")
-            );
+        $this->error($where, $fkParameter[0]);
     }
 
     /**
