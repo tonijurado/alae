@@ -36,26 +36,56 @@ class VerificationController extends BaseController
         if ($this->getEvent()->getRouteMatch()->getParam('id'))
         {
             $Batch = $this->getRepository()->find($this->getEvent()->getRouteMatch()->getParam('id'));
-            
-            for ($i = 5; $i < 12; $i++)
+
+            //******** VERIFICAR SI LOS VALORES NOMINALES ESTAN PUESTOS */
+            $elements = $this->getRepository("\\Alae\\Entity\\BatchNominal")->findBy(array("fkBatch" => $Batch->getPkBatch()));
+            $centi = 0;
+            foreach ($elements as $nominal)
             {
-                $function = 'V' . $i;
-                $this->$function($Batch);
+                $value = $nominal->getAnalyteConcentration();
+                
+                if(!isset($value))
+                {
+                    $centi++;
+                }
             }
-            
-            $response = $this->V12($Batch);
-            if ($response)
+
+            if ($centi == 0)
             {
-                //$this->V13($Batch);
-                $this->V13_23($Batch);
+                for ($i = 5; $i < 12; $i++)
+                {
+                    $function = 'V' . $i;
+                    $this->$function($Batch);
+                }
+                
+                $response = $this->V12($Batch);
+                if ($response)
+                {
+                    //$this->V13($Batch);
+                    $this->V13_23($Batch);
+                }
+                else
+                {
+                    return $this->redirect()->toRoute('verification', array(
+                        'controller' => 'verification',
+                        'action'     => 'error',
+                        'id'         => $Batch->getPkBatch()
+                    ));
+                }
             }
             else
             {
-                return $this->redirect()->toRoute('verification', array(
-                    'controller' => 'verification',
-                    'action'     => 'error',
-                    'id'         => $Batch->getPkBatch()
+                $AnaStudy = $this->getRepository("\\Alae\\Entity\\AnalyteStudy")->findBy(array(
+                    "fkAnalyte" => $Batch->getFkAnalyte(),
+                    "fkStudy" => $Batch->getFkStudy()
                 ));
+                
+                return $this->redirect()->toRoute('batch', array(
+                    'controller' => 'batch',
+                    'action'     => 'list',
+                    'id'         => $AnaStudy[0]->getPkAnalyteStudy(),
+                    'an'         => 1
+        ));
             }
         }
     }

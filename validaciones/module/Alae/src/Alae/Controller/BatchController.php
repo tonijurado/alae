@@ -186,11 +186,18 @@ class BatchController extends BaseController
             );
         }
 
+        if ($this->getEvent()->getRouteMatch()->getParam('an'))
+        {
+            $error = "<li>No se puede procesar, faltan los valores nominales.<li>";
+        }
+
         $datatable = new Datatable($data, Datatable::DATATABLE_BATCH, $this->_getSession()->getFkProfile()->getName());
         $viewModel = new ViewModel($datatable->getDatatable());
         $viewModel->setVariable('AnaStudy', $AnaStudy);
         $viewModel->setVariable('user', $this->_getSession());
         $viewModel->setVariable('state', $state);
+        $viewModel->setVariable('error', (isset($error) ? $error : ""));
+        
         return $viewModel;
     }
 

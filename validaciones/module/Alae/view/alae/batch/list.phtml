@@ -8,6 +8,7 @@
 <div id="batch-list">
     <div id="encab">
         <h2>ESTUDIO <?php echo $AnaStudy->getFkStudy()->getCode() ?></h2>
+        <ul id="errorBox"><?php echo isset($error) ? $error : ""?></ul>
     </div>
     <form id="datatable-form" action="" method="POST">
         <div id="datatable" class="<?php echo str_replace(" ", "_", strtolower($user->getFkProfile()->getName())) ?>"></div>
