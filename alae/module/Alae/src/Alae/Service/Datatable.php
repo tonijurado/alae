@@ -375,38 +375,38 @@ class Datatable
 	switch ($this->_datatable)
 	{
 	    case Datatable::DATATABLE_ANALYTE:
-		$response = $this->getAnalyteColumns();
-		break;
+            $response = $this->getAnalyteColumns();
+            break;
 	    case Datatable::DATATABLE_STUDY:
-		$response = $this->getStudyColumns();
-		break;
+            $response = $this->getStudyColumns();
+            break;
         case Datatable::DATATABLE_STUDY_CLOSE:
-        $response = $this->getStudyCloseColumns();
-        break;
+            $response = $this->getStudyCloseColumns();
+            break;
 	    case Datatable::DATATABLE_PARAMETER:
-		$response = $this->getParameterColumns();
-		break;
+            $response = $this->getParameterColumns();
+            break;
 	    case Datatable::DATATABLE_REASON:
-		$response = $this->getReasonColumns();
-		break;
+            $response = $this->getReasonColumns();
+            break;
 	    case Datatable::DATATABLE_UNFILLED:
-		$response = $this->getUnfilledColumns();
-		break;
+            $response = $this->getUnfilledColumns();
+            break;
 	    case Datatable::DATATABLE_ADMIN:
-		$response = $this->getAdminColumns();
-		break;
-            case Datatable::DATATABLE_ANASTUDY:
-                $response = $this->getAnaStudyColumns();
-                break;
-            case Datatable::DATATABLE_BATCH:
-                $response = $this->getBatchColumns();
-                break;
-            case Datatable::DATATABLE_SAMPLE_BATCH:
-                $response = $this->getSampleBatchColumns();
-                break;
-            case Datatable::DATATABLE_AUDIT_TRAIL:
-                $response = $this->getAuditColumns();
-                break;
+            $response = $this->getAdminColumns();
+            break;
+        case Datatable::DATATABLE_ANASTUDY:
+            $response = $this->getAnaStudyColumns();
+            break;
+        case Datatable::DATATABLE_BATCH:
+            $response = $this->getBatchColumns();
+            break;
+        case Datatable::DATATABLE_SAMPLE_BATCH:
+            $response = $this->getSampleBatchColumns();
+            break;
+        case Datatable::DATATABLE_AUDIT_TRAIL:
+            $response = $this->getAuditColumns();
+            break;
         }
 
 	return $response;
@@ -437,15 +437,15 @@ class Datatable
 	    case Datatable::DATATABLE_ADMIN:
 		$elements = '<span class="form-download-excel" onclick="excel(6);"></span>';
 		break;
-            case Datatable::DATATABLE_ANASTUDY:
-                $elements = '<span class="form-datatable-new"></span>';
-                break;
-            case Datatable::DATATABLE_BATCH:
-                $elements = '<input value="" type="submit"/>';
-                break;
-            case Datatable::DATATABLE_AUDIT_TRAIL:
-		$elements = '<span class="form-download-excel" onclick="excel(7);"></span>';
-		break;
+        case Datatable::DATATABLE_ANASTUDY:
+            $elements = '<span class="form-datatable-new"></span>';
+            break;
+        case Datatable::DATATABLE_BATCH:
+            $elements = '<input value="" type="submit"/>';
+            break;
+        case Datatable::DATATABLE_AUDIT_TRAIL:
+            $elements = '<span class="form-download-excel" onclick="excel(7);"></span>';
+            break;
 	    case Datatable::DATATABLE_SAMPLE_BATCH:
                 $elements = '<input value="" type="submit"/>';
 		break;
@@ -457,22 +457,25 @@ class Datatable
     protected function isDirectorEstudio()
     {
         switch ($this->_datatable)
-	{
-	    case Datatable::DATATABLE_STUDY:
-		$elements = '<a href="' . $this->_base_url . '/study/create" class="form-datatable-new"></a><span class="form-download-excel" onclick="excel(2);"></span>';
-		break;
-        case Datatable::DATATABLE_STUDY_CLOSE:
-        $elements = '<span class="form-download-excel" onclick="excel(8);"></span>';
-        break;
+	    {
+            case Datatable::DATATABLE_STUDY:
+                $elements = '<a href="' . $this->_base_url . '/study/create" class="form-datatable-new"></a><span class="form-download-excel" onclick="excel(2);"></span>';
+                break;
+            case Datatable::DATATABLE_STUDY_CLOSE:
+                $elements = '<span class="form-download-excel" onclick="excel(8);"></span>';
+                break;
             case Datatable::DATATABLE_ANASTUDY:
                 $elements = '<span class="form-datatable-new"></span>';
                 break;
             case Datatable::DATATABLE_UNFILLED:
-		$elements = '<span class="form-download-excel" onclick="excel(5);"></span>';
-		break;
-	    case Datatable::DATATABLE_SAMPLE_BATCH:
+                $elements = '<span class="form-download-excel" onclick="excel(5);"></span>';
+                break;
+            case Datatable::DATATABLE_SAMPLE_BATCH:
+                    $elements = '<input value="" type="submit"/>';
+                break;
+            case Datatable::DATATABLE_BATCH:
                 $elements = '<input value="" type="submit"/>';
-		break;
+                break;
             default :
                 $elements = "";
                 break;

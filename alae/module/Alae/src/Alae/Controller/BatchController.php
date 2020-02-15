@@ -82,7 +82,7 @@ class BatchController extends BaseController
 
         if ($request->isPost())
         {
-            if ($this->_getSession()->isAdministrador())
+            if ($this->_getSession()->isAdministrador() || $this->_getSession()->isDirectorEstudio())
             {
                 $AnaStudy            = $this->getRepository("\\Alae\\Entity\\AnalyteStudy")->find($request->getPost('id'));
                 $updateJustification = $request->getPost('update-justification');
@@ -152,7 +152,7 @@ class BatchController extends BaseController
 
             if (!$AnaStudy->getFkStudy()->getCloseFlag())
             {
-                if ($this->_getSession()->isAdministrador())
+                if ($this->_getSession()->isAdministrador() || $this->_getSession()->isDirectorEstudio())
                 {
                     $modify = is_null($batch->getValidFlag()) ? "" : ($batch->getValidFlag() ? '<button class="btn" onclick="changeElement(this, ' . $batch->getPkBatch() . ');"><span class="btn-reject"></span>rechazar</button>' : '<button class="btn" onclick="changeElement(this, ' . $batch->getPkBatch() . ');"><span class="btn-validate"></span>aceptar</button>');
                 }
