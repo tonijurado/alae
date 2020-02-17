@@ -420,7 +420,7 @@ class VerificationController extends BaseController
         (
             (s.sampleType = 'Blank' AND (s.sampleName NOT LIKE 'BLK%' AND 
                                         s.sampleName NOT LIKE 'SEL%' AND 
-                                        s.sampleName NOT LIKE 'ZS-%') 
+                                        s.sampleName NOT LIKE 'ZS%')
             )
                                         OR
 
@@ -438,20 +438,46 @@ class VerificationController extends BaseController
                                                   s.sampleName NOT LIKE 'ULQC%' AND
                                                   s.sampleName NOT LIKE 'LDQC%' AND
                                                   s.sampleName NOT LIKE 'HDQC%' AND
+                                                  s.sampleName NOT LIKE 'PID%' AND
+                                                  s.sampleName NOT LIKE 'AS%' AND
+                                                  s.sampleName NOT LIKE 'LL_LLOQ%' AND
                                                   s.sampleName NOT LIKE 'TZ%' AND
                                                   s.sampleName NOT LIKE 'ME%' AND
                                                   s.sampleName NOT LIKE 'FT%' AND
                                                   s.sampleName NOT LIKE 'ST%' AND
                                                   s.sampleName NOT LIKE 'LT%' AND
                                                   s.sampleName NOT LIKE 'PP%' AND
-                                                  s.sampleName NOT LIKE 'SLP%' AND
-                                                  s.sampleName NOT LIKE 'PID%' AND
-                                                  s.sampleName NOT LIKE 'LLOQ%')
+                                                  s.sampleName NOT LIKE 'SLP%'
+                                                  )
             )
                                         OR
             (s.sampleName = 'ZS_BC%' AND (s.sampleType <> 'Unknown')) 
                                         OR
             (s.sampleName = 'ZS_NT%' AND (s.sampleType <> 'Unknown'))
+            OR
+            (s.sampleType = 'Unknown' AND (s.sampleName NOT LIKE 'BLK%' AND 
+                                            s.sampleName NOT LIKE 'SEL%' AND 
+                                            s.sampleName NOT LIKE 'ZS%' AND
+                                            s.sampleName NOT LIKE 'CS%' AND
+                                            s.sampleName NOT LIKE 'REC%' AND 
+                                            s.sampleName NOT LIKE 'FM%' AND 
+                                            s.sampleName NOT LIKE 'EGC%' AND
+                                            s.sampleName NOT LIKE 'ES%' AND
+                                            s.sampleName NOT LIKE 'QC%' AND
+                                            s.sampleName NOT LIKE 'LLQC%' AND
+                                            s.sampleName NOT LIKE 'ULQC%' AND
+                                            s.sampleName NOT LIKE 'LDQC%' AND
+                                            s.sampleName NOT LIKE 'HDQC%' AND
+                                            s.sampleName NOT LIKE 'PID%' AND
+                                            s.sampleName NOT LIKE 'AS%' AND
+                                            s.sampleName NOT LIKE 'LL_LLOQ%' AND
+                                            s.sampleName NOT LIKE 'TZ%' AND
+                                            s.sampleName NOT LIKE 'ME%' AND
+                                            s.sampleName NOT LIKE 'FT%' AND
+                                            s.sampleName NOT LIKE 'ST%' AND
+                                            s.sampleName NOT LIKE 'LT%' AND
+                                            s.sampleName NOT LIKE 'PP%' AND
+                                            s.sampleName NOT LIKE 'SLP%'))
 
         ) AND s.fkBatch = " . $Batch->getPkBatch();
         
@@ -472,11 +498,13 @@ class VerificationController extends BaseController
     {
         $elements = $this->getRepository("\\Alae\\Entity\\AnalyteStudy")->findBy(array("fkStudy" => $Batch->getFkStudy(), "fkAnalyte" => $Batch->getFkAnalyte()));
 
+        //cs, etc
         foreach ($elements as $AnaStudy)
         {
             $cs_values = explode(",", $AnaStudy->getCsValues());
             $qc_values = explode(",", $AnaStudy->getQcValues());
 
+            //CS
             if (count($cs_values) == $AnaStudy->getCsNumber())
             {
                 for ($i = 1; $i <= count($cs_values); $i++)
@@ -500,6 +528,7 @@ class VerificationController extends BaseController
                 }
             }
 
+            //QC
             if (count($qc_values) == $AnaStudy->getQcNumber())
             {
                 for ($i = 1; $i <= count($qc_values); $i++)
@@ -516,6 +545,7 @@ class VerificationController extends BaseController
                 }
             }
 
+            //LDQC
             $valueLDQC = \Alae\Service\Conversion::conversion(
                 $AnaStudy->getFkUnit()->getName(),
                 $Batch->getAnalyteConcentrationUnits(),
@@ -525,7 +555,9 @@ class VerificationController extends BaseController
             $where = "s.sampleName LIKE 'LDQC%' AND s.analyteConcentration <> " . $valueLDQC . " AND s.fkBatch = " . $Batch->getPkBatch();
             $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V6"));
             $this->error($where, $fkParameter[0]);
+            //LDQC
 
+            //HDQC
             $valueHDQC = \Alae\Service\Conversion::conversion(
                 $AnaStudy->getFkUnit()->getName(),
                 $Batch->getAnalyteConcentrationUnits(),
@@ -535,7 +567,9 @@ class VerificationController extends BaseController
             $where = "s.sampleName LIKE 'HDQC%' AND s.analyteConcentration <> " . $valueHDQC . " AND s.fkBatch = " . $Batch->getPkBatch();
             $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V6"));
             $this->error($where, $fkParameter[0]);
+            //HDQC
 
+            //LLQC
             $valueLLQC = \Alae\Service\Conversion::conversion(
                 $AnaStudy->getFkUnit()->getName(),
                 $Batch->getAnalyteConcentrationUnits(),
@@ -545,7 +579,9 @@ class VerificationController extends BaseController
             $where = "s.sampleName LIKE 'LLQC%' AND s.analyteConcentration <> " . $valueLLQC . " AND s.fkBatch = " . $Batch->getPkBatch();
             $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V6"));
             $this->error($where, $fkParameter[0]);
+            //LLQC
 
+            //ULQC
             $valueULQC = \Alae\Service\Conversion::conversion(
                 $AnaStudy->getFkUnit()->getName(),
                 $Batch->getAnalyteConcentrationUnits(),
@@ -555,16 +591,19 @@ class VerificationController extends BaseController
             $where = "s.sampleName LIKE 'ULQC%' AND s.analyteConcentration <> " . $valueULQC . " AND s.fkBatch = " . $Batch->getPkBatch();
             $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V6"));
             $this->error($where, $fkParameter[0]);
+            //ULQC
         }
+        //fin cs, etc
 
+        //SampleVerificationStudy
         $elements = $this->getRepository("\\Alae\\Entity\\SampleVerificationStudy")->findBy(array("fkStudy" => $Batch->getFkStudy()));
         
         foreach ($elements as $sample)
         {
             $elements = $this->getRepository("\\Alae\\Entity\\AnalyteStudy")->findBy(array("fkStudy" => $Batch->getFkStudy(), "fkAnalyte" => $Batch->getFkAnalyte()));
 
-            $first = substr($sample->getAssociated(), 0, 2); 
-            $last = substr($sample->getAssociated(), -1); 
+            $first = substr($sample->getName(), 0, 2); 
+            $last = substr($sample->getName(), -1); 
             
             if($first == 'CS')
             {
@@ -586,7 +625,7 @@ class VerificationController extends BaseController
                 );
             }
 
-            if($sample->getAssociated() == 'HDQC')
+            if($sample->getName() == 'HDQC')
             {
                 $value = \Alae\Service\Conversion::conversion(
                     $AnaStudy->getFkUnit()->getName(),
@@ -595,7 +634,7 @@ class VerificationController extends BaseController
                 );
             }
 
-            if($sample->getAssociated() == 'LDQC')
+            if($sample->getName() == 'LDQC')
             {
                 $value = \Alae\Service\Conversion::conversion(
                     $AnaStudy->getFkUnit()->getName(),
@@ -604,7 +643,7 @@ class VerificationController extends BaseController
                 );
             }
 
-            if($sample->getAssociated() == 'LLQC')
+            if($sample->getName() == 'LLQC')
             {
                 $value = \Alae\Service\Conversion::conversion(
                     $AnaStudy->getFkUnit()->getName(),
@@ -613,7 +652,7 @@ class VerificationController extends BaseController
                 );
             }
 
-            if($sample->getAssociated() == 'ULQC')
+            if($sample->getName() == 'ULQC')
             {
                 $value = \Alae\Service\Conversion::conversion(
                     $AnaStudy->getFkUnit()->getName(),
@@ -622,7 +661,8 @@ class VerificationController extends BaseController
                 );
             }
 
-            $sample = $sample->getName();
+            $sample1 = $sample->getName();
+            $value = $sample->getAssociated();
             /*if ($sample == 'PID')
             {
                 $where = "s.sampleName LIKE '$sample%' AND s.analyteConcentration <> " . $value . " AND s.fkBatch = " . $Batch->getPkBatch();
@@ -632,11 +672,12 @@ class VerificationController extends BaseController
             }*/
             
             //echo $sample." ".$value;die();
-            $where = "s.sampleName LIKE '$sample%' AND s.analyteConcentration <> " . $value . " AND s.fkBatch = " . $Batch->getPkBatch();
+            $where = "s.sampleName LIKE '$sample1%' AND s.analyteConcentration <> " . $value . " AND s.fkBatch = " . $Batch->getPkBatch();
                     $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V6"));
                     $this->error($where, $fkParameter[0]);
 			//if ($sample == 'PID') { echo $sample." ".$value; die();} //** para borrar
         }
+        //fin SampleVerificationStudy
 
         $elements = $this->getRepository("\\Alae\\Entity\\BatchNominal")->findBy(array("fkBatch" => $Batch->getPkBatch()));
 
@@ -870,7 +911,7 @@ class VerificationController extends BaseController
     protected function V10(\Alae\Entity\Batch $Batch)
     {
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.1"));
-        $where      = "(s.sampleName LIKE 'CS1%' OR s.sampleName LIKE 'LLOQ%' OR s.sampleName LIKE 'LLQC%') AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.fkBatch = " . $Batch->getPkBatch();
+        $where      = "(s.sampleName LIKE 'CS1%' OR s.sampleName LIKE 'LLQC%' OR s.sampleName LIKE 'PID%' OR s.sampleName LIKE 'LL_LLOQ%') AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.fkBatch = " . $Batch->getPkBatch();
                 //echo $where;
                 //die();
         $this->error($where, $parameters[0], array(), false);
@@ -881,9 +922,23 @@ class VerificationController extends BaseController
         $this->error($where, $parameters[0], array('regexp' => '^CS[0-9]+(-[0-9]+(R[0-9]+)?)?$'), false);
 
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.3"));
-        $where      = "(REGEXP(s.sampleName, :regexp) = 1 OR s.sampleName LIKE 'ULQC%') AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.fkBatch = " . $Batch->getPkBatch();
+        $where      = "(REGEXP(s.sampleName, :regexp) = 1) AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.fkBatch = " . $Batch->getPkBatch();
         //$this->error($where, $parameters[0], array('regexp' => '^QC[0-9]+(-[0-9]+)?$'), false);
         $this->error($where, $parameters[0], array('regexp' => '^QC[0-9]+(-[0-9]+(R[0-9]+)?)?$'), false);
+
+        $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.3"));
+        $where      = "(s.sampleType = 'Quality Control' AND 
+                        (s.sampleName LIKE 'ULQC%' OR
+                        s.sampleName LIKE 'AS%' OR
+                        s.sampleName LIKE 'TZ%' OR
+                        s.sampleName LIKE 'FT%' OR
+                        s.sampleName LIKE 'ST%' OR
+                        s.sampleName LIKE 'LT%' OR
+                        s.sampleName LIKE 'PP%' OR
+                        s.sampleName LIKE 'SLP%'))
+                        AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.fkBatch = " . $Batch->getPkBatch();
+        //$this->error($where, $parameters[0], array('regexp' => '^QC[0-9]+(-[0-9]+)?$'), false);
+        $this->error($where, $parameters[0], array(), false);
 
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.4"));
         $where      = "s.sampleName LIKE 'TZ%' AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.fkBatch = " . $Batch->getPkBatch();
@@ -1096,7 +1151,14 @@ class VerificationController extends BaseController
         $query = $this->getEntityManager()->createQuery("
             SELECT AVG(s.isPeakArea)
             FROM Alae\Entity\SampleBatch s
-            WHERE (s.sampleName LIKE 'CS%' OR s.sampleName LIKE 'QC%') AND (s.sampleName NOT LIKE  '%\*%' OR s.sampleName NOT LIKE  'HDQC%' OR s.sampleName NOT LIKE  'LDQC%') AND s.validFlag <> 0 AND s.useRecord = 1 AND s.fkBatch = " . $Batch->getPkBatch());
+            WHERE (s.sampleName LIKE 'CS%' OR s.sampleName LIKE 'QC%' OR 
+                   s.sampleName LIKE 'LLQC%' OR 
+                   s.sampleName LIKE 'ULQC%') 
+                   AND 
+                   (s.sampleName NOT LIKE  '%\*%' OR 
+                   s.sampleName NOT LIKE  'HDQC%' OR 
+                   s.sampleName NOT LIKE  'LDQC%') 
+                   AND s.validFlag <> 0 AND s.useRecord = 1 AND s.fkBatch = " . $Batch->getPkBatch());
         $value = $query->getSingleScalarResult();
         if($value)
         {
