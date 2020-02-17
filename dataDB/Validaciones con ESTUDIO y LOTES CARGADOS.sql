@@ -5885,3 +5885,11 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`alae`@`localhost` SQL SECURITY DEFINER VIEW 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+
+-- Volcando estructura para vista alae.qry_alae_sample_errors
+-- Eliminando tabla temporal y crear estructura final de VIEW
+DROP TABLE IF EXISTS `qry_alae_sample_errors`;
+CREATE ALGORITHM=UNDEFINED DEFINER=`alae`@`localhost` VIEW `qry_alae_sample_errors` AS select `b`.`serial` AS `serial`,`b`.`pk_batch` AS `pk_batch`,`sb`.`analyte_peak_name` AS `analyte_peak_name`,`sb`.`sample_name` AS `sample_name`,`sb`.`sample_type` AS `sample_type`,`b`.`file_name` AS `file_name`,`e`.`fk_parameter` AS `fk_parameter`,`p`.`rule` AS `rule`,`p`.`verification` AS `verification`,`p`.`min_value` AS `min_value`,`p`.`max_value` AS `max_value`,`p`.`code_error` AS `code_error`,`p`.`message_error` AS `message_error`,`sb`.`is_used` AS `is_used` from (`alae_batch` `b` join ((`alae_sample_batch` `sb` join `alae_error` `e` on((`sb`.`pk_sample_batch` = `e`.`fk_sample_batch`))) join `alae_parameter` `p` on((`e`.`fk_parameter` = `p`.`pk_parameter`))) on((`b`.`pk_batch` = `sb`.`fk_batch`))) ;
+/*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
+/*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
