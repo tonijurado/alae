@@ -706,10 +706,10 @@ class VerificationController extends BaseController
             SELECT s.pkSampleBatch, SUBSTRING(s.sampleName, 1, 4) as sampleName,  COUNT(s.pkSampleBatch) as counter
             FROM Alae\Entity\SampleBatch s
             WHERE s.sampleName LIKE 'CS%' AND s.fkBatch = " . $Batch->getPkBatch() . "
-            GROUP BY sampleName
+            GROUP BY s.sampleName
             HAVING counter < " . $parameters[0]->getMinValue());
         $elements   = $query->getResult();
-
+        
         if (count($elements) > 0)
         {
             $pkSampleBatch = array();
@@ -730,10 +730,10 @@ class VerificationController extends BaseController
             SELECT s.pkSampleBatch, SUBSTRING(s.sampleName, 1, 4) as sampleName,  COUNT(s.pkSampleBatch) as counter
             FROM Alae\Entity\SampleBatch s
             WHERE s.sampleName LIKE 'QC%' AND s.fkBatch = " . $Batch->getPkBatch() . "
-            GROUP BY sampleName
+            GROUP BY s.sampleName
             HAVING counter < " . $parameters[0]->getMinValue());
         $elements   = $query->getResult();
-
+        
         if (count($elements) > 0)
         {
             $pkSampleBatch = array();
