@@ -789,49 +789,13 @@ class VerificationController extends BaseController
     protected function V9(\Alae\Entity\Batch $Batch)
     {
         $query    = $this->getEntityManager()->createQuery("
-            SELECT s.pkSampleBatch, s.sampleName
+            SELECT s.pkSampleBatch, s.sampleName, s.areaRatio
             FROM Alae\Entity\SampleBatch s
-            WHERE s.sampleName LIKE  '%R%' AND s.sampleName NOT LIKE  '%\*%' AND  s.fkBatch = " . $Batch->getPkBatch() . "
+            WHERE (REGEXP(s.sampleName, :regexp) = 1 OR REGEXP(s.sampleName, :regexp2) = 1) AND  s.fkBatch = " . $Batch->getPkBatch() . "
             ORDER BY s.sampleName ASC");
+        $query->setParameter('regexp', '^QC[0-9]+-[0-9]+R[0-9]+\\*$');
+        $query->setParameter('regexp2', '^CS[0-9]+-[0-9]+R[0-9]+\\*$');
         $elements = $query->getResult();
-
-        if (count($elements) > 0)
-        {
-            $replicated = array();
-            $original   = array();
-            foreach ($elements as $temp)
-            {
-                $ids[preg_replace('/R[0-9]+/', '', $temp["sampleName"])][] = $temp["pkSampleBatch"];
-            }
-
-            foreach ($ids as $key => $values){
-                array_pop($values);
-                if(!empty($values)){
-                    $replicated[] = implode(",", $values);
-                }
-
-                $original[] = sprintf("'%s'", $key);
-            }
-
-            $pkSampleBatch = "";
-            if(!empty($replicated)){
-                 $where = "(s.pkSampleBatch in (" . implode(",", $replicated) . ") OR
-                     (s.sampleName in (" . implode(",", $original) . ") AND s.sampleName NOT LIKE  '%R%' AND s.sampleName NOT LIKE  '%\*%')
-                 )";
-            }
-            else
-            {
-                $where = "s.sampleName in (" . implode(",", $original) . ") AND s.sampleName NOT LIKE  '%R%' AND s.sampleName NOT LIKE  '%\*%'";
-            }
-
-            $sql = "
-               UPDATE Alae\Entity\SampleBatch s
-               SET s.isUsed = 0, s.validFlag = 0
-               WHERE s.fkBatch = " . $Batch->getPkBatch() . " AND $where";
-            
-            $query = $this->getEntityManager()->createQuery($sql);
-            $query->execute();
-        }
 
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V9.1"));
         $min = $parameters[0]->getMinValue();
@@ -841,60 +805,60 @@ class VerificationController extends BaseController
 
         $parameters3 = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V9.3"));
 
-        //$where = "REGEXP(s.sampleName, :regexp) = 1 AND s.accuracy NOT BETWEEN " . $min . " AND " . $max . " AND s.fkBatch = " . $Batch->getPkBatch();
-        //$this->error($where, $parameters[0], array('regexp' => '^QC[0-9]+-[0-9]+R[0-9]+\\*$'), false);
 
-        $query    = $this->getEntityManager()->createQuery("
-            SELECT s.sampleName, s.areaRatio, s.useRecord
-            FROM Alae\Entity\SampleBatch s
-            WHERE (REGEXP(s.sampleName, :regexp) = 1 OR REGEXP(s.sampleName, :regexp2) = 1) AND s.fkBatch = " . $Batch->getPkBatch() . "
-            ORDER BY s.sampleName DESC");
-        $query->setParameter('regexp', '^QC[0-9]+-[0-9]+R[0-9]+\\*$');
-        $query->setParameter('regexp2', '^CS[0-9]+-[0-9]+R[0-9]+\\*$');
-        $elements = $query->getResult();
-
-        foreach($elements as $SampleName)
+        if (count($elements) > 0)
         {
-            $areaRatioInj = $SampleName['areaRatio'];
-            $injName = $SampleName['sampleName'];
-            $useRecord = $SampleName['useRecord'];
-            $originName  = preg_replace(array('/R[0-9]+/', '/\*/'), '', $SampleName['sampleName']);
-
-            $query    = $this->getEntityManager()->createQuery("
-            SELECT s.areaRatio
-            FROM Alae\Entity\SampleBatch s
-            WHERE s.sampleName = '". $originName . "' AND s.fkBatch = " . $Batch->getPkBatch());
-            $query->setMaxResults(1);
-            $areaRatioOrig = $query->getSingleScalarResult();
-
-            $dif = (($areaRatioOrig - $areaRatioInj) / $areaRatioOrig) * 100;
-
-            $centi = "N";
-            if ($dif >= $min && $dif <= $max)
+            foreach ($elements as $temp)
             {
-                $centi = "S";
-            }
+                $areaRatio = $temp['areaRatio'];
+                $useRecord = $temp['useRecord'];
 
-            $centi91 = "N";
-            if($centi == "N")
-            {
-                $centi91 = "S";
-                $where = "s.sampleName = '" . $injName . "' AND s.fkBatch = " . $Batch->getPkBatch();
-                $this->error($where, $parameters[0], array(), false);
-            }
+                $pos = strpos($temp["sampleName"], '*');
+                $pos = $pos - 1;
+                $reinyect =  trim(substr($temp["sampleName"], -3, $pos), '*');
 
-            $centi92 = "N";
-            if($useRecord == 1) //Cambio de 0 a 1 y verificacion ok.
-            {
-                $centi92 = "S";
-                $where = "s.sampleName = '" . $injName . "' AND s.fkBatch = " . $Batch->getPkBatch();
-                $this->error($where, $parameters2[0], array(), false);   
-            }
+                $query2    = $this->getEntityManager()->createQuery("
+                SELECT s.sampleName, s.areaRatio
+                FROM Alae\Entity\SampleBatch s
+                WHERE s.fkBatch = " . $Batch->getPkBatch() . " and s.sampleName LIKE '%". $reinyect . "%' AND s.sampleName NOT LIKE  '%\*%'
+                ORDER BY s.sampleName ASC");
+                $elements2 = $query2->getResult();
 
-            if($centi91 == "S" && $centi92 == "S")
-            {
-                $where = "s.sampleName = '" . $injName . "' AND s.fkBatch = " . $Batch->getPkBatch();
-                $this->error($where, $parameters3[0], array(), false);
+                foreach ($elements2 as $temp2)
+                {
+                    $sampleNameInj = $temp2['sampleName'];
+                    $areaRatioInj = $temp2['areaRatio'];
+
+                    $dif = (($areaRatio - $areaRatioInj) / $areaRatio) * 100;
+
+                    $centi = "N";
+                    if ($dif >= $min && $dif <= $max)
+                    {
+                        $centi = "S";
+                    }
+
+                    $centi91 = "N";
+                    if($centi == "N")
+                    {
+                        $centi91 = "S";
+                        $where = "s.sampleName = '" . $sampleNameInj . "' AND s.fkBatch = " . $Batch->getPkBatch();
+                        $this->error($where, $parameters[0], array(), false);
+                    }
+
+                    $centi92 = "N";
+                    if($useRecord == 1) //Cambio de 0 a 1 y verificacion ok.
+                    {
+                        $centi92 = "S";
+                        $where = "s.sampleName = '" . $sampleNameInj . "' AND s.fkBatch = " . $Batch->getPkBatch();
+                        $this->error($where, $parameters2[0], array(), false);   
+                    }
+
+                    if($centi91 == "S" && $centi92 == "S")
+                    {
+                        $where = "s.sampleName = '" . $sampleNameInj . "' AND s.fkBatch = " . $Batch->getPkBatch();
+                        $this->error($where, $parameters3[0], array(), false);
+                    }
+                }
             }
         }
     }
