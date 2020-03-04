@@ -1479,13 +1479,13 @@ class VerificationController extends BaseController
         $query    = $this->getEntityManager()->createQuery("
             SELECT COUNT(s.pkSampleBatch)
             FROM Alae\Entity\SampleBatch s
-            WHERE s.sampleName LIKE 'ZS%' AND s.fkBatch = " . $Batch->getPkBatch()
+            WHERE s.sampleName LIKE 'ZS%' AND s.sampleName NOT LIKE 'ZS_NT%' AND s.sampleName NOT LIKE 'ZS_BC%' AND s.fkBatch = " . $Batch->getPkBatch()
         );
         $zs_total = $query->getSingleScalarResult();
         $query = $this->getEntityManager()->createQuery("
             SELECT COUNT(s.pkSampleBatch)
             FROM Alae\Entity\SampleBatch s
-            WHERE s.sampleName LIKE 'ZS%' AND s.validFlag <> 0 AND s.fkBatch = " . $Batch->getPkBatch()
+            WHERE s.sampleName LIKE 'ZS%' AND s.sampleName NOT LIKE 'ZS_NT%' AND s.sampleName NOT LIKE 'ZS_BC%' AND s.validFlag <> 0 AND s.fkBatch = " . $Batch->getPkBatch()
         );
         $zs_accepted_total = $query->getSingleScalarResult();
         
@@ -1500,7 +1500,7 @@ class VerificationController extends BaseController
 		$parameters        = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V23.2"));
             if ($value < $parameters[0]->getMinValue())
             {
-                $where = "s.sampleName LIKE 'ZS%' AND s.fkBatch = " . $Batch->getPkBatch();
+                $where = "s.sampleName LIKE 'ZS%' AND s.sampleName NOT LIKE 'ZS_NT%' AND s.sampleName NOT LIKE 'ZS_BC%' AND s.fkBatch = " . $Batch->getPkBatch();
                 $this->error($where, $parameters[0]);
             }
         
