@@ -703,15 +703,17 @@ class VerificationController extends BaseController
     {
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V7.1"));
         $query      = $this->getEntityManager()->createQuery("
-            SELECT s.pkSampleBatch, SUBSTRING(s.sampleName, 1, 4) as sampleName,  COUNT(s.pkSampleBatch) as counter
+            SELECT s.pkSampleBatch, SUBSTRING(s.sampleName, 1, 4) as sampleNameTemp,  COUNT(s.pkSampleBatch) as counter
             FROM Alae\Entity\SampleBatch s
             WHERE s.sampleName LIKE 'CS%' AND s.fkBatch = " . $Batch->getPkBatch() . "
-            GROUP BY s.sampleName
+            GROUP BY sampleNameTemp
             HAVING counter < " . $parameters[0]->getMinValue());
         $elements   = $query->getResult();
         
         if (count($elements) > 0)
         {
+            echo 'PASO POR AQUI = ' . count($elements);
+            die();
             $pkSampleBatch = array();
             foreach ($elements as $temp)
             {
@@ -721,16 +723,17 @@ class VerificationController extends BaseController
             if(count($pkSampleBatch) > 0)
             {
                 $where = "s.pkSampleBatch IN (" . implode(",", $pkSampleBatch) . ")";
+               // echo 'where = ' . $where;
                 $this->error($where, $parameters[0]);
             }
         }
-
+        //die();
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V7.2"));
         $query      = $this->getEntityManager()->createQuery("
-            SELECT s.pkSampleBatch, SUBSTRING(s.sampleName, 1, 4) as sampleName,  COUNT(s.pkSampleBatch) as counter
+            SELECT s.pkSampleBatch, SUBSTRING(s.sampleName, 1, 4) as sampleNameTemp,  COUNT(s.pkSampleBatch) as counter
             FROM Alae\Entity\SampleBatch s
             WHERE s.sampleName LIKE 'QC%' AND s.fkBatch = " . $Batch->getPkBatch() . "
-            GROUP BY s.sampleName
+            GROUP BY sampleNameTemp
             HAVING counter < " . $parameters[0]->getMinValue());
         $elements   = $query->getResult();
         
