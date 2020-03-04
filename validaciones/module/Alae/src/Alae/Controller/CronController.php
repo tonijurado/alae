@@ -591,7 +591,7 @@ class CronController extends BaseController
             $qb
                     ->select('s.pkSampleBatch as PKSampleBatch', 's.sampleName as sampleName', 's.analyteConcentration','s.isConcentration')
                     ->from('Alae\Entity\SampleBatch', 's')
-                    ->where("s.fkBatch = " . $Batch->getPkBatch() . " AND (s.sampleName LIKE '%_NT%' OR s.sampleName LIKE '%_BC%') AND (s.sampleType = 'Standard' OR s.sampleType = 'QualityControl') ")
+                    ->where("s.fkBatch = " . $Batch->getPkBatch() . " AND (s.sampleName LIKE '%_NT%' OR s.sampleName LIKE '%_BC%') AND (s.sampleType = 'Standard' OR s.sampleType = 'Quality Control') ")
                     ->groupBy('s.pkSampleBatch')
                     ->orderBy('s.sampleName', 'ASC');
             $elements = $qb->getQuery()->getResult();
