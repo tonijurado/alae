@@ -36,6 +36,13 @@ class SampleVerificationStudy
      */
     protected $associated;
 
+      /**
+     * @var string
+     *
+     * @ORM\Column(name="value", type="string", length=250, nullable=false)
+     */
+    protected $value;
+
     /**
      * @var \Alae\Entity\Study
      *
@@ -74,6 +81,16 @@ class SampleVerificationStudy
     public function setAssociated($associated)
     {
         $this->associated = $associated;
+    }
+
+    public function getValue()
+    {
+        return $this->value;
+    }
+
+    public function setValue($value)
+    {
+        $this->value = $value;
     }
 
     public function getFkStudy()
