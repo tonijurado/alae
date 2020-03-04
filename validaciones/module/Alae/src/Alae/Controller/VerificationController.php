@@ -455,29 +455,29 @@ class VerificationController extends BaseController
                                         OR
             (s.sampleName = 'ZS_NT%' AND (s.sampleType <> 'Unknown'))
             OR
-            (s.sampleType = 'Unknown' AND (s.sampleName NOT LIKE 'BLK%' AND 
-                                            s.sampleName NOT LIKE 'SEL%' AND 
-                                            s.sampleName NOT LIKE 'ZS%' AND
-                                            s.sampleName NOT LIKE 'CS%' AND
-                                            s.sampleName NOT LIKE 'REC%' AND 
-                                            s.sampleName NOT LIKE 'FM%' AND 
-                                            s.sampleName NOT LIKE 'EGC%' AND
-                                            s.sampleName NOT LIKE 'ES%' AND
-                                            s.sampleName NOT LIKE 'QC%' AND
-                                            s.sampleName NOT LIKE 'LLQC%' AND
-                                            s.sampleName NOT LIKE 'ULQC%' AND
-                                            s.sampleName NOT LIKE 'LDQC%' AND
-                                            s.sampleName NOT LIKE 'HDQC%' AND
-                                            s.sampleName NOT LIKE 'PID%' AND
-                                            s.sampleName NOT LIKE 'AS%' AND
-                                            s.sampleName NOT LIKE 'LL_LLOQ%' AND
-                                            s.sampleName NOT LIKE 'TZ%' AND
-                                            s.sampleName NOT LIKE 'ME%' AND
-                                            s.sampleName NOT LIKE 'FT%' AND
-                                            s.sampleName NOT LIKE 'ST%' AND
-                                            s.sampleName NOT LIKE 'LT%' AND
-                                            s.sampleName NOT LIKE 'PP%' AND
-                                            s.sampleName NOT LIKE 'SLP%'))
+            (s.sampleType = 'Unknown' AND (s.sampleName  LIKE 'BLK%' OR 
+                                            s.sampleName LIKE 'SEL%' OR 
+                                            s.sampleName LIKE 'ZS%' OR
+                                            s.sampleName LIKE 'CS%' OR
+                                            s.sampleName LIKE 'REC%' OR 
+                                            s.sampleName LIKE 'FM%' OR 
+                                            s.sampleName LIKE 'EGC%' OR
+                                            s.sampleName LIKE 'ES%' OR
+                                            s.sampleName LIKE 'QC%' OR
+                                            s.sampleName LIKE 'LLQC%' OR
+                                            s.sampleName LIKE 'ULQC%' OR
+                                            s.sampleName LIKE 'LDQC%' OR
+                                            s.sampleName LIKE 'HDQC%' OR
+                                            s.sampleName LIKE 'PID%' OR
+                                            s.sampleName LIKE 'AS%' OR
+                                            s.sampleName LIKE 'LL_LLOQ%' OR
+                                            s.sampleName LIKE 'TZ%' OR
+                                            s.sampleName LIKE 'ME%' OR
+                                            s.sampleName LIKE 'FT%' OR
+                                            s.sampleName LIKE 'ST%' OR
+                                            s.sampleName LIKE 'LT%' OR
+                                            s.sampleName LIKE 'PP%' OR
+                                            s.sampleName LIKE 'SLP%'))
 
         ) AND s.fkBatch = " . $Batch->getPkBatch();
         
