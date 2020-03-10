@@ -344,7 +344,7 @@ class Datatable
 
         protected function getverificationSampleAssocColumns()
         {
-            $header = array("name", "associated");
+            $header = array("name", "associated", "value");
             $data   = $this->getData();
     
             return array(
@@ -352,9 +352,10 @@ class Datatable
                 "columns"  => json_encode(array(
                     array("key" => "name", "label" => "Sample", "sortable" => true),
                     array("key" => "associated", "label" => "Nivel de concentración asociado", "sortable" => true),
+                    array("key" => "value", "label" => "Valor", "sortable" => true),
                     array("key" => "edit", "allowHTML" => true)
                 )),
-                "editable" => json_encode(array("name", "associated")),
+                "editable" => json_encode(array("name", "associated", "value")),
         
                 "header"   => json_encode($header),
                 "filters"  => $this->getFilters($header)

@@ -602,10 +602,18 @@ class VerificationController extends BaseController
         {
             $elements = $this->getRepository("\\Alae\\Entity\\AnalyteStudy")->findBy(array("fkStudy" => $Batch->getFkStudy(), "fkAnalyte" => $Batch->getFkAnalyte()));
 
-            $first = substr($sample->getName(), 0, 2); 
-            $last = substr($sample->getName(), -1); 
+            /*$first = substr($sample->getAssociated(), 0, 2); 
+            $last = substr($sample->getAssociated(), -1);*/ 
+            $valueAssoc = $sample->getValue();
+            $sample1 = $sample->getName();
+
+            $value = \Alae\Service\Conversion::conversion(
+                $AnaStudy->getFkUnit()->getName(),
+                $Batch->getAnalyteConcentrationUnits(),
+                $valueAssoc
+            );
             
-            if($first == 'CS')
+            /*if($first == 'CS')
             {
                 $cs_values = explode(",", $AnaStudy->getCsValues());
                 $value = \Alae\Service\Conversion::conversion(
@@ -625,7 +633,7 @@ class VerificationController extends BaseController
                 );
             }
 
-            if($sample->getName() == 'HDQC')
+            if($sample->getAssociated() == 'HDQC')
             {
                 $value = \Alae\Service\Conversion::conversion(
                     $AnaStudy->getFkUnit()->getName(),
@@ -634,7 +642,7 @@ class VerificationController extends BaseController
                 );
             }
 
-            if($sample->getName() == 'LDQC')
+            if($sample->getAssociated() == 'LDQC')
             {
                 $value = \Alae\Service\Conversion::conversion(
                     $AnaStudy->getFkUnit()->getName(),
@@ -643,7 +651,7 @@ class VerificationController extends BaseController
                 );
             }
 
-            if($sample->getName() == 'LLQC')
+            if($sample->getAssociated() == 'LLQC')
             {
                 $value = \Alae\Service\Conversion::conversion(
                     $AnaStudy->getFkUnit()->getName(),
@@ -652,30 +660,18 @@ class VerificationController extends BaseController
                 );
             }
 
-            if($sample->getName() == 'ULQC')
+            if($sample->getAssociated() == 'ULQC')
             {
                 $value = \Alae\Service\Conversion::conversion(
                     $AnaStudy->getFkUnit()->getName(),
                     $Batch->getAnalyteConcentrationUnits(),
                     $AnaStudy->getUlqcValues()
                 );
-            }
-
-            $sample1 = $sample->getName();
-            $value = $sample->getAssociated();
-            /*if ($sample == 'PID')
-            {
-                $where = "s.sampleName LIKE '$sample%' AND s.analyteConcentration <> " . $value . " AND s.fkBatch = " . $Batch->getPkBatch();
-            
-                echo $where;
-                die();
             }*/
             
-            //echo $sample." ".$value;die();
             $where = "s.sampleName LIKE '$sample1%' AND s.analyteConcentration <> " . $value . " AND s.fkBatch = " . $Batch->getPkBatch();
                     $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V6"));
                     $this->error($where, $fkParameter[0]);
-			//if ($sample == 'PID') { echo $sample." ".$value; die();} //** para borrar
         }
         //fin SampleVerificationStudy
 
@@ -691,7 +687,6 @@ class VerificationController extends BaseController
                     $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V6"));
                     $this->error($where, $fkParameter[0]);
         }
-        
     }
 
     /**

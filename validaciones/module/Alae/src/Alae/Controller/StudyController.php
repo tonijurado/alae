@@ -774,43 +774,122 @@ class StudyController extends BaseController
     {
         $request = $this->getRequest();
 
-	if ($request->isGet() && ($this->_getSession()->isAdministrador() || $this->_getSession()->isDirectorEstudio()))
-	{
-            $AnaStudy = $this->getRepository('\\Alae\\Entity\\AnalyteStudy')->find($request->getQuery('id'));
+        if ($request->isGet() && ($this->_getSession()->isAdministrador() || $this->_getSession()->isDirectorEstudio()))
+        {
+                $AnaStudy = $this->getRepository('\\Alae\\Entity\\AnalyteStudy')->find($request->getQuery('id'));
 
-	    if ($AnaStudy && $AnaStudy->getPkAnalyteStudy())
-            {
-                try
+            if ($AnaStudy && $AnaStudy->getPkAnalyteStudy())
                 {
-                    //APROBAR CONCENTRACIONES NOMINALES
-                    $User = $this->_getSession();
-                    $AnaStudy->setStatus(true);
-                    $AnaStudy->setFkUserApprove($User);
-                    $this->getEntityManager()->persist($AnaStudy);
-                    $this->getEntityManager()->flush();
-                    $this->transaction(
-                        "Aprobación de concentraciones nominales",
-                        sprintf('El usuario %1$s ha aprobado las concentraciones nominales del estudio %2$s<br>'
-                                . 'Concentración Nominal de los Estándares de Calibración: %3$s<br>'
-                                . 'Concentración Nominal de los Controles de Calidad: %4$s<br>'
-                                . 'Concentración Nominal de los LDQC y HDQC, respectivamente: %5$s, %6$s',
-                            $User->getUsername(),
-                            $AnaStudy->getFkStudy()->getCode(),
-                            $AnaStudy->getCsValues(),
-                            $AnaStudy->getQcValues(),
-                            $AnaStudy->getLdqcValues(),
-                            $AnaStudy->getHdqcValues()
-                        ),
-                        false
-                    );
-                    return new JsonModel(array("status" => true));
+                    try
+                    {
+                        //APROBAR CONCENTRACIONES NOMINALES
+                        $User = $this->_getSession();
+                        $AnaStudy->setStatus(true);
+                        $AnaStudy->setFkUserApprove($User);
+                        $this->getEntityManager()->persist($AnaStudy);
+                        $this->getEntityManager()->flush();
+                        $this->transaction(
+                            "Aprobación de concentraciones nominales",
+                            sprintf('El usuario %1$s ha aprobado las concentraciones nominales del estudio %2$s<br>'
+                                    . 'Concentración Nominal de los Estándares de Calibración: %3$s<br>'
+                                    . 'Concentración Nominal de los Controles de Calidad: %4$s<br>'
+                                    . 'Concentración Nominal de los LDQC y HDQC, respectivamente: %5$s, %6$s',
+                                $User->getUsername(),
+                                $AnaStudy->getFkStudy()->getCode(),
+                                $AnaStudy->getCsValues(),
+                                $AnaStudy->getQcValues(),
+                                $AnaStudy->getLdqcValues(),
+                                $AnaStudy->getHdqcValues()
+                            ),
+                            false
+                        );
+
+                        $Study   = $this->getRepository()->find($AnaStudy->getFkStudy()->getPkStudy());
+                        $elements = $this->getRepository("\\Alae\\Entity\\SampleVerification")->findAll();
+        
+                        //MOSTRAR LOS DATOS
+                        foreach ($elements as $sample)
+                        {
+                            $studyVerification = new \Alae\Entity\SampleVerificationStudy();
+                            $studyVerification->setName($sample->getName());
+                            $studyVerification->setassociated($sample->getAssociated());
+                            
+                            $first = substr($sample->getAssociated(), 0, 2); 
+                            $last = substr($sample->getAssociated(), -1); 
+                            
+                            if($first == 'CS')
+                            {
+                                $cs_values = explode(",", $AnaStudy->getCsValues());
+                                $value = $cs_values[$last - 1];
+                            }
+
+                            if($first == 'QC')
+                            {
+                                $qc_values = explode(",", $AnaStudy->getQcValues());
+                                $value = $qc_values[$last - 1];
+                            }
+
+                            if($sample->getAssociated() == 'LLQC')
+                            {
+                                $value = $AnaStudy->getLlqcValues();
+                               
+                            }
+                            $studyVerification->setValue($value);
+                            $studyVerification->setFkStudy($Study);
+                            $this->getEntityManager()->persist($studyVerification);
+                            $this->getEntityManager()->flush();
+                        }
+
+                        return new JsonModel(array("status" => true));
+                    }
+                    catch (Exception $e)
+                    {
+                        exit;
+                    }
                 }
-                catch (Exception $e)
+        }
+    }
+
+    /**
+     * Función para aprobar las concentraciones nominales
+     */
+    public function associatedApproveAction()
+    {
+        $request = $this->getRequest();
+
+        if ($request->isGet() && ($this->_getSession()->isAdministrador() || $this->_getSession()->isDirectorEstudio()))
+        {
+                $AnaStudy = $this->getRepository('\\Alae\\Entity\\AnalyteStudy')->find($request->getQuery('id'));
+
+            if ($AnaStudy && $AnaStudy->getPkAnalyteStudy())
                 {
-                    exit;
+                    try
+                    {
+                        //APROBAR CONCENTRACIONES NOMINALES
+                        $User = $this->_getSession();
+                        $AnaStudy->setFkUserAssociated($User);
+                        $AnaStudy->setAssociatedAt(new \DateTime('now'));
+                        $this->getEntityManager()->persist($AnaStudy);
+                        $this->getEntityManager()->flush();
+                        $this->transaction(
+                            "Aprobación de asociación de concentraciones nominales",
+                            sprintf('El usuario %1$s ha aprobado la asociación de concentraciones nominales <br>'
+                                    . ' en el estudio %2$s del analito %3$s',
+                                $User->getUsername(),
+                                $AnaStudy->getFkStudy()->getCode(),
+                                $AnaStudy->getFkAnalyte()->getShortening()
+                            ),
+                            false
+                        );
+
+                        return new JsonModel(array("status" => true));
+                    }
+                    catch (Exception $e)
+                    {
+                        exit;
+                    }
                 }
-            }
-	}
+        }
     }
 
     /*
@@ -1109,9 +1188,10 @@ class StudyController extends BaseController
 
         if ($request->isPost())
         {
-            $Study   = $this->getRepository()->find($AnaStudy->getFkStudy()->getPkStudy());
+            $Study            = $this->getRepository()->find($AnaStudy->getFkStudy()->getPkStudy());
             $createNames      = $request->getPost('create-name');
             $createAssociated = $request->getPost('create-associated');
+            $createValue      = $request->getPost('create-value');
 
             if (!empty($createNames))
             {
@@ -1121,14 +1201,16 @@ class StudyController extends BaseController
                     $sample->setFkStudy($Study);
                     $sample->setName($createNames[$key]);
                     $sample->setAssociated($createAssociated[$key]);
+                    $sample->setValue($createValue[$key]);
                     $this->getEntityManager()->persist($sample);
                     $this->getEntityManager()->flush();
                     $this->transaction(
                         "Ingreso de nivel de concentración asociado",
-                        sprintf('En el Estudio %1$s Se ha ingresado el sample %2$s asociado a: %3$s',
+                        sprintf('En el Estudio %1$s Se ha ingresado el sample %2$s asociado a: %3$s con valor: %4$s',
                             $Study->getCode(),
                             $sample->getName(),
-                            $sample->getAssociated()
+                            $sample->getAssociated(),
+                            $sample->getValue()
                         ),
                         false
                     );  
@@ -1137,6 +1219,7 @@ class StudyController extends BaseController
 
             $updateName = $request->getPost('update-name');
             $updateAssociated = $request->getPost('update-associated');
+            $updateValue = $request->getPost('update-value');
 
             if (!empty($updateName))
             {
@@ -1149,24 +1232,27 @@ class StudyController extends BaseController
                     
                     if ($sampleVerification && $sampleVerification->getId())
                     {    
-                        $older = sprintf('Valores antiguos: Sample -> %1$s, Association -> %2$s',
+                        $older = sprintf('Valores antiguos: Sample -> %1$s, Association -> %2$s, valor -> %3$s ',
                             $sampleVerification->getName(),
-                            $sampleVerification->getAssociated()
+                            $sampleVerification->getAssociated(),
+                            $sampleVerification->getValue()
                         );
                         
                         $sampleVerification->setName($updateName[$key]);
                         $sampleVerification->setAssociated($updateAssociated[$key]);
+                        $sampleVerification->setValue($updateValue[$key]);
                         $this->getEntityManager()->persist($sampleVerification);
                         $this->getEntityManager()->flush();
 
                         //INGRESO A AUDIT TRANSACTION
                         $this->transaction(
                             "Edición de tabla de asociación",
-                            sprintf('%1$s<br> Estudio: %2$s. Nombre -> %3$s, Asociación -> %4$s',
+                            sprintf('%1$s<br> Estudio: %2$s. Nombre -> %3$s, Asociación -> %4$s, Value ->%5$s ',
                                 $older,
                                 $Study->getCode(),
                                 $updateName[$key],
-                                $updateAssociated[$key]
+                                $updateAssociated[$key],
+                                $updateValue[$key]
                             ),
                             false
                         );
@@ -1176,7 +1262,7 @@ class StudyController extends BaseController
         }
 
         $query    = $this->getEntityManager()->createQuery("
-            SELECT v.id as id, v.name as name, v.associated as associated
+            SELECT v.id as id, v.name as name, v.associated as associated, v.value as value
             FROM Alae\Entity\SampleVerificationStudy v
             WHERE v.fkStudy = " . $AnaStudy->getFkStudy()->getPkStudy() . "
             ORDER BY v.id ASC");
@@ -1193,7 +1279,7 @@ class StudyController extends BaseController
             foreach ($elements as $temp)
             {
                 $buttons = "";
-                if (!$AnaStudy->getFkStudy()->getCloseFlag())
+                if (!$AnaStudy->getFkUserAssociated())
                 {
                     $buttons .= '<span class="form-datatable-change" onclick="changeElement(this, ' . $temp["id"] . ');"></span>';
                     $buttons .= '<span class="form-datatable-delete" onclick="removeElement(this, ' . $temp["id"] . ');"></span>';
@@ -1203,12 +1289,13 @@ class StudyController extends BaseController
                 $data[] = array(
                     "name"       => $temp["name"],
                     "associated" => $temp["associated"],
+                    "value"      => $temp["value"],
                     "edit"                  => $buttons
                 );
             }
         }
 
-        if (!$AnaStudy->getFkStudy()->getCloseFlag())
+        if (!$AnaStudy->getFkUserAssociated())
         {
             $datatable = new Datatable($data, Datatable::DATATABLE_VERIFICATION_SAMPLE_ASSOC, $this->_getSession()->getFkProfile()->getName());
         }
