@@ -604,12 +604,12 @@ class CronController extends BaseController
                     
                     $arrayBC = explode("_BC", $temp["sampleName"]);
                     if (isset($arrayBC[1])) {
-                        if (in_array($arrayBC[0], $arrayFinal)) {
+                        if (in_array($arrayBC[0]."_BC", $arrayFinal)) {
                             
                         }
                         else
                         {
-                            array_push($arrayFinal, $arrayBC[0]);
+                            array_push($arrayFinal, $arrayBC[0]."_BC");
                         }
                         
                     }
@@ -617,12 +617,12 @@ class CronController extends BaseController
                     $arrayNT = explode("_NT", $temp["sampleName"]);
                     if (isset($arrayNT[1])) {
                         
-                        if (in_array($arrayNT[0], $arrayFinal)) {
+                        if (in_array($arrayNT[0]."_NT", $arrayFinal)) {
                             
                         }
                         else
                         {
-                            array_push($arrayFinal, $arrayNT[0]);
+                            array_push($arrayFinal, $arrayNT[0]."_NT");
                         }
                     }
                 }
