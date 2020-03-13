@@ -596,18 +596,45 @@ class CronController extends BaseController
                     ->orderBy('s.sampleName', 'ASC');
             $elements = $qb->getQuery()->getResult();
 
+            $arrayFinal = [];
             if (count($elements) > 0)
             {
                 foreach ($elements as $temp)
                 {
-                    $BatchNominal = new \Alae\Entity\BatchNominal();
-
-                    $samplename = substr($temp["sampleName"], 0, -2);
-                    $BatchNominal->setFkBatch($Batch);
-                    $BatchNominal->setSampleName($samplename);
                     
-                    $this->getEntityManager()->persist($BatchNominal);
-                    $this->getEntityManager()->flush();
+                    $arrayBC = explode("_BC", $temp["sampleName"]);
+                    if (isset($arrayBC[1])) {
+                        if (in_array($arrayBC[0], $arrayFinal)) {
+                            
+                        }
+                        else
+                        {
+                            array_push($arrayFinal, $arrayBC[0]);
+                        }
+                        
+                    }
+
+                    $arrayNT = explode("_NT", $temp["sampleName"]);
+                    if (isset($arrayNT[1])) {
+                        
+                        if (in_array($arrayNT[0], $arrayFinal)) {
+                            
+                        }
+                        else
+                        {
+                            array_push($arrayFinal, $arrayNT[0]);
+                        }
+                    }
+                }
+
+                if (isset($arrayFinal)) {
+                    foreach ($arrayFinal as $array) {
+                        $BatchNominal = new \Alae\Entity\BatchNominal();
+                        $BatchNominal->setFkBatch($Batch);
+                        $BatchNominal->setSampleName($array);
+                        $this->getEntityManager()->persist($BatchNominal);
+                        $this->getEntityManager()->flush();
+                    }
                 }
             }
 
