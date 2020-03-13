@@ -166,7 +166,17 @@ class BatchController extends BaseController
                 }
                 if($this->_getSession()->isAdministrador() || $this->_getSession()->isDirectorEstudio() || $this->_getSession()->isLaboratorio())
                 {
-                    $nominal = is_null($batch->getValidFlag()) ? '<a href="' . \Alae\Service\Helper::getVarsConfig("base_url") . '/batch/nominal/' . $batch->getPkBatch() . '?state='.$state. '" class="btn" type="button"><span class="btn-validate"></span>Valor nominal</a>' : "";
+                    $batchNominal = $this->getRepository("\\Alae\\Entity\\BatchNominal")->findBy(array("fkBatch" => $batch->getPkBatch()));
+            
+                    if ($batchNominal)
+                    {
+                        $nominal = is_null($batch->getValidFlag()) ? '<a href="' . \Alae\Service\Helper::getVarsConfig("base_url") . '/batch/nominal/' . $batch->getPkBatch() . '?state='.$state. '" class="btn" type="button"><span class="btn-validate"></span>Valor nominal</a>' : "";
+                    }
+                    else
+                    {
+                        $nominal = "";
+                    }
+                        
                     $validation = is_null($batch->getValidFlag()) ? '<a href="' . \Alae\Service\Helper::getVarsConfig("base_url") . '/verification/index/' . $batch->getPkBatch() . '?state='.$state. '" class="btn" type="button"><span class="btn-validate"></span>validar</a>' : "";
                 }
             }
