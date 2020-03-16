@@ -669,7 +669,7 @@ class VerificationController extends BaseController
                 );
             }*/
             
-            $where = "s.sampleName LIKE '$sample1%' AND s.analyteConcentration <> " . $value . " AND s.fkBatch = " . $Batch->getPkBatch();
+            $where = "s.sampleName LIKE '$sample1%' AND s.sampleName NOT LIKE '%NT%' AND s.sampleName NOT LIKE '%BC%' AND s.analyteConcentration <> " . $value . " AND s.fkBatch = " . $Batch->getPkBatch();
                     $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V6"));
                     $this->error($where, $fkParameter[0]);
         }
