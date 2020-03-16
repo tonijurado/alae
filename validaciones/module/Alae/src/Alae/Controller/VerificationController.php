@@ -971,7 +971,7 @@ class VerificationController extends BaseController
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.5"));
         $min5 = $parameters[0]->getMinValue();
         $max5 = $parameters[0]->getMaxValue();
-
+/*
         $query   = $this->getEntityManager()->createQuery("
             SELECT COUNT(s.pkSampleBatch) as counter
             FROM Alae\Entity\SampleBatch s
@@ -991,9 +991,31 @@ class VerificationController extends BaseController
         $query->setParameter('regexp1', '^CS[0-9]+(-[0-9]+)?$');
         $query->setParameter('regexp2', '^QC[0-9]+(-[0-9]+)?$');
         $query->setParameter('regexp3', '^((L|H)?DQC)[0-9]+(-[0-9]+)?$');
+*/
+        /*REAJUSTADO DE CONDICION HABLADO CON NATALIA el 16/03/2020
+            Deben saltar las muestras que:
+                * CS1, LLOQ, LLQC tengan Accuracy entre 80-120 con UseRecord=0
+                * Todos los SampleType = Standard que no sean CS1 entre 85 y 115 con useRecord = 0
+                * Todos los SampleType = Quality Control menos los LLQC, LLOQ y TZ entre 85 y 115 con useRecord = 0
+                * Los sampleName = TZ entre 90 y 110 con useRecord = 0
+        */
+        $query   = $this->getEntityManager()->createQuery("
+        SELECT COUNT(s.pkSampleBatch) as counter
+        FROM Alae\Entity\SampleBatch s
+        WHERE s.fkBatch = " . $Batch->getPkBatch() . "
+            AND (
+                ((s.sampleName LIKE 'CS1%' OR s.sampleName LIKE 'LLOQ%' OR s.sampleName LIKE 'LLQC%') AND s.accuracy BETWEEN " . $min1  . " AND " . $max1 . " AND s.useRecord = 0)
+                OR (s.sampleType LIKE 'Standard' AND s.sampleName NOT LIKE 'CS1%' AND s.accuracy BETWEEN " . $min2 . " AND " . $max2 . " AND s.useRecord = 0)
+                OR (s.sampleType LIKE 'Quality Control' AND s.sampleName NOT LIKE 'LLOQ%' AND s.sampleName NOT LIKE 'LLQC%' AND s.sampleName NOT LIKE 'TZ%' AND s.accuracy BETWEEN " . $min3 . " AND " . $max3 . " AND s.useRecord = 0)
+                OR (s.sampleName LIKE 'TZ%' AND s.accuracy BETWEEN " . $min4 . " AND " . $max4 . " AND s.useRecord = 0)
+            )");
+        //$query->setParameter('regexp1', '^CS[0-9]+(-[0-9]+)?$');
+        //$query->setParameter('regexp2', '^QC[0-9]+(-[0-9]+)?$');
+        //$query->setParameter('regexp3', '^((L|H)?DQC)[0-9]+(-[0-9]+)?$');
 
         return $query->getSingleScalarResult() > 0 ? false : true;
     }
+    // FIN DEL REAJUSTADO HABLADO CON NATALIA EL 16/03/2020
 
     /**
      * V13: Tiempo de retención CS/QC (C2)
