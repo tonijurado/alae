@@ -123,6 +123,23 @@ class VerificationController extends BaseController
             $Batch = $this->getRepository()->find($this->getEvent()->getRouteMatch()->getParam('id'));
         }
 
+        //ESTA QUERY DEBE COINCIDIR CON LA QUERY COUNT de la V12
+
+        $query   = $this->getEntityManager()->createQuery("
+        SELECT s.pkSampleBatch, s.fileName, s.sampleName, s.accuracy, s.useRecord
+        FROM Alae\Entity\SampleBatch s
+        WHERE s.fkBatch = " . $Batch->getPkBatch() . "
+            AND (
+                ((s.sampleName LIKE 'CS1%' OR s.sampleName LIKE 'LLOQ%' OR s.sampleName LIKE 'LLQC%') AND s.accuracy BETWEEN " . $min1  . " AND " . $max1 . " AND s.useRecord = 0)
+                OR (s.sampleType LIKE 'Standard' AND s.sampleName NOT LIKE 'CS1%' AND s.accuracy BETWEEN " . $min2 . " AND " . $max2 . " AND s.useRecord = 0)
+                OR (s.sampleType LIKE 'Quality Control' AND s.sampleName NOT LIKE 'LLOQ%' AND s.sampleName NOT LIKE 'LLQC%' AND s.sampleName NOT LIKE 'TZ%' AND s.accuracy BETWEEN " . $min3 . " AND " . $max3 . " AND s.useRecord = 0)
+                OR (s.sampleName LIKE 'TZ%' AND s.accuracy BETWEEN " . $min4 . " AND " . $max4 . " AND s.useRecord = 0)
+            )");
+        //$query->setParameter('regexp1', '^CS[0-9]+(-[0-9]+)?$');
+        //$query->setParameter('regexp2', '^QC[0-9]+(-[0-9]+)?$');
+        //$query->setParameter('regexp3', '^((L|H)?DQC)[0-9]+(-[0-9]+)?$');
+        
+        /*
         $query   = $this->getEntityManager()->createQuery("
             SELECT s.pkSampleBatch, s.fileName, s.sampleName, s.accuracy, s.useRecord
             FROM Alae\Entity\SampleBatch s
@@ -143,6 +160,7 @@ class VerificationController extends BaseController
         $query->setParameter('regexp1', '^CS[0-9]+(-[0-9]+)?$');
         $query->setParameter('regexp2', '^QC[0-9]+(-[0-9]+)?$');
         $query->setParameter('regexp3', '^((L|H)?DQC)[0-9]+(-[0-9]+)?$');
+        */
 
         $data     = array();
         $elements = $query->getResult();
@@ -998,6 +1016,10 @@ class VerificationController extends BaseController
                 * Todos los SampleType = Standard que no sean CS1 entre 85 y 115 con useRecord = 0
                 * Todos los SampleType = Quality Control menos los LLQC, LLOQ y TZ entre 85 y 115 con useRecord = 0
                 * Los sampleName = TZ entre 90 y 110 con useRecord = 0
+        *******************************************************************************************************************************************************
+        NOTA: Los criterios de la Query siguiente, son los mismos criterios que debemos aplicar en errorAction() ->Filas 125 de este fichero 
+        Parece que esta query de abajo es para contar y la de arriba errorAction() es para mostrar el desplegable
+        *******************************************************************************************************************************************************
         */
         $query   = $this->getEntityManager()->createQuery("
         SELECT COUNT(s.pkSampleBatch) as counter
