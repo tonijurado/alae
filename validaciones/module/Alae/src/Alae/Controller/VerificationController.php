@@ -1070,11 +1070,42 @@ class VerificationController extends BaseController
             $max_is = $AnaStudy[0]->getRetentionIs() + ($AnaStudy[0]->getAcceptanceIs() * $AnaStudy[0]->getRetentionIs() / 100);
 
             // Toni: Añado al condicional $where la condicion de que no evalue SampleName BLK según mail y nota de NATALIA del 8 de diciembre de 2019
-
+            /*
             $where = " (s.sampleName <> 'BLK' AND s.sampleType != 'Solvent' AND s.analyteRetentionTime NOT BETWEEN $min AND $max OR 
                         s.isRetentionTime NOT BETWEEN $min_is AND $max_is)
                     AND s.fkBatch = " . $Batch->getPkBatch();
             
+            */
+            
+            
+            /*
+                Toni: 26-03-2020, se deben evaluar todas las muestras excepto:
+                -	muestras cuyo Sample Type sea = Solvent
+                -	muestras cuyo Sample Name empieza por BLK o SEL
+                -	muestras cuyo Sample Name empieza por CO_BLK, CC_BLK y LL_BLK 
+                -	muestras cuyo valor en las columnas Analyte Peak Area o IS Peak Area sea = 0.
+            */
+            $where = "(s.sampleType <> 'Solvent') 
+                    AND
+                    (
+                        s.sampleName NOT LIKE 'BLK%' AND
+                        s.sampleName NOT LIKE 'SEL%' AND
+                        s.sampleName NOT LIKE 'CO_BLK%' AND
+                        s.sampleName NOT LIKE 'CC_BLK%' AND
+                        s.sampleName NOT LIKE 'LL_BLK%'
+                    )
+                    AND 
+                    (
+                        s.isPeakArea <> 0 AND
+                        s.analytePeakArea <> 0
+                    )
+                    AND
+                    (
+                        s.analyteRetentionTime NOT BETWEEN $min AND $max OR s.isRetentionTime NOT BETWEEN $min_is AND $max_is
+                    )
+                    AND s.fkBatch = " . $Batch->getPkBatch();
+                        
+
             $this->error($where, $parameters[0], array(), false);
             // Toni: 14/1/2020 - Cambio el Where2 para que evalue s.sampletype en lugar de s.sampleName (cambio la primera linea de where2)
             //$where2 = "(s.sampleName LIKE 'CS%' OR s.sampleName LIKE 'QC%') AND
