@@ -44,14 +44,14 @@ class SampleVerificationStudy
     protected $value;
 
     /**
-     * @var \Alae\Entity\Study
+     * @var \Alae\Entity\AnalyteStudy
      *
-     * @ORM\ManyToOne(targetEntity="Alae\Entity\Study")
+     * @ORM\ManyToOne(targetEntity="Alae\Entity\AnalyteStudy")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="fk_study", referencedColumnName="pk_study")
+     *   @ORM\JoinColumn(name="fk_analyte_study", referencedColumnName="pk_analyte_study")
      * })
      */
-    protected $fkStudy;
+    protected $fkAnalyteStudy;
 
     public function getId()
     {
@@ -93,13 +93,13 @@ class SampleVerificationStudy
         $this->value = $value;
     }
 
-    public function getFkStudy()
+    public function getFkAnalyteStudy()
     {
-        return $this->fkStudy;
+        return $this->fkAnalyteStudy;
     }
 
-    public function setFkStudy(\Alae\Entity\Study $fkStudy)
+    public function setFkAnalyteStudy(\Alae\Entity\AnalyteStudy $fkAnalyteStudy)
     {
-        $this->fkStudy = $fkStudy;
+        $this->fkAnalyteStudy = $fkAnalyteStudy;
     }
 }

@@ -213,7 +213,6 @@ class BatchController extends BaseController
 
     public function nominalAction()
     {
-        echo "prueba";
         $error = "";
         $request = $this->getRequest();
         if(isset($_GET['state']))

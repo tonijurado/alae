@@ -614,11 +614,11 @@ class VerificationController extends BaseController
         //fin cs, etc
 
         //SampleVerificationStudy
-        $elements = $this->getRepository("\\Alae\\Entity\\SampleVerificationStudy")->findBy(array("fkStudy" => $Batch->getFkStudy()));
+        $elements = $this->getRepository("\\Alae\\Entity\\SampleVerificationStudy")->findBy(array("fkAnalyteStudy" => $AnaStudy->getPkAnalyteStudy()));
         
         foreach ($elements as $sample)
         {
-            $elements = $this->getRepository("\\Alae\\Entity\\AnalyteStudy")->findBy(array("fkStudy" => $Batch->getFkStudy(), "fkAnalyte" => $Batch->getFkAnalyte()));
+            //$elements = $this->getRepository("\\Alae\\Entity\\AnalyteStudy")->findBy(array("fkStudy" => $Batch->getFkStudy(), "fkAnalyte" => $Batch->getFkAnalyte()));
 
             /*$first = substr($sample->getAssociated(), 0, 2); 
             $last = substr($sample->getAssociated(), -1);*/ 

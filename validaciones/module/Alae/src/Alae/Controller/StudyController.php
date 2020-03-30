@@ -835,7 +835,7 @@ class StudyController extends BaseController
                                
                             }
                             $studyVerification->setValue($value);
-                            $studyVerification->setFkStudy($Study);
+                            $studyVerification->setFkAnalyteStudy($AnaStudy);
                             $this->getEntityManager()->persist($studyVerification);
                             $this->getEntityManager()->flush();
                         }
@@ -1188,7 +1188,6 @@ class StudyController extends BaseController
 
         if ($request->isPost())
         {
-            $Study            = $this->getRepository()->find($AnaStudy->getFkStudy()->getPkStudy());
             $createNames      = $request->getPost('create-name');
             $createAssociated = $request->getPost('create-associated');
             $createValue      = $request->getPost('create-value');
@@ -1198,16 +1197,18 @@ class StudyController extends BaseController
                 foreach ($createNames as $key => $value)
                 {
                     $sample = new \Alae\Entity\SampleVerificationStudy();
-                    $sample->setFkStudy($Study);
+                    $sample->setFkAnalyteStudy($AnaStudy);
                     $sample->setName($createNames[$key]);
                     $sample->setAssociated($createAssociated[$key]);
                     $sample->setValue($createValue[$key]);
                     $this->getEntityManager()->persist($sample);
                     $this->getEntityManager()->flush();
+
                     $this->transaction(
                         "Ingreso de nivel de concentración asociado",
-                        sprintf('En el Estudio %1$s Se ha ingresado el sample %2$s asociado a: %3$s con valor: %4$s',
-                            $Study->getCode(),
+                        sprintf('En el Estudio %1$s y Analito %2$s. Se ha ingresado el sample %3$s asociado a: %4$s con valor: %5$s',
+                            $AnaStudy->getFkStudy()->getCode(),
+                            $AnaStudy->getFkAnalyte()->getShortening(),
                             $sample->getName(),
                             $sample->getAssociated(),
                             $sample->getValue()
@@ -1247,9 +1248,10 @@ class StudyController extends BaseController
                         //INGRESO A AUDIT TRANSACTION
                         $this->transaction(
                             "Edición de tabla de asociación",
-                            sprintf('%1$s<br> Estudio: %2$s. Nombre -> %3$s, Asociación -> %4$s, Value ->%5$s ',
+                            sprintf('%1$s<br> Estudio: %2$s. Analito: %3$s. Nombre -> %4$s, Asociación -> %5$s, Value ->%6$s ',
                                 $older,
-                                $Study->getCode(),
+                                $AnaStudy->getFkStudy()->getCode(),
+                                $AnaStudy->getFkAnalyte()->getShortening(),
                                 $updateName[$key],
                                 $updateAssociated[$key],
                                 $updateValue[$key]
@@ -1264,7 +1266,7 @@ class StudyController extends BaseController
         $query    = $this->getEntityManager()->createQuery("
             SELECT v.id as id, v.name as name, v.associated as associated, v.value as value
             FROM Alae\Entity\SampleVerificationStudy v
-            WHERE v.fkStudy = " . $AnaStudy->getFkStudy()->getPkStudy() . "
+            WHERE v.fkAnalyteStudy = " . $AnaStudy->getPkAnalyteStudy() . "
             ORDER BY v.id ASC");
         $elements = $query->getResult();
 

@@ -8,6 +8,9 @@
 <div id="create-analyte">
     <div id="encab">
         <h2>Asociación de muestras</h2>
+        <h3>Estudio: <?php echo $AnaStudy->getFkStudy()->getCode(); ?></h3>
+        <h3>Analito: <?php echo $AnaStudy->getFkAnalyte()->getName(); ?></h3>
+        
     </div>
     <ul id="errorBox" <?php if ($error == "") : ?>style="display: none;"<?php endif; ?>>
         <?php echo $error ? $error : ""; ?>
