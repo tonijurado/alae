@@ -1067,8 +1067,10 @@ class VerificationController extends BaseController
             He hecho pruebas con echo y die y getValidation devuelve 1 cuando debería dar 0
             Estoy casi convencido que esa función no devuelve el campo correcto, pero no se donde va a buscarlo
         */
-        if($Study[0]->getValidation() == 1)
+        if($Study[0]->getVerification() == 1)
         {
+            echo 'Paso por la V13 - ' . $Study[0]->getValidation();
+            die();
             $min = $AnaStudy[0]->getRetention() - ($AnaStudy[0]->getAcceptance() * $AnaStudy[0]->getRetention() / 100);
             $max = $AnaStudy[0]->getRetention() + ($AnaStudy[0]->getAcceptance() * $AnaStudy[0]->getRetention() / 100);
 
