@@ -58,7 +58,8 @@ class VerificationController extends BaseController
                     $this->$function($Batch);
                 }
                 
-                $response = $this->V12($Batch);
+                $response = $this->V12($Batch); //Llama a V12 para ver si debe mostrar la venta emergente. Si response es TRUE hace el resto de verificaciones V13_23, sino, ventana emergente
+
                 if ($response)
                 {
                     //$this->V13($Batch);
@@ -66,6 +67,7 @@ class VerificationController extends BaseController
                 }
                 else
                 {
+                    //Este return ejecuta la VENTANA EMERGENTE 
                     return $this->redirect()->toRoute('verification', array(
                         'controller' => 'verification',
                         'action'     => 'error',
@@ -891,19 +893,39 @@ class VerificationController extends BaseController
      * V10.4: Accuracy (TZ) - NO CUMPLE ACCURACY
      * V10.5: Accuracy (DQC) - NO CUMPLE ACCURACY
      * @param \Alae\Entity\Batch $Batch
+     * 
+     * TONI 03/04/2020: Incorporamos en esta verificación también los pasos para VERIFICAR que si NO SE CUMPLE ACCURACY pero está marcado el USE RECORD = 1, 
+     * se genere un error de USE RECORD y se rechace el lote.
+     * Después de cada verificación, he repetido el código pero añadiendo que s.useRecord = 1, de esta forma identifico las muestras que NO CUMPLEN ACCURACY pero tienen USE RECORD = 1
+     * 
      */
     protected function V10(\Alae\Entity\Batch $Batch)
     {
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.1"));
         $where      = "(s.sampleName LIKE 'CS1%' OR s.sampleName LIKE 'LLQC%' OR s.sampleName LIKE 'PID%' OR s.sampleName LIKE 'LL_LLOQ%') AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.fkBatch = " . $Batch->getPkBatch();
-                //echo $where;
-                //die();
         $this->error($where, $parameters[0], array(), false);
-            
+
+        //REPITO la consulta anterior pero ahora Verificamos el USE RECORD de las muestras que no cumple accuracy de V10.1
+        //Si ese USE RECORD = 1, se debe identificar la muestra como error y se anula lote gracias al parámetro de la tblParameters 
+            $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.1.1"));
+            $where      = "(s.sampleName LIKE 'CS1%' OR s.sampleName LIKE 'LLQC%' OR s.sampleName LIKE 'PID%' OR s.sampleName LIKE 'LL_LLOQ%') AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.useRecord = 1 AND s.fkBatch = " . $Batch->getPkBatch();
+            $this->error($where, $parameters[0], array(), false);
+        //Fin de la comprobación del USE RECORD = 1 para muestras que no cumplen Accuracy para la V10.1
+
+        
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.2"));
         $where      = "REGEXP(s.sampleName, :regexp) = 1 AND s.sampleName NOT LIKE 'CS1%' AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.fkBatch = " . $Batch->getPkBatch();
         //$this->error($where, $parameters[0], array('regexp' => '^CS[0-9]+(-[0-9]+)?$'), false);
         $this->error($where, $parameters[0], array('regexp' => '^CS[0-9]+(-[0-9]+(R[0-9]+)?)?$'), false);
+
+        //REPITO la consulta anterior pero ahora Verificamos el USE RECORD de las muestras que no cumple accuracy de V10.2
+        //Si ese USE RECORD = 1, se debe identificar la muestra como error y se anula lote gracias al parámetro de la tblParameters 
+            $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.2.1"));
+            $where      = "REGEXP(s.sampleName, :regexp) = 1 AND s.sampleName NOT LIKE 'CS1%' AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.useRecord = 1 AND s.fkBatch = " . $Batch->getPkBatch();
+            //$this->error($where, $parameters[0], array('regexp' => '^CS[0-9]+(-[0-9]+)?$'), false);
+            $this->error($where, $parameters[0], array('regexp' => '^CS[0-9]+(-[0-9]+(R[0-9]+)?)?$'), false);
+        //Fin de la comprobación del USE RECORD = 1 para muestras que no cumplen Accuracy para la V10.2
+
 
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.3"));
         $where      = "(REGEXP(s.sampleName, :regexp) = 1) AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.fkBatch = " . $Batch->getPkBatch();
@@ -924,13 +946,49 @@ class VerificationController extends BaseController
         //$this->error($where, $parameters[0], array('regexp' => '^QC[0-9]+(-[0-9]+)?$'), false);
         $this->error($where, $parameters[0], array(), false);
 
+        //REPITO la consulta anterior pero ahora Verificamos el USE RECORD de las muestras que no cumple accuracy de V10.3
+        //Si ese USE RECORD = 1, se debe identificar la muestra como error y se anula lote gracias al parámetro de la tblParameters 
+            $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.3.1"));
+            $where      = "(s.sampleType = 'Quality Control' AND 
+                            (s.sampleName LIKE 'ULQC%' OR
+                            s.sampleName LIKE 'AS%' OR
+                            s.sampleName LIKE 'TZ%' OR
+                            s.sampleName LIKE 'FT%' OR
+                            s.sampleName LIKE 'ST%' OR
+                            s.sampleName LIKE 'LT%' OR
+                            s.sampleName LIKE 'PP%' OR
+                            s.sampleName LIKE 'SLP%'))
+                            AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.useRecord = 1 AND s.fkBatch = " . $Batch->getPkBatch();
+            //$this->error($where, $parameters[0], array('regexp' => '^QC[0-9]+(-[0-9]+)?$'), false);
+            $this->error($where, $parameters[0], array(), false);
+        
+        //Fin de la comprobación del USE RECORD = 1 para muestras que no cumplen Accuracy para la V10.3 
+
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.4"));
         $where      = "s.sampleName LIKE 'TZ%' AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.fkBatch = " . $Batch->getPkBatch();
         $this->error($where, $parameters[0], array(), false);
 
+        //REPITO la consulta anterior pero ahora Verificamos el USE RECORD de las muestras que no cumple accuracy de V10.4
+        //Si ese USE RECORD = 1, se debe identificar la muestra como error y se anula lote gracias al parámetro de la tblParameters 
+            $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.4"));
+            $where      = "s.sampleName LIKE 'TZ%' AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.useRecord = 1 AND s.fkBatch = " . $Batch->getPkBatch();
+            $this->error($where, $parameters[0], array(), false);
+
+        //Fin de la comprobación del USE RECORD = 1 para muestras que no cumplen Accuracy para la V10.4 
+
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.5"));
         $where      = "REGEXP(s.sampleName, :regexp) = 1 AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.fkBatch = " . $Batch->getPkBatch();
         $this->error($where, $parameters[0], array('regexp' => '^((L|H)?DQC)[0-9]+(-[0-9]+)?$'), false);
+
+        //REPITO la consulta anterior pero ahora Verificamos el USE RECORD de las muestras que no cumple accuracy de V10.5
+        //Si ese USE RECORD = 1, se debe identificar la muestra como error y se anula lote gracias al parámetro de la tblParameters 
+            $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.5"));
+            $where      = "REGEXP(s.sampleName, :regexp) = 1 AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.useRecord = 1 AND s.fkBatch = " . $Batch->getPkBatch();
+            $this->error($where, $parameters[0], array('regexp' => '^((L|H)?DQC)[0-9]+(-[0-9]+)?$'), false);
+        
+        //Fin de la comprobación del USE RECORD = 1 para muestras que no cumplen Accuracy para la V10.5 
+
+
     }
 
     /**
@@ -967,6 +1025,11 @@ class VerificationController extends BaseController
     /**
      * V12: Use record (CS/QC/DQC)
      * @param \Alae\Entity\Batch $Batch
+     * 
+     * Toni: 2 de abril de 2020
+     * Esta función V12 lo que está mirando es CUANTAS MUESTRAS aparecerán en la ventana emergente.
+     * La función ejecuta un SELECT COUNT para ver si el numero de muestras a mostrar en la ventana emergente es MAYOR que 0
+     * El return devuelve es FALSE si el numero de muestras en MAYOR que 0 y por tanto DEBE mostrar la ventana emergente, sino retorna TRUE que significa que NO debe mostrar la ventana emergente.
      */
     protected function V12(\Alae\Entity\Batch $Batch)
     {
@@ -1035,7 +1098,7 @@ class VerificationController extends BaseController
         //$query->setParameter('regexp2', '^QC[0-9]+(-[0-9]+)?$');
         //$query->setParameter('regexp3', '^((L|H)?DQC)[0-9]+(-[0-9]+)?$');
 
-        return $query->getSingleScalarResult() > 0 ? false : true;
+        return $query->getSingleScalarResult() > 0 ? false : true; // Si encuentra algo para mostrar en la ventana emergente, retorna FALSE, sino TRUE
     }
     // FIN DEL REAJUSTADO HABLADO CON NATALIA EL 16/03/2020
 
@@ -1069,8 +1132,7 @@ class VerificationController extends BaseController
         */
         if($Study[0]->getVerification() == 1)
         {
-            echo 'Paso por la V13 - ' . $Study[0]->getValidation();
-            die();
+
             $min = $AnaStudy[0]->getRetention() - ($AnaStudy[0]->getAcceptance() * $AnaStudy[0]->getRetention() / 100);
             $max = $AnaStudy[0]->getRetention() + ($AnaStudy[0]->getAcceptance() * $AnaStudy[0]->getRetention() / 100);
 
@@ -1462,11 +1524,16 @@ class VerificationController extends BaseController
      * V21: 67% QC - LOTE RECHAZADO (67% QC)
      * @param \Alae\Entity\Batch $Batch
      */
+    /* 
     protected function V21(\Alae\Entity\Batch $Batch)
     {
         if($Batch->getQcTotal() != 0)
         {
+                echo 'getQcTotal:= ' . $Batch->getQcTotal();
+                echo ' - getQcAcceptedTotal := ' . $Batch->getQcAcceptedTotal();
             $value      = ($Batch->getQcAcceptedTotal() / $Batch->getQcTotal()) * 100;
+                echo ' - VALUE := ' . $value;
+                die();
             $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V21"));
 			//echo "value: " . $value . " / QCAcceptedTotal = " . $Batch->getQcAcceptedTotal() . " / QCTotal = " . $Batch->getQcTotal() ;
 			//die();
@@ -1477,6 +1544,39 @@ class VerificationController extends BaseController
             }
         }
     }
+    */
+
+    protected function V21(\Alae\Entity\Batch $Batch)
+    {
+        //Empezamos obteniendo el número total de QC's a contar los QC's + LLQC + ULQC y no Reinjecciones (*)
+        $query = $this->getEntityManager()->createQuery("
+            SELECT COUNT(s.pkSampleBatch) 
+            FROM Alae\Entity\SampleBatch s
+            WHERE ((s.sampleName like 'QC%' OR s.sampleName like 'LLQC%' or s.sampleName like 'ULQC%') AND s.sampleName NOT LIKE '%*%') AND s.isUsed = 1 AND s.fkBatch = " . $Batch->getPkBatch() . "
+            ");
+        $qc_total = $query->getSingleScalarResult();
+        
+        //Ahora contamos los QC's válidos
+        $query = $this->getEntityManager()->createQuery("
+        SELECT COUNT(s.pkSampleBatch) 
+        FROM Alae\Entity\SampleBatch s
+        WHERE ((s.sampleName like 'QC%' OR s.sampleName like 'LLQC%' or s.sampleName like 'ULQC%') AND s.sampleName NOT LIKE '%*%') AND s.isUsed = 1 AND s.validFlag = 1 AND s.fkBatch = " . $Batch->getPkBatch() . "
+        ");
+        $qc_totalAccepted = $query->getSingleScalarResult();
+
+        $value = $qc_totalAccepted/$qc_total * 100;
+
+        //echo 'QC TOTAL = ' . $qc_total . ' - QC Aceptados = ' . $qc_totalAccepted . ' - Valor = ' . $value;
+        //die();
+        $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V21"));
+        if ($value < $parameters[0]->getMinValue())
+        {
+            $where = "((s.sampleName like 'QC%' OR s.sampleName like 'LLQC%' or s.sampleName like 'ULQC%') AND s.sampleName NOT LIKE '%*%') AND s.isUsed = 1 AND s.fkBatch = " . $Batch->getPkBatch();
+            $this->error($where, $parameters[0]);
+        }
+
+    }
+
 
     /**
      * V22: 50% de cada nivel de QC - LOTE RECHAZADO (50% QCx)
@@ -1487,21 +1587,21 @@ class VerificationController extends BaseController
         $query    = $this->getEntityManager()->createQuery("
             SELECT SUBSTRING(s.sampleName, 1, 3) as sample_name, s.validFlag, s.sampleName as otro
             FROM Alae\Entity\SampleBatch s
-            WHERE (s.sampleName like 'QC%' OR s.sampleName like 'LLQC%')  AND s.isUsed = 1 AND s.fkBatch = " . $Batch->getPkBatch() . "
+            WHERE (s.sampleName like 'QC%' OR s.sampleName like 'LLQC%' or s.sampleName like 'ULQC%')  AND s.isUsed = 1 AND s.fkBatch = " . $Batch->getPkBatch() . "
             GROUP BY sample_name
             ORDER BY sample_name ASC");
         $elements = $query->getResult();
 
         foreach ($elements as $qc)
         {
-            $query    = $this->getEntityManager()->createQuery("
+            $query = $this->getEntityManager()->createQuery("
                 SELECT COUNT(s.pkSampleBatch)
                 FROM Alae\Entity\SampleBatch s
                 WHERE s.sampleName LIKE '" . $qc['sample_name'] . "%' AND s.isUsed = 1 AND s.sampleName NOT LIKE '%*%' AND s.fkBatch = " . $Batch->getPkBatch()
             );
             $qc_total = $query->getSingleScalarResult();
 
-            $query                 = $this->getEntityManager()->createQuery("
+            $query = $this->getEntityManager()->createQuery("
                 SELECT COUNT(s.pkSampleBatch)
                 FROM Alae\Entity\SampleBatch s
                 WHERE s.sampleName LIKE '" . $qc['sample_name'] . "%' AND s.sampleName NOT LIKE '%*%' AND s.useRecord = 0 AND s.fkBatch = " . $Batch->getPkBatch()
