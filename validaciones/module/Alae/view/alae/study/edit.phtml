@@ -159,11 +159,24 @@
         </div>
     </form>
     <script>
+    //https://stackoverflow.com/questions/1240275/how-to-negate-specific-word-in-regex
     jQuery.validator.addMethod("rule", function(value, element, params) {
         return this.optional(element) || /^-?(?:\d+|\d{1,3}(?:,\d{3})+)?(?:\.\d+)?$/.test(value);
     }, "Please enter a valid number");
     jQuery.validator.addMethod("regex", function(value, element, params) {
         return this.optional(element) || /^[A-Z0-9]+(\-[0-9]+)?$/.test(value);
+    }, "Please enter a valid Rule");
+    jQuery.validator.addMethod("caracter1", function(value, element, params) {
+        return this.optional(element) || /^(?!.*\*).*$/.test(value);
+    }, "Please enter a valid Rule");
+    jQuery.validator.addMethod("caracter2", function(value, element, params) {
+        return this.optional(element) || /^(?!.*').*$/.test(value);
+    }, "Please enter a valid Rule");
+    jQuery.validator.addMethod("caracter3", function(value, element, params) {
+        return this.optional(element) || /^(?!.*´).*$/.test(value);
+    }, "Please enter a valid Rule");
+    jQuery.validator.addMethod("caracter4", function(value, element, params) {
+        return this.optional(element) || /^(?!.*`).*$/.test(value);
     }, "Please enter a valid Rule");
     jQuery.validator.addClassRules('datatable-class-cs_number', {
         required: true,
@@ -187,13 +200,45 @@
             code: {
                 required: true,
                 regex: true
-            }
+            },
+            create_at: {
+                required: true
+            },
+            description: {
+                required: true,
+                caracter1: true,
+                caracter2: true,
+                caracter3: true,
+                caracter4: true
+            },
+            observation: {
+                required: true,
+                caracter1: true,
+                caracter2: true,
+                caracter3: true,
+                caracter4: true
+            },
+            
         },
         messages: {
             code: {
                 required: "El campo <strong>Código</strong> es requerido",
                 regex: "Por favor, ingreso un <strong>Código</strong> válido. Ejm: XXANE-YYYY"
-            }
+            },
+            description: {
+                required: "<strong>Descripción</strong> es requerido",
+                caracter1: "HA UTILIZADO CARACTERES NO PERMITIDOS",
+                caracter2: "HA UTILIZADO CARACTERES NO PERMITIDOS",
+                caracter3: "HA UTILIZADO CARACTERES NO PERMITIDOS",
+                caracter4: "HA UTILIZADO CARACTERES NO PERMITIDOS"
+            },
+            observation: {
+                required: "<strong>observation</strong> es requerido",
+                caracter1: "HA UTILIZADO CARACTERES NO PERMITIDOS",
+                caracter2: "HA UTILIZADO CARACTERES NO PERMITIDOS",
+                caracter3: "HA UTILIZADO CARACTERES NO PERMITIDOS",
+                caracter4: "HA UTILIZADO CARACTERES NO PERMITIDOS"
+            },
         },
         submitHandler: function(form){
             answer = confirm("¿Desea guardar los cambios?");
