@@ -8,11 +8,11 @@ namespace Alae;
 
 return array(
     //RUTA BASE
-    "base_url"              => "http://localhost/alae/validaciones/public",
+    "base_url"              => "http://www.test-alae.com/alae/validaciones/public",
  //"base_url" => "http://www.alaeapp.com",
     //"base_url" => "http://localhost/alae/public",
-    "batch_directory"       => "C:\lotes_validaciones",
-    "batch_directory_older" => "C:\lotes_validaciones_xyz",
+    "batch_directory"       => "C:\LotesValidacionesTest",
+    "batch_directory_older" => "C:\LotesValidacionesTestBKP",
     "mail_host_smtp"        => "smtp.gmail.com",
     "mail_port"             => 587,
     "mail_username"         => "cilantro.admistrador@gmail.com", //email base
