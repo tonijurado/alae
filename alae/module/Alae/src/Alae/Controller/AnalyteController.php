@@ -139,7 +139,7 @@ class AnalyteController extends BaseController
                         }
                         else
                         {
-                            $error .= sprintf('<li>Carácteres no permitidos<li>');
+                            $error .= sprintf('<li>HA UTILIZADO CARACTERES NO PERMITIDOS.<li>');
                         }
                     }
                 }

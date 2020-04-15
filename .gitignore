@@ -5,6 +5,8 @@ vendor/**
 # Local configs
 config/autoload/*.local.php
 module/Alae/config/vars.config.php
+config/autoload/doctrine.local
+
 
 # Binary gettext files
 *.mo

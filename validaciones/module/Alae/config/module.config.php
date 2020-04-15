@@ -110,9 +110,11 @@ return array(
 	    'batch' => array(
 		'type' => 'segment',
 		'options' => array(
-		    'route' => '/batch[/][:action][/:id]',
+		    'route' => '/batch[/][:action][/:id][/:an]',
 		    'constraints' => array(
 			'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+			'id' => '[0-9]+',
+			'an' => '[0-9]+',
 		    ),
 		    'defaults' => array(
 			'controller' => 'Alae\Controller\Batch',

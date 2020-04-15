@@ -254,7 +254,7 @@ class Datatable
                 array("key" => "accepted_flag", "label" => "Válido ADM", "sortable" => true),
                 array("key" => "justification", "label" => "Justificar Modificación", "sortable" => false)
             )),
-            "editable" => json_encode(array("nominal","accepted_flag", "justification")),
+            "editable" => json_encode(array("accepted_flag", "justification")),
             "header"   => json_encode($header),
             "filters"  => $this->getFilters($header)
         );
@@ -344,7 +344,7 @@ class Datatable
 
         protected function getverificationSampleAssocColumns()
         {
-            $header = array("name", "associated");
+            $header = array("name", "associated", "value");
             $data   = $this->getData();
     
             return array(
@@ -352,9 +352,10 @@ class Datatable
                 "columns"  => json_encode(array(
                     array("key" => "name", "label" => "Sample", "sortable" => true),
                     array("key" => "associated", "label" => "Nivel de concentración asociado", "sortable" => true),
+                    array("key" => "value", "label" => "Valor", "sortable" => true),
                     array("key" => "edit", "allowHTML" => true)
                 )),
-                "editable" => json_encode(array("name", "associated")),
+                "editable" => json_encode(array("name", "associated", "value")),
         
                 "header"   => json_encode($header),
                 "filters"  => $this->getFilters($header)
@@ -599,10 +600,13 @@ class Datatable
 		break;
 	    case Datatable::DATATABLE_SAMPLE_BATCH:
                 $elements = '<input value="" type="submit"/>';
-		break;
-            default :
-                $elements = "";
-                break;
+        break;
+        case Datatable::DATATABLE_BATCH:
+            $elements = '<input value="" type="submit"/>';
+            break;
+        default :
+            $elements = "";
+            break;
         }
 
         return $elements;

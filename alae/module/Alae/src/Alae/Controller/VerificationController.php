@@ -4,8 +4,8 @@
  * Modulo encargado de realizar las verificaciones a cada lote
  * Verificaciones de 4 - 24
  *
- * @author Maria Quiroz
- * Fecha de creación: 18/05/2014
+ *  EL FICHERO CORRESPONDE A ALAE2 
+ *  
  */
 
 namespace Alae\Controller;
@@ -1230,8 +1230,10 @@ class VerificationController extends BaseController
         $maxTretIS = $AnaStudy[0]->getRetentionTimeIS() + $AnaStudy[0]->getAcceptanceMargin() / 100 * $AnaStudy[0]->getRetentionTimeIS();
         
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V26"));
+        // Toni: Según mail de Natalia del día 08.12.2019, no se deberían evaluar para el control de tiempo de retención las muestras BLK
+        // para conseguirlo, modificamos la primera parte del siguiente WHERE.
 
-        $where = " (s.analyteRetentionTime NOT BETWEEN $minTretAna AND $maxTretAna OR 
+        $where = " (s.sampleName <> 'BLK' AND s.analyteRetentionTime NOT BETWEEN $minTretAna AND $maxTretAna OR 
                     s.isRetentionTime NOT BETWEEN $minTretIS AND $maxTretIS)
                    AND s.fkBatch = " . $Batch->getPkBatch();
         

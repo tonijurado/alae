@@ -591,23 +591,50 @@ class CronController extends BaseController
             $qb
                     ->select('s.pkSampleBatch as PKSampleBatch', 's.sampleName as sampleName', 's.analyteConcentration','s.isConcentration')
                     ->from('Alae\Entity\SampleBatch', 's')
-                    ->where("s.fkBatch = " . $Batch->getPkBatch() . " AND (s.sampleName LIKE '%NT%' OR s.sampleName LIKE '%BC%') AND (s.sampleName LIKE '%1')  ")
+                    ->where("s.fkBatch = " . $Batch->getPkBatch() . " AND (s.sampleName LIKE '%_NT%' OR s.sampleName LIKE '%_BC%') AND (s.sampleType = 'Standard' OR s.sampleType = 'Quality Control') ")
                     ->groupBy('s.pkSampleBatch')
                     ->orderBy('s.sampleName', 'ASC');
             $elements = $qb->getQuery()->getResult();
 
+            $arrayFinal = [];
             if (count($elements) > 0)
             {
                 foreach ($elements as $temp)
                 {
-                    $BatchNominal = new \Alae\Entity\BatchNominal();
-
-                    $samplename = substr($temp["sampleName"], 0, -2);
-                    $BatchNominal->setFkBatch($Batch);
-                    $BatchNominal->setSampleName($samplename);
                     
-                    $this->getEntityManager()->persist($BatchNominal);
-                    $this->getEntityManager()->flush();
+                    $arrayBC = explode("_BC", $temp["sampleName"]);
+                    if (isset($arrayBC[1])) {
+                        if (in_array($arrayBC[0]."_BC", $arrayFinal)) {
+                            
+                        }
+                        else
+                        {
+                            array_push($arrayFinal, $arrayBC[0]."_BC");
+                        }
+                        
+                    }
+
+                    $arrayNT = explode("_NT", $temp["sampleName"]);
+                    if (isset($arrayNT[1])) {
+                        
+                        if (in_array($arrayNT[0]."_NT", $arrayFinal)) {
+                            
+                        }
+                        else
+                        {
+                            array_push($arrayFinal, $arrayNT[0]."_NT");
+                        }
+                    }
+                }
+
+                if (isset($arrayFinal)) {
+                    foreach ($arrayFinal as $array) {
+                        $BatchNominal = new \Alae\Entity\BatchNominal();
+                        $BatchNominal->setFkBatch($Batch);
+                        $BatchNominal->setSampleName($array);
+                        $this->getEntityManager()->persist($BatchNominal);
+                        $this->getEntityManager()->flush();
+                    }
                 }
             }
 

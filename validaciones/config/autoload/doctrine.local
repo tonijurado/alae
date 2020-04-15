@@ -9,8 +9,13 @@ return array(
 		    'host' => 'localhost',
 		    'port' => '3306',
 		    'user' => 'alae',
+<<<<<<< HEAD
 		    'password' => 'Alae1',
 		    'dbname' => 'validacionestest',
+=======
+		    'password' => 'Alae11',
+		    'dbname' => 'validaciones',
+>>>>>>> 54b5feb817e5fe478749f6fbac19c6623b6d0a6d
 		    'charset' => 'utf8',
 		)
 	    )

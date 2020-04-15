@@ -90,7 +90,7 @@ class BatchController extends BaseController
 
         if ($request->isPost())
         {
-            if ($this->_getSession()->isAdministrador())
+            if ($this->_getSession()->isAdministrador() || $this->_getSession()->isDirectorEstudio())
             {
                 $AnaStudy            = $this->getRepository("\\Alae\\Entity\\AnalyteStudy")->find($request->getPost('id'));
                 $updateJustification = $request->getPost('update-justification');
@@ -160,13 +160,23 @@ class BatchController extends BaseController
 
             if (!$AnaStudy->getFkStudy()->getCloseFlag())
             {
-                if ($this->_getSession()->isAdministrador())
+                if ($this->_getSession()->isAdministrador() || $this->_getSession()->isDirectorEstudio())
                 {
                     $modify = is_null($batch->getValidFlag()) ? "" : ($batch->getValidFlag() ? '<button class="btn" onclick="changeElement(this, ' . $batch->getPkBatch() . ');"><span class="btn-reject"></span>rechazar</button>' : '<button class="btn" onclick="changeElement(this, ' . $batch->getPkBatch() . ');"><span class="btn-validate"></span>aceptar</button>');
                 }
                 if($this->_getSession()->isAdministrador() || $this->_getSession()->isDirectorEstudio() || $this->_getSession()->isLaboratorio())
                 {
-                    $nominal = is_null($batch->getValidFlag()) ? '<a href="' . \Alae\Service\Helper::getVarsConfig("base_url") . '/batch/nominal/' . $batch->getPkBatch() . '?state='.$state. '" class="btn" type="button"><span class="btn-validate"></span>Valor nominal</a>' : "";
+                    $batchNominal = $this->getRepository("\\Alae\\Entity\\BatchNominal")->findBy(array("fkBatch" => $batch->getPkBatch()));
+            
+                    if ($batchNominal)
+                    {
+                        $nominal = is_null($batch->getValidFlag()) ? '<a href="' . \Alae\Service\Helper::getVarsConfig("base_url") . '/batch/nominal/' . $batch->getPkBatch() . '?state='.$state. '" class="btn" type="button"><span class="btn-validate"></span>Valor nominal</a>' : "";
+                    }
+                    else
+                    {
+                        $nominal = "";
+                    }
+                        
                     $validation = is_null($batch->getValidFlag()) ? '<a href="' . \Alae\Service\Helper::getVarsConfig("base_url") . '/verification/index/' . $batch->getPkBatch() . '?state='.$state. '" class="btn" type="button"><span class="btn-validate"></span>validar</a>' : "";
                 }
             }
@@ -186,17 +196,23 @@ class BatchController extends BaseController
             );
         }
 
+        if ($this->getEvent()->getRouteMatch()->getParam('an'))
+        {
+            $error = "<li>No se puede procesar, faltan los valores nominales.<li>";
+        }
+
         $datatable = new Datatable($data, Datatable::DATATABLE_BATCH, $this->_getSession()->getFkProfile()->getName());
         $viewModel = new ViewModel($datatable->getDatatable());
         $viewModel->setVariable('AnaStudy', $AnaStudy);
         $viewModel->setVariable('user', $this->_getSession());
         $viewModel->setVariable('state', $state);
+        $viewModel->setVariable('error', (isset($error) ? $error : ""));
+        
         return $viewModel;
     }
 
     public function nominalAction()
     {
-        echo "prueba";
         $error = "";
         $request = $this->getRequest();
         if(isset($_GET['state']))

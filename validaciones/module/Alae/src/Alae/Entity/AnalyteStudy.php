@@ -194,6 +194,23 @@ class AnalyteStudy
      */
     protected $acceptanceIs = 0;
 
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="associated_at", type="datetime", nullable=false)
+     */
+    protected $associatedAt;
+
+    /**
+     * @var \Alae\Entity\User
+     *
+     * @ORM\ManyToOne(targetEntity="Alae\Entity\User")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="fk_user_associated", referencedColumnName="pk_user")
+     * })
+     */
+    protected $fkUserAssociated;
+
     public function __construct()
     {
         $this->updatedAt = new \DateTime('now');
@@ -427,5 +444,25 @@ class AnalyteStudy
     public function setAcceptanceIs($acceptanceIs)
     {
         $this->acceptanceIs = $acceptanceIs;
+    }
+
+    public function getAssociateddAt()
+    {
+        return $this->associatedAt->format('d.m.Y H:i:s');
+    }
+
+    public function setAssociatedAt(\DateTime $associatedAt)
+    {
+        $this->associatedAt = $associatedAt;
+    }
+
+    public function getFkUserAssociated()
+    {
+        return $this->fkUserAssociated;
+    }
+
+    public function setFkUserAssociated(\Alae\Entity\User $fkUser)
+    {
+        $this->fkUserAssociated = $fkUser;
     }
 }
