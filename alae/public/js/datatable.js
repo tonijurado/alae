@@ -89,11 +89,11 @@ function getInputs(filters) {
         }
         else if (value == 'cs_number')
         {
-            input += '<td><input ' + disabled + ' type="text" name="create-' + value + '[' + createNumberIncr + ']" class="datatable-class-' + value + '" value="8"/></td>';
+            input += '<td><input ' + disabled + ' type="text" name="create-' + value + '[' + createNumberIncr + ']" class="datatable-class-' + value + '" value=""/></td>';
         }
         else if (value == 'qc_number')
         {
-            input += '<td><input ' + disabled + ' type="text" name="create-' + value + '[' + createNumberIncr + ']" class="datatable-class-' + value + '" value="4"/></td>';
+            input += '<td><input ' + disabled + ' type="text" name="create-' + value + '[' + createNumberIncr + ']" class="datatable-class-' + value + '" value=""/></td>';
         }
         else{
             input += '<td><input ' + disabled + ' type="text" name="create-' + value + '[' + createNumberIncr + ']" class="datatable-class-' + value + '"/></td>';
