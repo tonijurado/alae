@@ -13,6 +13,7 @@
 
 
 -- Volcando estructura de base de datos para validaciones
+DROP DATABASE IF EXISTS `validaciones`;
 CREATE DATABASE IF NOT EXISTS `validaciones` /*!40100 DEFAULT CHARACTER SET utf8 */;
 USE `validaciones`;
 
