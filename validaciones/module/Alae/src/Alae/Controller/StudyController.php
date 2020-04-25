@@ -714,6 +714,8 @@ class StudyController extends BaseController
                     $counter = $query->getSingleScalarResult();
 
                     $newStudy = new \Alae\Entity\Study();
+                    $newStudy->setVerification($Study->getVerification());
+                    $newStudy->setValidation($Study->getValidation());
                     $newStudy->setDescription($Study->getDescription());
                     $newStudy->setObservation($Study->getObservation());
                     $newStudy->setCode($code[0] . "-" . $code[1] . "-" . str_pad($counter, 2, "0", STR_PAD_LEFT));
