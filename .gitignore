@@ -6,6 +6,8 @@ vendor/**
 config/autoload/*.local.php
 module/Alae/config/vars.config.php
 config/autoload/doctrine.local
+alae/module/Alae/config/vars.config.php
+validaciones/module/Alae/config/vars.config.php
 
 
 # Binary gettext files
