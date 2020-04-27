@@ -117,7 +117,7 @@ class ReportController extends BaseController
     public function indexAction()
     {
         $error    = $this->getEvent()->getRouteMatch()->getParam('id') > 0 ? true : false;
-        $elements = $this->getRepository("\\Alae\\Entity\\Study")->findBy(array("status" => true));
+        $elements = $this->getRepository("\\Alae\\Entity\\Study")->findBy(array("status" => true), array("code" => 'desc'));
         return new ViewModel(array("studies" => $elements, "error" => $error));
     }
 
