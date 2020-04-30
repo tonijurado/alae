@@ -727,8 +727,8 @@ class VerificationController extends BaseController
         
         if (count($elements) > 0)
         {
-            echo 'PASO POR AQUI = ' . count($elements);
-            die();
+            // echo 'PASO POR AQUI = ' . count($elements);
+            // die();
             $pkSampleBatch = array();
             foreach ($elements as $temp)
             {
