@@ -14,7 +14,7 @@
             <form id="study-form" action="" method="POST">
                 <p>
                     <label>Código:</label>
-                    <input type="text" name="code" value="">
+                    <input type="text" id="code" name="code" value="">
                     <label>Fecha creación:</label>
                     <input class="centro" type="date" name="create_at" value="<?php echo date("Y-m-d"); ?>">
                     <label>Arbol de Dilución:</label>
@@ -45,35 +45,71 @@
     jQuery.validator.addMethod("regex", function (value, element, params) {
         return this.optional(element) || /^[A-Z0-9]+(\-[0-9]+)?$/.test(value);
     }, "Please enter a valid Rule");
+    jQuery.validator.addMethod("caracter1", function(value, element, params) {
+        return this.optional(element) || /^(?!.*\*).*$/.test(value);
+    }, "Please enter a valid Rule");
+    jQuery.validator.addMethod("caracter2", function(value, element, params) {
+        return this.optional(element) || /^(?!.*').*$/.test(value);
+    }, "Please enter a valid Rule");
+    jQuery.validator.addMethod("caracter3", function(value, element, params) {
+        return this.optional(element) || /^(?!.*´).*$/.test(value);
+    }, "Please enter a valid Rule");
+    jQuery.validator.addMethod("caracter4", function(value, element, params) {
+        return this.optional(element) || /^(?!.*`).*$/.test(value);
+    }, "Please enter a valid Rule");
     $("#study-form").validate({
         rules: {
             code: {
                 required: true,
-                regex: true
+                regex: true,
+                caracter1: true,
+                caracter2: true,
+                caracter3: true,
+                caracter4: true
             },
             create_at: {
                 required: true
             },
             description: {
-                required: true
+                required: true,
+                caracter1: true,
+                caracter2: true,
+                caracter3: true,
+                caracter4: true
             },
             observation: {
-                required: true
+                required: true,
+                caracter1: true,
+                caracter2: true,
+                caracter3: true,
+                caracter4: true
             }
         },
         messages: {
             code: {
                 required: "<strong>Código</strong> es requerido",
-                regex: "Por favor, introduzca un <strong>Código</strong> válido. Ejm: XXANE-YYYY"
+                regex: "Por favor, introduzca un <strong>Código</strong> válido. Ejm: XXANE-YYYY",
+                caracter1: "HA UTILIZADO CARACTERES NO PERMITIDOS",
+                caracter2: "HA UTILIZADO CARACTERES NO PERMITIDOS",
+                caracter3: "HA UTILIZADO CARACTERES NO PERMITIDOS",
+                caracter4: "HA UTILIZADO CARACTERES NO PERMITIDOS"
             },
             create_at: {
                 required: "<strong>Fecha creación</strong> es requerido"
             },
             description: {
-                required: "<strong>Descripción</strong> es requerido"
+                required: "<strong>Descripción</strong> es requerido",
+                caracter1: "HA UTILIZADO CARACTERES NO PERMITIDOS",
+                caracter2: "HA UTILIZADO CARACTERES NO PERMITIDOS",
+                caracter3: "HA UTILIZADO CARACTERES NO PERMITIDOS",
+                caracter4: "HA UTILIZADO CARACTERES NO PERMITIDOS"
             },
             observation: {
-                required: "<strong>Observaciones</strong> es requerido"
+                required: "<strong>Observaciones</strong> es requerido",
+                caracter1: "HA UTILIZADO CARACTERES NO PERMITIDOS",
+                caracter2: "HA UTILIZADO CARACTERES NO PERMITIDOS",
+                caracter3: "HA UTILIZADO CARACTERES NO PERMITIDOS",
+                caracter4: "HA UTILIZADO CARACTERES NO PERMITIDOS"
             }
         },
         errorLabelContainer: "#errorBox",
