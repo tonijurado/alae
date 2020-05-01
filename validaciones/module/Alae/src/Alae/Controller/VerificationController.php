@@ -130,7 +130,7 @@ class VerificationController extends BaseController
         $query   = $this->getEntityManager()->createQuery("
         SELECT s.pkSampleBatch, s.fileName, s.sampleName, s.accuracy, s.useRecord
         FROM Alae\Entity\SampleBatch s
-        WHERE s.fkBatch = " . $Batch->getPkBatch() . "
+        WHERE s.fkBatch = " . $Batch->getPkBatch() . " AND (s.sampleName NOT LIKE '%R%*') 
             AND (
                 ((s.sampleName LIKE 'CS1%' OR s.sampleName LIKE 'LLOQ%' OR s.sampleName LIKE 'LLQC%') AND s.accuracy BETWEEN " . $min1  . " AND " . $max1 . " AND s.useRecord = 0)
                 OR (s.sampleType LIKE 'Standard' AND s.sampleName NOT LIKE 'CS1%' AND s.accuracy BETWEEN " . $min2 . " AND " . $max2 . " AND s.useRecord = 0)
@@ -819,10 +819,10 @@ class VerificationController extends BaseController
         $min = $parameters[0]->getMinValue();
         $max = $parameters[0]->getMaxValue();
 
-        $parameters2 = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V9.2"));
-
-        $parameters3 = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V9.3"));
-
+        // $parameters2 = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V9.2"));
+        //$parameters3 = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V9.3"));
+        
+        //Toni: 
 
         if (count($elements) > 0)
         {
@@ -861,13 +861,13 @@ class VerificationController extends BaseController
                 {
                     $centi92 = "S";
                     $where = "s.sampleName = '" . $temp['sampleName'] . "' AND s.fkBatch = " . $Batch->getPkBatch();
-                    $this->error($where, $parameters2[0], array(), false);
+                    $this->error($where, $parameters[0], array(), false);
                 }
                 //echo 'Centi 91 calculos -> ' . $centi91 . ' // centi92 UseRecord == 0 ->' . $centi92;
-                if($centi91 == "S" && $centi92 == "S")
+                if($centi91 == "S" || $centi92 == "S")
                 {
                     $where = "s.sampleName = '" . $temp['sampleName'] . "' AND s.fkBatch = " . $Batch->getPkBatch();
-                    $this->error($where, $parameters3[0], array(), false);
+                    $this->error($where, $parameters[0], array(), false);
 
                     $pos = strpos($temp["sampleName"], '*');
                     $pos = $pos - 1;
@@ -883,7 +883,7 @@ class VerificationController extends BaseController
                     foreach ($elements2 as $temp2)
                     {
                         $where = "s.sampleName = '" . $temp2['sampleName'] . "' AND s.fkBatch = " . $Batch->getPkBatch();
-                        $this->error($where, $parameters3[0], array(), false);
+                        $this->error($where, $parameters[0], array(), false);
                     }   
                 }
             } //die();
@@ -1092,7 +1092,7 @@ class VerificationController extends BaseController
         $query   = $this->getEntityManager()->createQuery("
         SELECT COUNT(s.pkSampleBatch) as counter
         FROM Alae\Entity\SampleBatch s
-        WHERE s.fkBatch = " . $Batch->getPkBatch() . "
+        WHERE s.fkBatch = " . $Batch->getPkBatch() . " AND (s.sampleName NOT LIKE '%R%*') 
             AND (
                 ((s.sampleName LIKE 'CS1%' OR s.sampleName LIKE 'LLOQ%' OR s.sampleName LIKE 'LLQC%') AND s.accuracy BETWEEN " . $min1  . " AND " . $max1 . " AND s.useRecord = 0)
                 OR (s.sampleType LIKE 'Standard' AND s.sampleName NOT LIKE 'CS1%' AND s.accuracy BETWEEN " . $min2 . " AND " . $max2 . " AND s.useRecord = 0)
