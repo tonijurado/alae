@@ -830,9 +830,10 @@ class VerificationController extends BaseController
             {
                 $areaRatioInj = $temp['areaRatio'];
                 $useRecordInj = $temp['useRecord'];
-
+                    //echo 'UseRecord = ' . $useRecordInj . ' /// ';
                 $originName  = preg_replace(array('/R[0-9]+/', '/\*/'), '', $temp['sampleName']);
-
+                    //echo $originName . ' /// ';
+                    //die();
                 $query2    = $this->getEntityManager()->createQuery("
                 SELECT s.sampleName, s.areaRatio
                 FROM Alae\Entity\SampleBatch s
@@ -848,17 +849,21 @@ class VerificationController extends BaseController
                 $dif = (($areaRatioOrig - $areaRatioInj) / $areaRatioOrig) * 100;
 
                 $centi91 = "N";
-                if ($dif >= $min && $dif <= $max)
+                if ($dif <= $min || $dif >= $max)
                 {
                     $centi91 = "S";
+                    $where = "s.sampleName = '" . $temp['sampleName'] . "' AND s.fkBatch = " . $Batch->getPkBatch();
+                    $this->error($where, $parameters[0], array(), false);
                 }
 
                 $centi92 = "N";
-                if($useRecordInj == 0)
+                if($useRecordInj == 1)
                 {
                     $centi92 = "S";
+                    $where = "s.sampleName = '" . $temp['sampleName'] . "' AND s.fkBatch = " . $Batch->getPkBatch();
+                    $this->error($where, $parameters2[0], array(), false);
                 }
-
+                //echo 'Centi 91 calculos -> ' . $centi91 . ' // centi92 UseRecord == 0 ->' . $centi92;
                 if($centi91 == "S" && $centi92 == "S")
                 {
                     $where = "s.sampleName = '" . $temp['sampleName'] . "' AND s.fkBatch = " . $Batch->getPkBatch();
@@ -881,7 +886,7 @@ class VerificationController extends BaseController
                         $this->error($where, $parameters3[0], array(), false);
                     }   
                 }
-            }
+            } //die();
         }
     }
 
