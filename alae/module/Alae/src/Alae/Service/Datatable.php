@@ -198,7 +198,7 @@ class Datatable
     //COLUMNAS DEL ESTUDIO DE ANALITO
     protected function getAnaStudyColumns()
     {
-        $header = array("analyte", "analyte_is", "cs_number", "qc_number", "unit", "is", "retention_TimeA","retention_TimeIS","acceptance_Margin","use");
+        $header = array("analyte", "analyte_is", "cs_number", "qc_number", "unit", "is", "retention","acceptance","retention_min","retention_max","retention_is","acceptance_is","retention_min_is","retention_max_is", "use");
         $data   = $this->getData();
 
         return array(
@@ -210,13 +210,18 @@ class Datatable
                 array("key" => "qc_number", "label" => "Núm. QC", "sortable" => true),
                 array("key" => "unit", "label" => "Unidades", "sortable" => false),
                 array("key" => "is", "label" => "% var IS", "sortable" => true, "allowHTML" => true),
-                array("key" => "retention_TimeA", "label" => "tr teórico analito", "sortable" => true, "allowHTML" => true),
-                array("key" => "retention_TimeIS", "label" => "tr teórico IS", "sortable" => true, "allowHTML" => true),
-                array("key" => "acceptance_Margin", "label" => "margen de aceptación % ", "sortable" => true, "allowHTML" => true),
+                array("key" => "retention", "label" => "Tiempo de retención", "sortable" => true, "allowHTML" => true),
+                array("key" => "acceptance", "label" => "% Margen de aceptación", "sortable" => true, "allowHTML" => true),
+                array("key" => "retention_min", "label" => "Tr. mínimo", "sortable" => true, "allowHTML" => true),
+                array("key" => "retention_max", "label" => "Tr. máximo", "sortable" => true, "allowHTML" => true),
+                array("key" => "retention_is", "label" => "Tiempo de retención IS", "sortable" => true, "allowHTML" => true),
+                array("key" => "acceptance_is", "label" => "% Margen de aceptación IS", "sortable" => true, "allowHTML" => true),
+                array("key" => "retention_min_is", "label" => "Tr. mínimo IS", "sortable" => true, "allowHTML" => true),
+                array("key" => "retention_max_is", "label" => "Tr. máximo IS", "sortable" => true, "allowHTML" => true),
                 array("key" => "use", "label" => "usar", "sortable" => false, "allowHTML" => true, "formatter" => '{value}'),
                 array("key" => "edit", "allowHTML" => true)
             )),
-            "editable" => json_encode(array("analyte", "analyte_is", "cs_number", "qc_number", "unit", "is","retention_TimeA","retention_TimeIS","acceptance_Margin", "use")),
+            "editable" => json_encode(array("analyte", "analyte_is", "cs_number", "qc_number", "unit", "is", "retention", "acceptance", "retention_is", "acceptance_is", "use")),
             "header"   => json_encode($header),
             "filters"  => $this->getFilters($header)
         );
