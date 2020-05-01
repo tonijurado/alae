@@ -440,7 +440,7 @@ class VerificationController extends BaseController
         (
             (s.sampleType = 'Blank' AND (s.sampleName NOT LIKE 'BLK%' AND 
                                         s.sampleName NOT LIKE 'SEL%' AND 
-                                        s.sampleName NOT LIKE 'ZS%')
+                                        s.sampleName NOT LIKE 'ZS-%')
             )
                                         OR
 
@@ -477,7 +477,7 @@ class VerificationController extends BaseController
             OR
             (s.sampleType = 'Unknown' AND (s.sampleName  LIKE 'BLK%' OR 
                                             s.sampleName LIKE 'SEL%' OR 
-                                            s.sampleName LIKE 'ZS%' OR
+                                            s.sampleName LIKE 'ZS-%' OR
                                             s.sampleName LIKE 'CS%' OR
                                             s.sampleName LIKE 'REC%' OR 
                                             s.sampleName LIKE 'FM%' OR 
