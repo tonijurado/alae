@@ -1223,11 +1223,11 @@ class VerificationController extends BaseController
             "fkStudy"   => $Batch->getFkStudy()
         ));
 
-        $minTretAna = $AnaStudy[0]->getRetentionTimeAnalyte() - $AnaStudy[0]->getAcceptanceMargin() / 100 * $AnaStudy[0]->getRetentionTimeAnalyte();
-        $maxTretAna = $AnaStudy[0]->getRetentionTimeAnalyte() + $AnaStudy[0]->getAcceptanceMargin() / 100 * $AnaStudy[0]->getRetentionTimeAnalyte();
+        $minTretAna = $AnaStudy[0]->getRetention() - $AnaStudy[0]->getAcceptance() / 100 * $AnaStudy[0]->getRetention();
+        $maxTretAna = $AnaStudy[0]->getRetention() + $AnaStudy[0]->getAcceptance() / 100 * $AnaStudy[0]->getRetention();
 
-        $minTretIS = $AnaStudy[0]->getRetentionTimeIS() - $AnaStudy[0]->getAcceptanceMargin() / 100 * $AnaStudy[0]->getRetentionTimeIS();
-        $maxTretIS = $AnaStudy[0]->getRetentionTimeIS() + $AnaStudy[0]->getAcceptanceMargin() / 100 * $AnaStudy[0]->getRetentionTimeIS();
+        $minTretIS = $AnaStudy[0]->getRetentionIS() - $AnaStudy[0]->getAcceptanceIs() / 100 * $AnaStudy[0]->getRetentionIS();
+        $maxTretIS = $AnaStudy[0]->getRetentionIS() + $AnaStudy[0]->getAcceptanceIs() / 100 * $AnaStudy[0]->getRetentionIS();
         
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V26"));
         // Toni: Según mail de Natalia del día 08.12.2019, no se deberían evaluar para el control de tiempo de retención las muestras BLK
