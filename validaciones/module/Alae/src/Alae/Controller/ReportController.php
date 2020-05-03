@@ -88,10 +88,11 @@ class ReportController extends BaseController
         $request  = $this->getRequest();
         $elements = $this->getRepository('\\Alae\\Entity\\AnalyteStudy')->findBy(array(
             "fkStudy" => $request->getQuery('id')));
-        $data     = '<option value="-1">Seleccione</option>';
+        //$data     = '<option value="-1">Seleccione</option>';
+        $data = '';
         foreach ($elements as $anaStudy)
         {
-            $data .= '<option value="' . $anaStudy->getFkAnalyte()->getPkAnalyte() . '">' . $anaStudy->getFkAnalyte()->getName() . '</option>';
+            $data .= '<option style="color:#000000;" value="' . $anaStudy->getFkAnalyte()->getPkAnalyte() . '">' . $anaStudy->getFkAnalyte()->getName() . '</option>';
         }
         return new JsonModel(array("data" => $data));
     }
@@ -103,10 +104,11 @@ class ReportController extends BaseController
         $query    = $this->getEntityManager()->createQuery("
             SELECT b
             FROM Alae\Entity\Batch b
-            WHERE b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id') . "
+            WHERE b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id') . " AND b.validFlag is NOT NULL
             ORDER BY b.fileName ASC");
         $elements = $query->getResult();
-        $data     = '<option value="-1">Seleccione</option>';
+        // $data     = '<option value="-1">Seleccione</option>';
+        $data = '';
         foreach ($elements as $Batch)
         {
             $data .= '<option value="' . $Batch->getPkBatch() . '">' . $Batch->getFileName() . '</option>';

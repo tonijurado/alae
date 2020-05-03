@@ -88,7 +88,8 @@ class ReportController extends BaseController
         $request  = $this->getRequest();
         $elements = $this->getRepository('\\Alae\\Entity\\AnalyteStudy')->findBy(array(
             "fkStudy" => $request->getQuery('id')));
-        $data     = '<option value="-1">Seleccione</option>';
+        // $data     = '<option value="-1">Seleccione</option>';
+        $data = '';
         foreach ($elements as $anaStudy)
         {
             $data .= '<option value="' . $anaStudy->getFkAnalyte()->getPkAnalyte() . '">' . $anaStudy->getFkAnalyte()->getName() . '</option>';
@@ -106,7 +107,8 @@ class ReportController extends BaseController
             WHERE b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id') . "
             ORDER BY b.fileName ASC");
         $elements = $query->getResult();
-        $data     = '<option value="-1">Seleccione</option>';
+        // $data     = '<option value="-1">Seleccione</option>';
+        $data = '';
         foreach ($elements as $Batch)
         {
             $data .= '<option value="' . $Batch->getPkBatch() . '">' . $Batch->getFileName() . '</option>';

@@ -16,8 +16,7 @@
                 <?php endif; ?>
                 <p>
                     <label>C&oacute;digo del Estudio:</label>
-                    <select id="study">
-                        <option value="-1">Seleccione</option>
+                    <select id="study"class="selectpicker" data-live-search="true" title="Seleccione un estudio de la lista">
                         <?php foreach ($studies as $study) : ?>
                         <option value="<?php echo $study->getPkStudy(); ?>"><?php echo $study->getCode(); ?></option>
                         <?php endforeach; ?>
@@ -25,11 +24,11 @@
                 </p>
                 <p id="ajax1" style="display: none">
                     <label>Analito (*): </label>
-                    <select id="analyte"></select>
+                    <select id="analyte" class="selectpicker" data-live-search="true" title="Seleccione un analito de lista"></select>
                 </p>
                 <p id="ajax2" style="display: none">
                     <label>Lote (*): </label>
-                    <select id="batch"></select>
+                    <select id="batch" class="selectpicker" data-live-search="true" title="Seleccione un lote de la lista"></select>
                 </p>
                 <h4>Seleccione el informe deseado:</h4>
                 <ul class="pdf"><br/>
@@ -115,6 +114,7 @@
                 success: function(data)
                 {
                     $('#analyte').html(data.data);
+                    $('#analyte').selectpicker('refresh');
                     $('#ajax1').show();
                     $('#analyte').show();
                     $('#ajax2').hide();
@@ -145,6 +145,7 @@
                 success: function(data)
                 {
                     $('#batch').html(data.data);
+                    $('#batch').selectpicker('refresh');
                     $('#ajax2').show();
                     $('#batch').show();
                 }
