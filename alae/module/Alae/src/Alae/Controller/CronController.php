@@ -468,7 +468,9 @@ class CronController extends BaseController
                 {
                     if (isset($setters[$key]))
                     {
-                        $SampleBatch->$setters[$key](trim($value));
+                        $value1 = $setters[$key]; 
+                        //$SampleBatch->$setters[$key](trim($value));
+                        $SampleBatch->$value1(trim($value));
                     }
                 }
                 $SampleBatch->setFkBatch($Batch);
