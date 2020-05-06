@@ -72,6 +72,13 @@ class Parameter
     protected $typeParam;
 
     /**
+     * @var boolean
+     *
+     * @ORM\Column(name="status", type="boolean", nullable=false)
+     */
+    protected $status;
+
+    /**
      * @var \Alae\Entity\User
      *
      * @ORM\ManyToOne(targetEntity="Alae\Entity\User")
@@ -159,6 +166,16 @@ class Parameter
     public function setTypeParam($typeParam)
     {
         $this->typeParam = $typeParam;
+    }
+
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+    public function setStatus($status)
+    {
+        $this->status = $status;
     }
 
     public function getFkUser()
