@@ -849,7 +849,7 @@ class VerificationController extends BaseController
                 $dif = (($areaRatioOrig - $areaRatioInj) / $areaRatioOrig) * 100;
 
                 $centi91 = "N";
-                if ($dif <= $min || $dif >= $max)
+                if ($dif <= $min || $dif >= $max) //Verificamos el ratio de +- 15%, si no cumple, generamos error para las muestras reinyectadas junto a esta
                 {
                     $centi91 = "S";
                     $where = "s.sampleName = '" . $temp['sampleName'] . "' AND s.fkBatch = " . $Batch->getPkBatch();
@@ -857,7 +857,7 @@ class VerificationController extends BaseController
                 }
 
                 $centi92 = "N";
-                if($useRecordInj == 1)
+                if($useRecordInj == 1) //Si alguna muestra tiene useRecord <> 0 generamos error ya que todas las muestras reinyectadas deben tener useRecord=0
                 {
                     $centi92 = "S";
                     $where = "s.sampleName = '" . $temp['sampleName'] . "' AND s.fkBatch = " . $Batch->getPkBatch();
@@ -1032,9 +1032,12 @@ class VerificationController extends BaseController
      * @param \Alae\Entity\Batch $Batch
      * 
      * Toni: 2 de abril de 2020
+     * V12 debe comprobar que si una muestra cumple Accuracy(V10), su UseRecord DEBE SER 1
+     * En caso de que una muestra NO CUMPLA ACCURACY, su UseRecord DEBE SER 0
+     * Si por el motivo que sea, una muestra cumple ACCURACY, pero tiene UseRecord = 0, debe aparecer una ventana emergente donde especificar el motivo.
      * Esta función V12 lo que está mirando es CUANTAS MUESTRAS aparecerán en la ventana emergente.
      * La función ejecuta un SELECT COUNT para ver si el numero de muestras a mostrar en la ventana emergente es MAYOR que 0
-     * El return devuelve es FALSE si el numero de muestras en MAYOR que 0 y por tanto DEBE mostrar la ventana emergente, sino retorna TRUE que significa que NO debe mostrar la ventana emergente.
+     * El return devuelve FALSE si el numero de muestras en MAYOR que 0 y por tanto DEBE mostrar la ventana emergente, sino retorna TRUE que significa que NO debe mostrar la ventana emergente.
      */
     protected function V12(\Alae\Entity\Batch $Batch)
     {
@@ -1117,7 +1120,7 @@ class VerificationController extends BaseController
         $parameters2 = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V13.2"));
 
         //Toni: 14-01-2020 Agregamos v13.3 que estaba en el documento de usr
-        $parameters3 = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V13.3"));
+        //$parameters3 = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V13.3"));
         
         $AnaStudy = $this->getRepository("\\Alae\\Entity\\AnalyteStudy")->findBy(array(
             "fkAnalyte" => $Batch->getFkAnalyte(),
@@ -1192,13 +1195,14 @@ class VerificationController extends BaseController
                     AND s.fkBatch = " . $Batch->getPkBatch();
             
             $this->error($where2, $parameters2[0], array(), false);
-            
+
+            /* No ejecutamos esta condición porque queda incluida en la condición que determina el 13.1
             //Toni: 14/1/2020 - Agrego condición 13.3 para descargar muestras con analytePeakArea = 0 OR isPeakArea = 0
             $where3 = " (s.analytePeakArea = 0 OR s.isPeakArea = 0) 
                         AND s.fkBatch = " . $Batch->getPkBatch();
 
             $this->error($where3, $parameters3[0], array(), false);
-        
+          */
         }
     }
 
