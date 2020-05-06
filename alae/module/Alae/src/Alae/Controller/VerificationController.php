@@ -190,6 +190,7 @@ class VerificationController extends BaseController
      */
     protected function evaluation(\Alae\Entity\Batch $Batch, $status = true, $parameter = false)
     {
+        
         if (is_null($Batch->getFkParameter()))
         {
             if ($parameter)
@@ -199,12 +200,14 @@ class VerificationController extends BaseController
 
             if ($status)
             {
+                //AND ((e.fkParameter BETWEEN 1 AND 8) OR (e.fkParameter BETWEEN 23 AND 29))
                 $query = $this->getEntityManager()->createQuery("
                     SELECT COUNT(e.fkParameter)
-                    FROM Alae\Entity\Error e, Alae\Entity\SampleBatch s
+                    FROM Alae\Entity\Error e, Alae\Entity\SampleBatch s, Alae\Entity\Parameter p
                     WHERE s.pkSampleBatch = e.fkSampleBatch
-                        AND ((e.fkParameter BETWEEN 1 AND 8) OR (e.fkParameter BETWEEN 23 AND 29))
-                        AND s.fkBatch = " . $Batch->getPkBatch());
+                        AND p.status = 1
+                        AND s.fkBatch = " . $Batch->getPkBatch() ."
+                        AND p.pkParameter = e.fkParameter");
                 $errors = $query->getSingleScalarResult();
                 $status = $errors > 0 ? false : true;
             }
@@ -241,18 +244,24 @@ class VerificationController extends BaseController
      */
     protected function V13_25(\Alae\Entity\Batch $Batch)
     {
+        
         for ($i = 13; $i <= 20; $i++)
         {
             $function = 'V' . $i;
             $this->$function($Batch);
         }
-                $function = 'V23';
-                $this->$function($Batch);
+        
+        $function = 'V23';
+        $this->$function($Batch);
+
+        $function = 'V25';
+        $this->$function($Batch);
 
         $continue = $this->evaluation($Batch);
         
         if ($continue && is_null($Batch->getFkParameter()))
         {
+            $this->$function($Batch);
             for ($i = 21; $i <= 25; $i++)
             {
                 $function = 'V' . $i;
@@ -1154,8 +1163,7 @@ class VerificationController extends BaseController
      * @param \Alae\Entity\Batch $Batch
      */
     protected function V25(\Alae\Entity\Batch $Batch)
-    {
-        
+    {  
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V25"));
 
         $elements = $this->getRepository("\\Alae\\Entity\\AnalyteStudy")->findBy(array("fkStudy" => $Batch->getFkStudy(), "fkAnalyte" => $Batch->getFkAnalyte()));
@@ -1177,8 +1185,6 @@ class VerificationController extends BaseController
             }
         }
 
-        //echo $analyteConcentration."pr";die();
-
         /*$query = $this->getEntityManager()->createQuery("
             SELECT s.analyteConcentration
             FROM Alae\Entity\SampleBatch s
@@ -1186,20 +1192,18 @@ class VerificationController extends BaseController
             ORDER BY s.sampleName DESC")
             ->setMaxResults(1);
         $analyteConcentration = $query->getSingleScalarResult();
-
-        echo $analyteConcentration;die();*/
-        
+*/      
         $query    = $this->getEntityManager()->createQuery("
             SELECT s.pkSampleBatch
             FROM Alae\Entity\SampleBatch s
-            WHERE (REGEXP(s.sampleName, :regexp) = 1  OR REGEXP(s.sampleName, :regexp1) = 1)
+            WHERE (REGEXP(s.sampleName, :regexp) = 1)
             AND s.analyteConcentration >= $analyteConcentration
             AND s.sampleType = 'Unknown'
             AND s.fkBatch = " . $Batch->getPkBatch() . "
             ORDER BY s.pkSampleBatch");
 
-        $query->setParameter('regexp', '([0-9])+([0-9])-([0-9])+(\\.01)');
-        $query->setParameter('regexp1', '([0-9])+([0-9])-([0-9])+(\\.01-[0-9])');
+        $query->setParameter('regexp', '([0-9])+([0-9])-([0-9])+[.][0][1](-[0-9]+)?$');
+        //$query->setParameter('regexp1', '([0-9])+([0-9])-([0-9])+(\\.01-[0-9])');
         $elements = $query->getResult();
 
         foreach($elements as $SampleName)
