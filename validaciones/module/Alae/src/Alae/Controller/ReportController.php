@@ -1007,6 +1007,7 @@ class ReportController extends BaseController
      */
     public function r11Action()
     {
+        //echo 'r11';die();
         $request = $this->getRequest();
         if ($request->isGet())
         {
@@ -1014,7 +1015,7 @@ class ReportController extends BaseController
                 "fkAnalyte" => $request->getQuery('an'),
                 "fkStudy"   => $request->getQuery('id'),
                 "validFlag" => true
-            ), array("fileName" => asc));
+            ), array("fileName" => 'asc'));
             $Analyte = $this->getRepository("\\Alae\\Entity\\Analyte")->find($request->getQuery('an'));
             $Study   = $this->getRepository("\\Alae\\Entity\\Study")->find($request->getQuery('id'));
             $AnalyteName = $Analyte->getName();
@@ -1040,6 +1041,7 @@ class ReportController extends BaseController
                     $elements1 = $query->getResult();
 
                     $count1 = $elements1[0]['count1'];
+                    echo $count1;
                     //número de muestras con “Record Modified = 1”
                     $query    = $this->getEntityManager()->createQuery("
                         SELECT COUNT(s.recordModified) as recordModified
@@ -1050,7 +1052,7 @@ class ReportController extends BaseController
                     $elements2 = $query->getResult();
 
                     $recordModified =  $elements2[0]['recordModified'];
-
+                    //echo '-' . $recordModified; die();
                     $query    = $this->getEntityManager()->createQuery("
                         SELECT s.sampleName, s.analyteIntegrationType, s.isIntegrationType
                         FROM Alae\Entity\SampleBatch s

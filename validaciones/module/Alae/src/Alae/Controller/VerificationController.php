@@ -1345,21 +1345,22 @@ class VerificationController extends BaseController
         }
 
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V15.2"));
-        $where      = "s.sampleName LIKE 'BLK%' AND s.analytePeakArea > " . ($analytePeakArea * ($parameters[0]->getMinValue() / 100)) . " AND s.fkBatch = " . $Batch->getPkBatch();
+        $where      = "s.sampleName LIKE 'BLK%' AND s.analytePeakArea >= " . ($analytePeakArea * ($parameters[0]->getMinValue() / 100)) . " AND s.fkBatch = " . $Batch->getPkBatch();
         $this->error($where, $parameters[0], array(), false);
 
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V15.3"));
-        $where      = "s.sampleName LIKE 'BLK%' AND s.isPeakArea > " . ($isPeakArea * ($parameters[0]->getMinValue() / 100)) . " AND s.fkBatch = " . $Batch->getPkBatch();
+        $where      = "s.sampleName LIKE 'BLK%' AND s.isPeakArea >= " . ($isPeakArea * ($parameters[0]->getMinValue() / 100)) . " AND s.fkBatch = " . $Batch->getPkBatch();
         $this->error($where, $parameters[0], array(), false);
 
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V15.4"));
-        $where      = "s.sampleName LIKE 'ZS%' AND s.sampleName NOT LIKE 'ZS_NT%' AND s.sampleName NOT LIKE 'ZS_BC%' AND s.analytePeakArea > " . ($analytePeakArea * ($parameters[0]->getMinValue() / 100)) . " AND s.fkBatch = " . $Batch->getPkBatch();
+        $where      = "s.sampleName LIKE 'ZS%' AND s.sampleName NOT LIKE 'ZS_NT%' AND s.sampleName NOT LIKE 'ZS_BC%' AND s.analytePeakArea >= " . ($analytePeakArea * ($parameters[0]->getMinValue() / 100)) . " AND s.fkBatch = " . $Batch->getPkBatch();
         $this->error($where, $parameters[0], array(), false);
     }
 
     protected function V16(\Alae\Entity\Batch $Batch)
     {
-
+        //En realidad la V16 del documento funcional no es una Verificación, simplemente es información de datos que debemos tener para calcular otras verificaciones
+        //y así se hace (son datos que se almacenan en la tabla Batch y se calculan en la V15)
     }
 
     /**

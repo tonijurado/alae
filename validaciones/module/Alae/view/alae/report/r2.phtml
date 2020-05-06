@@ -130,6 +130,19 @@
             <td   align="left"  height="20">
             </td>
         </tr>
+        <!-- Agregamos el CheckSum calculado dividiendo la Variabilidad IS entre el valor m, sumarle el valor numerico de la fecha de validación, pasando el valor a entero y mostrarlo en Hexadecimal --> 
+        <tr>
+            <td  align="left" height="20" style="font-size: 13px;">
+                CheckSum:
+            </td>
+            <td  align="left"  height="20" style="">
+                <?php echo dechex(intval(($varIs / Alae\Service\Helper::getformatDecimal($batch->getSlope())) + $batch->getValidationDate())); ?>
+            </td>
+            <td   align="left"  height="20">
+            </td>
+            <td   align="left"  height="20">
+            </td>
+        </tr>
 	</table>
 	
     <table border="0" cellspacing="0" cellpadding="0"  style="width:600px;background-color:#fff;padding:40px 40px 40px 40px;font: arial;margin-right:100px">
