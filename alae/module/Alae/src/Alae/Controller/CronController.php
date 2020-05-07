@@ -187,28 +187,27 @@ class CronController extends BaseController
         //si el tamaño del archivo es mayor que el tamaño del parametro
         if($fileSize < $value)
         {
+            echo "FALLO EXPORT TAMAÑO.";
             $this->execute(\Alae\Service\Verification::updateBatch("b.pkBatch = " . $Batch->getPkBatch(), "V1.1"));
-        }
-        else
-        {    
-            if(count($data["data"]) > 0)
-            {
-                $this->saveSampleBatch($data["headers"], $data['data'], $Batch);
+        }  
 
-                if (!is_null($Analyte) && !is_null($Study))
-                {
-                    $this->batchVerify($Batch, $Analyte, $fileName);
-                    $this->updateBatch($Batch, $Analyte, $Study);
-                }
-                else
-                {
-                    $this->execute(\Alae\Service\Verification::updateBatch("b.pkBatch = " . $Batch->getPkBatch(), "V1"));
-                }
+        if(count($data["data"]) > 0)
+        {
+            $this->saveSampleBatch($data["headers"], $data['data'], $Batch);
+
+            if (!is_null($Analyte) && !is_null($Study))
+            {
+                $this->batchVerify($Batch, $Analyte, $fileName);
+                $this->updateBatch($Batch, $Analyte, $Study);
             }
             else
             {
                 $this->execute(\Alae\Service\Verification::updateBatch("b.pkBatch = " . $Batch->getPkBatch(), "V1"));
             }
+        }
+        else
+        {
+            $this->execute(\Alae\Service\Verification::updateBatch("b.pkBatch = " . $Batch->getPkBatch(), "V1"));
         }
     }
 

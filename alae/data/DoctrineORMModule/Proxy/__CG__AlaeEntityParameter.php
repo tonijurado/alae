@@ -64,10 +64,10 @@ class Parameter extends \Alae\Entity\Parameter implements \Doctrine\ORM\Proxy\Pr
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'pkParameter', 'rule', 'verification', 'minValue', 'maxValue', 'codeError', 'messageError', 'typeParam', 'fkUser');
+            return array('__isInitialized__', 'pkParameter', 'rule', 'verification', 'minValue', 'maxValue', 'codeError', 'messageError', 'typeParam', 'status', 'fkUser');
         }
 
-        return array('__isInitialized__', 'pkParameter', 'rule', 'verification', 'minValue', 'maxValue', 'codeError', 'messageError', 'typeParam', 'fkUser');
+        return array('__isInitialized__', 'pkParameter', 'rule', 'verification', 'minValue', 'maxValue', 'codeError', 'messageError', 'typeParam', 'status', 'fkUser');
     }
 
     /**
@@ -351,6 +351,28 @@ class Parameter extends \Alae\Entity\Parameter implements \Doctrine\ORM\Proxy\Pr
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setTypeParam', array($typeParam));
 
         return parent::setTypeParam($typeParam);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getStatus()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getStatus', array());
+
+        return parent::getStatus();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setStatus($status)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setStatus', array($status));
+
+        return parent::setStatus($status);
     }
 
     /**

@@ -242,39 +242,37 @@ class CronController extends BaseController
         {
             echo "FALLO EXPORT TAMAÑO.";
             $this->execute(\Alae\Service\Verification::updateBatch("b.pkBatch = " . $Batch->getPkBatch(), "V1"));
-        }
-        else
-        {    
+        }  
             
-            if(count($data["data"]) > 0)
-            {
-                $this->saveSampleBatch($data["headers"], $data['data'], $Batch);
-                $this->saveBatchNominal($Batch);
-                $this->batchVerify($Batch, $Analyte, $fileName);
+        if(count($data["data"]) > 0)
+        {
+            $this->saveSampleBatch($data["headers"], $data['data'], $Batch);
+            $this->saveBatchNominal($Batch);
+            $this->batchVerify($Batch, $Analyte, $fileName);
 
-                if (!is_null($Analyte) && !is_null($Study))
-                {
-                    
-                       
-                    $this->updateBatch($Batch, $Analyte, $Study);
-                }
-                else
-                {
+            if (!is_null($Analyte) && !is_null($Study))
+            {
                 
-                    if (is_null($Study))
-                    {
-                        echo "EXPORT ERRONEO. SIN ESTUDIO";
-                        $this->execute(\Alae\Service\Verification::updateBatch("b.pkBatch = " . $Batch->getPkBatch(), "V2"));
-                    }
+                    
+                $this->updateBatch($Batch, $Analyte, $Study);
+            }
+            else
+            {
+            
+                if (is_null($Study))
+                {
+                    echo "EXPORT ERRONEO. SIN ESTUDIO";
+                    $this->execute(\Alae\Service\Verification::updateBatch("b.pkBatch = " . $Batch->getPkBatch(), "V2"));
                 }
             }
-            /*else
-            {
-                
-                echo "EXPORT ERRONEO. SIN SAMPLES";
-                $this->execute(\Alae\Service\Verification::updateBatch("b.pkBatch = " . $Batch->getPkBatch(), "V1"));
-            }*/
         }
+        /*else
+        {
+            
+            echo "EXPORT ERRONEO. SIN SAMPLES";
+            $this->execute(\Alae\Service\Verification::updateBatch("b.pkBatch = " . $Batch->getPkBatch(), "V1"));
+        }*/
+        
     }
 
     private function cleanHeaders($headers)
