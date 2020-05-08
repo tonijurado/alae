@@ -526,9 +526,13 @@ class StudyController extends BaseController
 
             if($anaStudy->getFkStudy()->getApprove() && $anaStudy->getStatus())
             {
-                $buttons .= '<a href="' . \Alae\Service\Helper::getVarsConfig("base_url") . '/batch/list/' . $anaStudy->getPkAnalyteStudy() . '?state='.$state.'"><span class="form-datatable-batch"></span></a>';
                 $buttons .= '<a href="' . \Alae\Service\Helper::getVarsConfig("base_url") . '/study/sampleverificationassociation/' . $anaStudy->getPkAnalyteStudy() . '?state='.$state.'"><span class="form-datatable-change" title="asociación"></span></a>';
                 //$buttons .= '<a href="' . \Alae\Service\Helper::getVarsConfig("base_url") . '/study/sampleverification/' . $anaStudy->getPkAnalyteStudy() . '?state='.$state.'"><span class="form-datatable-change" title="verificación"></span></a>';
+            }
+
+            if($anaStudy->getFkUserAssociated())
+            {
+                $buttons .= '<a href="' . \Alae\Service\Helper::getVarsConfig("base_url") . '/batch/list/' . $anaStudy->getPkAnalyteStudy() . '?state='.$state.'"><span class="form-datatable-batch"></span></a>';    
             }
 
             $min = $anaStudy->getRetention() - ($anaStudy->getAcceptance() * $anaStudy->getRetention() / 100);
