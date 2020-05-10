@@ -21,6 +21,7 @@ class Datatable
     const DATATABLE_UNFILLED     = 'unfilled';
     const DATATABLE_ADMIN        = 'admin';
     const DATATABLE_ANASTUDY     = 'analyte_study';
+    const DATATABLE_ANASTUDY2     = 'analyte_study2';
     const DATATABLE_BATCH        = 'batch';
     const DATATABLE_BATCH_NOMINAL = 'batch_nominal';
     const DATATABLE_SAMPLE_BATCH = 'sample_batch';
@@ -204,7 +205,7 @@ class Datatable
     //COLUMNAS DEL ESTUDIO DE ANALITO
     protected function getAnaStudyColumns()
     {
-        $header = array("analyte", "analyte_is", "cs_number", "qc_number", "unit", "is", "retention","acceptance","retention_min","retention_max","retention_is","acceptance_is","retention_min_is","retention_max_is");
+        $header = array("analyte", "analyte_is", "cs_number", "qc_number", "unit", "retention","acceptance","retention_min","retention_max","retention_is","acceptance_is","retention_min_is","retention_max_is");
         $data   = $this->getData();
 
         return array(
@@ -215,7 +216,6 @@ class Datatable
                 array("key" => "cs_number", "label" => "Núm. CS", "sortable" => true, "allowHTML" => true),
                 array("key" => "qc_number", "label" => "Núm. QC", "sortable" => true),
                 array("key" => "unit", "label" => "Unidades", "sortable" => false),
-                array("key" => "is", "label" => "% var IS", "sortable" => true, "allowHTML" => true),
                 array("key" => "retention", "label" => "Tiempo de retención", "sortable" => true, "allowHTML" => true),
                 array("key" => "acceptance", "label" => "% Margen de aceptación", "sortable" => true, "allowHTML" => true),
                 array("key" => "retention_min", "label" => "Tr. mínimo", "sortable" => true, "allowHTML" => true),
@@ -226,11 +226,33 @@ class Datatable
                 array("key" => "retention_max_is", "label" => "Tr. máximo IS", "sortable" => true, "allowHTML" => true),
                 array("key" => "edit", "allowHTML" => true)
             )),
-            "editable" => json_encode(array("analyte", "analyte_is", "cs_number", "qc_number", "unit", "is","retention","acceptance","retention_is","acceptance_is")),
+            "editable" => json_encode(array("analyte", "analyte_is", "cs_number", "qc_number", "unit","retention","acceptance","retention_is","acceptance_is")),
             "header"   => json_encode($header),
             "filters"  => $this->getFilters($header)
         );
     }
+
+        //COLUMNAS DEL ESTUDIO DE ANALITO
+        protected function getAnaStudyColumns2()
+        {
+            $header = array("analyte", "analyte_is", "cs_number", "qc_number", "unit");
+            $data   = $this->getData();
+    
+            return array(
+                "data"     => (!empty($data)) ? json_encode($data) : 0,
+                "columns"  => json_encode(array(
+                    array("key" => "analyte", "label" => "Analito", "sortable" => true),
+                    array("key" => "analyte_is", "label" => "Patrón Interno (IS)", "sortable" => true, "allowHTML" => true),
+                    array("key" => "cs_number", "label" => "Núm. CS", "sortable" => true, "allowHTML" => true),
+                    array("key" => "qc_number", "label" => "Núm. QC", "sortable" => true),
+                    array("key" => "unit", "label" => "Unidades", "sortable" => false),
+                    array("key" => "edit", "allowHTML" => true)
+                )),
+                "editable" => json_encode(array("analyte", "analyte_is", "cs_number", "qc_number", "unit")),
+                "header"   => json_encode($header),
+                "filters"  => $this->getFilters($header)
+            );
+        }
 
     //COLUMNAS DEL LOTE
     protected function getBatchColumns()
@@ -489,6 +511,9 @@ class Datatable
         case Datatable::DATATABLE_ANASTUDY:
             $response = $this->getAnaStudyColumns();
             break;
+        case Datatable::DATATABLE_ANASTUDY2:
+            $response = $this->getAnaStudyColumns2();
+            break;
         case Datatable::DATATABLE_BATCH:
             $response = $this->getBatchColumns();
             break;
@@ -547,6 +572,9 @@ class Datatable
 		$elements = '<span class="form-download-excel" onclick="excel(6);"></span>';
 		break;
         case Datatable::DATATABLE_ANASTUDY:
+            $elements = '<span class="form-datatable-new"></span>';
+            break;
+        case Datatable::DATATABLE_ANASTUDY2:
             $elements = '<span class="form-datatable-new"></span>';
             break;
         case Datatable::DATATABLE_BATCH:

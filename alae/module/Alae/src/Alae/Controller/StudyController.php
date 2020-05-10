@@ -315,7 +315,9 @@ class StudyController extends BaseController
             $createRetentionIs = $request->getPost('create-retention_is');
             $createAcceptanceIs = $request->getPost('create-acceptance_is');
             $createUse       = $request->getPost('create-use');
+
             $updateAnalyte   = $request->getPost('update-analyte');
+            $updateUnit      = $request->getPost('update-unit');
             $updateAnalyteIs = $request->getPost('update-analyte_is');
             $updateRetention = $request->getPost('update-retention');
             $updateAcceptance = $request->getPost('update-acceptance');
@@ -355,7 +357,7 @@ class StudyController extends BaseController
                         $this->getEntityManager()->flush();
                         $this->transaction(
                             "Asociar analitos a estudio",
-                            sprintf('El usuario %1$s ha agrega el analito %2$s(%3$s) al estudio %4$s.<br>Patrón Interno (IS): %5$s, Núm CS: %6$s, Núm QC: %7$s, Unidades: %8$s, % var IS: %9$s, Tiempo retención: %10$s,Margen de aceptación: %11$s,Tiempo retención IS: %12$s,Margen de aceptación IS: %13$s, usar: %14$s',
+                            sprintf('El usuario %1$s ha agregado el analito %2$s(%3$s) al estudio %4$s.<br>Patrón Interno (IS): %5$s, Núm CS: %6$s, Núm QC: %7$s, Unidades: %8$s, var IS: %9$s, Tiempo retención: %10$s,Margen de aceptación: %11$s,Tiempo retención IS: %12$s,Margen de aceptación IS: %13$s, usar: %14$s',
                                 $User->getUsername(),
                                 $Analyte->getName(),
                                 $Analyte->getShortening(),
@@ -391,25 +393,28 @@ class StudyController extends BaseController
                     {
                         try
                         {
-                            $older =  sprintf('Valores antiguos -> Analito: %1$s, Patrón Internos IS: %2$s, Núm CS: %3$s, Núm QC: %4$s, % var IS: %5$s, Tiempo retención analito: %6$s,Margen de aceptación: %7$s,Tiempo retención IS: %8$s,Margen de aceptación IS: %9$s, usar: %10$s<br>',
+                            $older =  sprintf('Valores antiguos -> Analito: %1$s, Patrón Internos IS: %2$s, Núm CS: %3$s, Núm QC: %4$s, Unidad: %5$s, usar: %6$s, var IS: %7$s, Tiempo retención analito: %8$s,Margen de aceptación: %9$s,Tiempo retención IS: %10$s,Margen de aceptación IS: %11$s<br>',
                                 $AnaStudy->getFkAnalyte()->getShortening(),
                                 $AnaStudy->getFkAnalyteIs()->getShortening(),   
                                 $AnaStudy->getCsNumber(),
                                 $AnaStudy->getQcNumber(),
+                                $AnaStudy->getFkUnit()->getName(),
+                                ($AnaStudy->getIsUsed() ? "S" : "N"),
                                 $AnaStudy->getInternalStandard(),
                                 $AnaStudy->getRetention(),
                                 $AnaStudy->getAcceptance(),
                                 $AnaStudy->getRetentionIs(),
-                                $AnaStudy->getAcceptanceIs(),
-                                ($AnaStudy->getIsUsed() ? "S" : "N") 
+                                $AnaStudy->getAcceptanceIs() 
                             );
                             $Analyte   = $this->getRepository('\\Alae\\Entity\\Analyte')->find($updateAnalyte[$key]);
                             $AnalyteIs = $this->getRepository('\\Alae\\Entity\\Analyte')->find($updateAnalyteIs[$key]);
+                            $Unit      = $this->getRepository('\\Alae\\Entity\\Unit')->find($updateUnit[$key]);
 
                             $AnaStudy->setFkAnalyte($Analyte);
                             $AnaStudy->setFkAnalyteIs($AnalyteIs);
                             $AnaStudy->setCsNumber($updateCsNumber[$key]);
                             $AnaStudy->setQcNumber($updateQcNumber[$key]);
+                            $AnaStudy->setFkUnit($Unit);
                             $AnaStudy->setInternalStandard($updateIs[$key]);
                             $AnaStudy->setRetention($updateRetention[$key]);
                             $AnaStudy->setAcceptance($updateAcceptance[$key]);
@@ -421,8 +426,8 @@ class StudyController extends BaseController
                             $this->transaction(
                                 "Edición de analitos asociados a estudio",
                                 sprintf('El usuario %1$s ha editado la información del analito %2$s(%3$s) en el estudio %4$s.<br>%5$s'
-                                        . 'Valores nuevos -> Analito: %6$s, Patrón Internos IS: %7$s, Núm CS: %8$s, Núm QC: %9$s, % var IS: %10$s, Tiempo retención: %11$s,Margen de aceptación: %12$s,Tiempo retención IS: %13$s,'
-                                        .'Margen de aceptación IS: %14$s, usar: %15$s',
+                                        . 'Valores nuevos -> Analito: %6$s, Patrón Internos IS: %7$s, Núm CS: %8$s, Núm QC: %9$s, Unidad: %10$s, usar: %11$s, var IS: %12$s, Tiempo retención: %13$s,Margen de aceptación: %14$s,Tiempo retención IS: %15$s,'
+                                        .'Margen de aceptación IS: %16$s',
                                     $User->getUsername(),
                                     $AnaStudy->getFkAnalyte()->getName(),
                                     $AnaStudy->getFkAnalyte()->getShortening(),
@@ -432,14 +437,15 @@ class StudyController extends BaseController
                                     $updateAnalyteIs[$key],
                                     $updateCsNumber[$key],
                                     $updateQcNumber[$key],
+                                    $Unit->getName(),
+                                    (isset($updateUse[$key]) ? "S" : "N"),
                                     $updateIs[$key],
                                     $AnalyteIs->getShortening(),
                                     $Analyte->getShortening(),
                                     $updateRetention[$key],
                                     $updateAcceptance[$key],
                                     $updateRetentionIs[$key],
-                                    $updateAcceptanceIs[$key],
-                                    (isset($updateUse[$key]) ? "S" : "N")
+                                    $updateAcceptanceIs[$key]
                                 ),
                                 false
                             );
@@ -495,6 +501,7 @@ class StudyController extends BaseController
                 "qc_number"  => $anaStudy->getQcNumber(),
                 "unit"       => $anaStudy->getFkUnit()->getName(),
                 "is"         => number_format($anaStudy->getInternalStandard(), 4, '.', ''),
+                "use"        => $anaStudy->getIsUsed(),
                 "retention" => number_format($anaStudy->getRetention(), 4, '.', ''),
                 "acceptance" => number_format($anaStudy->getAcceptance(), 4, '.', ''),
                 "retention_min" => $min,
@@ -503,7 +510,6 @@ class StudyController extends BaseController
                 "acceptance_is" => number_format($anaStudy->getAcceptanceIs(), 4, '.', ''),
                 "retention_min_is" => $min_is,
                 "retention_max_is" => $max_is,
-                "use"        => $anaStudy->getIsUsed(),
                 "edit"       => $buttons
             );
         }

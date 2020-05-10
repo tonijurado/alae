@@ -277,8 +277,10 @@ class StudyController extends BaseController
 
         if ($this->getEvent()->getRouteMatch()->getParam('id'))
         {
-            $Study   = $this->getRepository()->find($this->getEvent()->getRouteMatch()->getParam('id'));
-            $canEdit = ($this->_getSession()->isAdministrador() || $this->_getSession()->isDirectorEstudio()) && !$Study->getCloseFlag() && !$Study->getApprove();
+            $Study        = $this->getRepository()->find($this->getEvent()->getRouteMatch()->getParam('id'));
+            $canEdit      = ($this->_getSession()->isAdministrador() || $this->_getSession()->isDirectorEstudio()) && !$Study->getCloseFlag() && !$Study->getApprove();
+            $verification = $Study->getVerification();
+            $validation   = $Study->getValidation();
         }
 
         if ($request->isPost())
@@ -350,24 +352,34 @@ class StudyController extends BaseController
             $createCsNumber  = $request->getPost('create-cs_number');
             $createQcNumber  = $request->getPost('create-qc_number');
             $createUnit      = $request->getPost('create-unit');
-            $createIs        = $request->getPost('create-is');
-            $createRetention = $request->getPost('create-retention');
-            $createAcceptance = $request->getPost('create-acceptance');
-            $createRetentionIs = $request->getPost('create-retention_is');
-            $createAcceptanceIs = $request->getPost('create-acceptance_is');
-           
-            $createUse       = $request->getPost('create-use');
-            $updateAnalyte   = $request->getPost('update-analyte');
-            $updateAnalyteIs = $request->getPost('update-analyte_is');
-            $updateRetention = $request->getPost('update-retention');
-            $updateAcceptance = $request->getPost('update-acceptance');
-            $updateRetentionIs = $request->getPost('update-retention_is');
-            $updateAcceptanceIs = $request->getPost('update-acceptance_is');
 
+            $updateAnalyte      = $request->getPost('update-analyte');
+            $updateAnalyteIs    = $request->getPost('update-analyte_is');
             $updateCsNumber  = $request->getPost('update-cs_number');
             $updateQcNumber  = $request->getPost('update-qc_number');
-            $updateIs        = $request->getPost('update-is');
-            $updateUse       = $request->getPost('update-use');
+            $updateUnit      = $request->getPost('update-unit');
+            if($validation == 0)
+            {
+                
+            }
+            else
+            {
+                if($verification == 1)
+                {
+                    $createRetention    = $request->getPost('create-retention');
+                    $createAcceptance   = $request->getPost('create-acceptance');
+                    $createRetentionIs  = $request->getPost('create-retention_is');
+                    $createAcceptanceIs = $request->getPost('create-acceptance_is');
+                    $updateRetention    = $request->getPost('update-retention');
+                    $updateAcceptance   = $request->getPost('update-acceptance');
+                    $updateRetentionIs  = $request->getPost('update-retention_is');
+                    $updateAcceptanceIs = $request->getPost('update-acceptance_is');    
+                }
+                else
+                {
+                    
+                }
+            }
 
             if (!empty($createAnalyte))
             {
@@ -386,37 +398,67 @@ class StudyController extends BaseController
                         $AnaStudy->setCsNumber($createCsNumber[$key]);
                         $AnaStudy->setQcNumber($createQcNumber[$key]);
                         $AnaStudy->setFkUnit($Unit);
-                        $AnaStudy->setInternalStandard($createIs[$key]);
-                        $AnaStudy->setRetention($createRetention[$key]);
-                        $AnaStudy->setAcceptance($createAcceptance[$key]);
-                        $AnaStudy->setRetentionIs($createRetentionIs[$key]);
-                        $AnaStudy->setAcceptanceIs($createAcceptanceIs[$key]);
+
+                        if($validation == 0)
+                        {
+                            $newer = sprintf('El usuario %1$s ha agregado el analito %2$s(%3$s) al estudio %4$s.<br>Patrón Interno (IS): %5$s, Núm CS: %6$s, Núm QC: %7$s, Unidades: %8$s',
+                                    $User->getUsername(),
+                                    $Analyte->getName(),
+                                    $Analyte->getShortening(),
+                                    $Study->getCode(),
+                                    $AnalyteIs->getName(),
+                                    $createCsNumber[$key],
+                                    $createQcNumber[$key],
+                                    $Unit->getName()
+                                );
+                        }
+                        else
+                        {
+                            if($verification == 1)
+                            {
+                                $AnaStudy->setRetention($createRetention[$key]);
+                                $AnaStudy->setAcceptance($createAcceptance[$key]);
+                                $AnaStudy->setRetentionIs($createRetentionIs[$key]);
+                                $AnaStudy->setAcceptanceIs($createAcceptanceIs[$key]);
+
+                                $newer =  sprintf('El usuario %1$s ha agregado el analito %2$s(%3$s) al estudio %4$s.<br>Patrón Interno (IS): %5$s, Núm CS: %6$s, Núm QC: %7$s, Unidades: %8$s, Tiempo retención: %9$s,Margen de aceptación: %10$s,Tiempo retención IS: %11$s,Margen de aceptación IS: %12$s',
+                                    $User->getUsername(),
+                                    $Analyte->getName(),
+                                    $Analyte->getShortening(),
+                                    $Study->getCode(),
+                                    $AnalyteIs->getName(),
+                                    $createCsNumber[$key],
+                                    $createQcNumber[$key],
+                                    $Unit->getName(),
+                                    $createRetention[$key],
+                                    $createAcceptance[$key],
+                                    $createRetentionIs[$key],
+                                    $createAcceptanceIs[$key]
+                                ); 
+                            }
+                            else
+                            {
+                                $newer = sprintf('El usuario %1$s ha agregado el analito %2$s(%3$s) al estudio %4$s.<br>Patrón Interno (IS): %5$s, Núm CS: %6$s, Núm QC: %7$s, Unidades: %8$s',
+                                    $User->getUsername(),
+                                    $Analyte->getName(),
+                                    $Analyte->getShortening(),
+                                    $Study->getCode(),
+                                    $AnalyteIs->getName(),
+                                    $createCsNumber[$key],
+                                    $createQcNumber[$key],
+                                    $Unit->getName()
+                                );
+                            }
+                        }
                         
                         $AnaStudy->setStatus(false);
-                        $AnaStudy->setIsUsed((isset($createUse[$key]) ? true : false));
                         $AnaStudy->setFkUser($User);
                         $this->getEntityManager()->persist($AnaStudy);
                         $this->getEntityManager()->flush();
                         $this->transaction(
                             "Asociar analitos a estudio",
-                            sprintf('El usuario %1$s ha agrega el analito %2$s(%3$s) al estudio %4$s.<br>Patrón Interno (IS): %5$s, Núm CS: %6$s, Núm QC: %7$s, Unidades: %8$s, var IS: %9$s, Tiempo retención: %10$s,Margen de aceptación: %11$s,Tiempo retención IS: %12$s,Margen de aceptación IS: %13$s, usar: %14$s',
-                                $User->getUsername(),
-                                $Analyte->getName(),
-                                $Analyte->getShortening(),
-                                $Study->getCode(),
-                                $AnalyteIs->getName(),
-                                $createCsNumber[$key],
-                                $createQcNumber[$key],
-                                $Unit->getName(),
-                                $createIs[$key],
-                                //(isset($createUse[$key]) ? "S" : "N"),
-                                //$createAnalyte[$key],
-                                //$createAnalyteIs[$key],
-                                $createRetention[$key],
-                                $createAcceptance[$key],
-                                $createRetentionIs[$key],
-                                $createAcceptanceIs[$key],
-                                (isset($createUse[$key]) ? "S" : "N")
+                            sprintf('%1$s',
+                                $newer
                             ),
                             false
                         );
@@ -438,55 +480,119 @@ class StudyController extends BaseController
                     {
                         try
                         {
-                            $older =  sprintf('Valores antiguos -> Analito: %9$s, Patrón Internos IS: %10$s, Tiempo retención analito: %4$s,Margen de aceptación: %5$s,Tiempo retención IS: %6$s,Margen de aceptación IS: %7$s, Núm CS: %1$s, Núm QC: %2$s, % var IS: %3$s, usar: %8$s<br>',
-                                $AnaStudy->getCsNumber(),
-                                $AnaStudy->getQcNumber(),
-                                $AnaStudy->getInternalStandard(),
-                                $AnaStudy->getRetention(),
-                                $AnaStudy->getAcceptance(),
-                                $AnaStudy->getRetentionIs(),
-                                $AnaStudy->getAcceptanceIs(),
-                                ($AnaStudy->getIsUsed() ? "S" : "N"),
-                                $AnaStudy->getFkAnalyte()->getShortening(),
-                                $AnaStudy->getFkAnalyteIs()->getShortening()
-                            );
                             $Analyte   = $this->getRepository('\\Alae\\Entity\\Analyte')->find($updateAnalyte[$key]);
                             $AnalyteIs = $this->getRepository('\\Alae\\Entity\\Analyte')->find($updateAnalyteIs[$key]);
+                            $Unit      = $this->getRepository('\\Alae\\Entity\\Unit')->find($updateUnit[$key]);
 
-                            $AnaStudy->setFkAnalyte($Analyte);
-                            $AnaStudy->setFkAnalyteIs($AnalyteIs);
-                            $AnaStudy->setCsNumber($updateCsNumber[$key]);
-                            $AnaStudy->setQcNumber($updateQcNumber[$key]);
-                            $AnaStudy->setInternalStandard($updateIs[$key]);
-                            $AnaStudy->setRetention($updateRetention[$key]);
-                            $AnaStudy->setAcceptance($updateAcceptance[$key]);
-                            $AnaStudy->setRetentionIs($updateRetentionIs[$key]);
-                            $AnaStudy->setAcceptanceIs($updateAcceptanceIs[$key]);
+                            if($validation == 0)
+                            {
+                                $older =  sprintf('Valores antiguos -> Analito: %1$s, Patrón Interno IS: %2$s, Núm CS: %3$s, Núm QC: %4$s, Unidad: %5$s',
+                                        $AnaStudy->getFkAnalyte()->getShortening(),
+                                        $AnaStudy->getFkAnalyteIs()->getShortening(),
+                                        $AnaStudy->getCsNumber(),
+                                        $AnaStudy->getQcNumber(),
+                                        $AnaStudy->getFkUnit()->getName()
+                                    );  
+
+                                    $AnaStudy->setFkAnalyte($Analyte);
+                                    $AnaStudy->setFkAnalyteIs($AnalyteIs);
+                                    $AnaStudy->setCsNumber($updateCsNumber[$key]);
+                                    $AnaStudy->setQcNumber($updateQcNumber[$key]);
+                                    $AnaStudy->setFkUnit($Unit);
+
+                                    $this->getEntityManager()->persist($AnaStudy);
+                                    $this->getEntityManager()->flush();
+
+                                    $newer =  sprintf('Valores nuevos -> Analito: %1$s, Patrón Interno IS: %2$s, Núm CS: %3$s, Núm QC: %4$s, Unidad: %5$s',
+                                        $Analyte->getShortening(),
+                                        $AnalyteIs->getShortening(),
+                                        $updateCsNumber[$key],
+                                        $updateQcNumber[$key],
+                                        $Unit->getName()
+                                    );
+                                
+                            }
+                            else
+                            {
+                                if($verification == 1)
+                                {
+                                    $older =  sprintf('Valores antiguos -> Analito: %1$s, Patrón Interno IS: %2$s, Núm CS: %3$s, Núm QC: %4$s, Unidad: %5$s, Tiempo retención analito: %6$s,Margen de aceptación: %7$s,Tiempo retención IS: %8$s,Margen de aceptación IS: %9$s',
+                                        $AnaStudy->getFkAnalyte()->getShortening(),
+                                        $AnaStudy->getFkAnalyteIs()->getShortening(),
+                                        $AnaStudy->getCsNumber(),
+                                        $AnaStudy->getQcNumber(),
+                                        $AnaStudy->getFkUnit()->getName(),
+                                        $AnaStudy->getRetention(),
+                                        $AnaStudy->getAcceptance(),
+                                        $AnaStudy->getRetentionIs(),
+                                        $AnaStudy->getAcceptanceIs()
+                                    );  
+
+                                    $AnaStudy->setFkAnalyte($Analyte);
+                                    $AnaStudy->setFkAnalyteIs($AnalyteIs);
+                                    $AnaStudy->setCsNumber($updateCsNumber[$key]);
+                                    $AnaStudy->setQcNumber($updateQcNumber[$key]);
+                                    $AnaStudy->setFkUnit($Unit);
+                                    $AnaStudy->setRetention($updateRetention[$key]);
+                                    $AnaStudy->setAcceptance($updateAcceptance[$key]);
+                                    $AnaStudy->setRetentionIs($updateRetentionIs[$key]);
+                                    $AnaStudy->setAcceptanceIs($updateAcceptanceIs[$key]);
+
+                                    $this->getEntityManager()->persist($AnaStudy);
+                                    $this->getEntityManager()->flush();
+
+                                    $newer =  sprintf('Valores nuevos -> Analito: %1$s, Patrón Interno IS: %2$s, Núm CS: %3$s, Núm QC: %4$s, '
+                                    .'Unidad: %5$s, Tiempo retención: %6$s,Margen de aceptación: %7$s, Tiempo retención IS: %8$s, Margen de aceptación IS: %9$s',
+                                        $Analyte->getShortening(),
+                                        $AnalyteIs->getShortening(),
+                                        $updateCsNumber[$key],
+                                        $updateQcNumber[$key],
+                                        $Unit->getName(),
+                                        $updateRetention[$key],
+                                        $updateAcceptance[$key],
+                                        $updateRetentionIs[$key],
+                                        $updateAcceptanceIs[$key]
+                                    ); 
+                                }
+                                else
+                                {
+                                    $older =  sprintf('Valores antiguos -> Analito: %1$s, Patrón Interno IS: %2$s, Núm CS: %3$s, Núm QC: %4$s, Unidad: %5$s',
+                                        $AnaStudy->getFkAnalyte()->getShortening(),
+                                        $AnaStudy->getFkAnalyteIs()->getShortening(),
+                                        $AnaStudy->getCsNumber(),
+                                        $AnaStudy->getQcNumber(),
+                                        $AnaStudy->getFkUnit()->getName()
+                                    );  
+
+                                    $AnaStudy->setFkAnalyte($Analyte);
+                                    $AnaStudy->setFkAnalyteIs($AnalyteIs);
+                                    $AnaStudy->setCsNumber($updateCsNumber[$key]);
+                                    $AnaStudy->setQcNumber($updateQcNumber[$key]);
+                                    $AnaStudy->setFkUnit($Unit);
+
+                                    $this->getEntityManager()->persist($AnaStudy);
+                                    $this->getEntityManager()->flush();
+
+                                    $newer =  sprintf('Valores nuevos -> Analito: %1$s, Patrón Interno IS: %2$s, Núm CS: %3$s, Núm QC: %4$s, Unidad: %5$s',
+                                        $Analyte->getShortening(),
+                                        $AnalyteIs->getShortening(),
+                                        $updateCsNumber[$key],
+                                        $updateQcNumber[$key],
+                                        $Unit->getName()
+                                    );
+                                }
+                            }
                             
-                            $AnaStudy->setIsUsed(isset($updateUse[$key]) ? true : false);
-                            $this->getEntityManager()->persist($AnaStudy);
-                            $this->getEntityManager()->flush();
                             $this->transaction(
                                 "Edición de analitos asociados a estudio",
                                 sprintf('El usuario %1$s ha editado la información del analito %2$s(%3$s) en el estudio %4$s.<br>%5$s'
-                                        . 'Valores nuevos -> Analito: %6$s, Patrón Internos IS: %7$s, Núm CS: %8$s, Núm QC: %9$s, '
-                                        .'Var IS: %10$s, Tiempo retención: %11$s,Margen de aceptación: %12$s,Tiempo retención IS: %13$s,'
-                                        .'Margen de aceptación IS: %14$s, usar: %15$s',
+                                        . '<br>%6$s',
                                     $User->getUsername(),
                                     $AnaStudy->getFkAnalyte()->getName(),
                                     $AnaStudy->getFkAnalyte()->getShortening(),
                                     $Study->getCode(),
                                     $older,
-                                    $Analyte->getShortening(),
-                                    $AnalyteIs->getShortening(),
-                                    $updateCsNumber[$key],
-                                    $updateQcNumber[$key],
-                                    $updateIs[$key],
-                                    $updateRetention[$key],
-                                    $updateAcceptance[$key],
-                                    $updateRetentionIs[$key],
-                                    $updateAcceptanceIs[$key],
-                                    (isset($updateUse[$key]) ? "S" : "N")
+                                    $newer
                                 ),
                                 false
                             );
@@ -541,31 +647,74 @@ class StudyController extends BaseController
             $min_is = $anaStudy->getRetentionIs() - ($anaStudy->getAcceptanceIs() * $anaStudy->getRetentionIs() / 100);
             $max_is = $anaStudy->getRetentionIs() + ($anaStudy->getAcceptanceIs() * $anaStudy->getRetentionIs() / 100);
     
-            $data[] = array(
-                "analyte"    => $anaStudy->getFkAnalyte()->getShortening(),
-                "analyte_is" => $anaStudy->getFkAnalyteIs()->getShortening(),
-                "cs_number"  => $anaStudy->getCsNumber(),
-                "qc_number"  => $anaStudy->getQcNumber(),
-                "unit"       => $anaStudy->getFkUnit()->getName(),
-                "is"         => number_format($anaStudy->getInternalStandard(), 4, '.', ''),
-                "retention" => number_format($anaStudy->getRetention(), 4, '.', ''),
-                "acceptance" => number_format($anaStudy->getAcceptance(), 4, '.', ''),
-                "retention_min" => $min,
-                "retention_max" => $max,
-                "retention_is" => number_format($anaStudy->getRetentionIs(), 4, '.', ''),
-                "acceptance_is" => number_format($anaStudy->getAcceptanceIs(), 4, '.', ''),
-                "retention_min_is" => $min_is,
-                "retention_max_is" => $max_is,
-                "use"        => $anaStudy->getIsUsed(),
-                "edit"       => $buttons
-            );
+            if($validation == 0)
+            {
+                $data[] = array(
+                    "analyte"    => $anaStudy->getFkAnalyte()->getShortening(),
+                    "analyte_is" => $anaStudy->getFkAnalyteIs()->getShortening(),
+                    "cs_number"  => $anaStudy->getCsNumber(),
+                    "qc_number"  => $anaStudy->getQcNumber(),
+                    "unit"       => $anaStudy->getFkUnit()->getName(),
+                    "edit"       => $buttons
+                );
+            }
+            else
+            {
+                if($verification == 1)
+                {
+                    $data[] = array(
+                        "analyte"    => $anaStudy->getFkAnalyte()->getShortening(),
+                        "analyte_is" => $anaStudy->getFkAnalyteIs()->getShortening(),
+                        "cs_number"  => $anaStudy->getCsNumber(),
+                        "qc_number"  => $anaStudy->getQcNumber(),
+                        "unit"       => $anaStudy->getFkUnit()->getName(),
+                        "retention" => number_format($anaStudy->getRetention(), 4, '.', ''),
+                        "acceptance" => number_format($anaStudy->getAcceptance(), 4, '.', ''),
+                        "retention_min" => $min,
+                        "retention_max" => $max,
+                        "retention_is" => number_format($anaStudy->getRetentionIs(), 4, '.', ''),
+                        "acceptance_is" => number_format($anaStudy->getAcceptanceIs(), 4, '.', ''),
+                        "retention_min_is" => $min_is,
+                        "retention_max_is" => $max_is,
+                        "use"        => $anaStudy->getIsUsed(),
+                        "edit"       => $buttons
+                    );
+                }
+                else
+                {
+                    $data[] = array(
+                        "analyte"    => $anaStudy->getFkAnalyte()->getShortening(),
+                        "analyte_is" => $anaStudy->getFkAnalyteIs()->getShortening(),
+                        "cs_number"  => $anaStudy->getCsNumber(),
+                        "qc_number"  => $anaStudy->getQcNumber(),
+                        "unit"       => $anaStudy->getFkUnit()->getName(),
+                        "edit"       => $buttons
+                    );
+                }
+            }
         }
 
         $isDuplicated = $Study->getApprove() && $this->_getSession()->isAdministrador() && !$Study->getCloseFlag();
 
         $Analyte   = $this->getRepository('\\Alae\\Entity\\Analyte')->findBy(array("status" => true), array('shortening' => 'ASC'));
         $Unit      = $this->getRepository('\\Alae\\Entity\\Unit')->findAll();
-        $datatable = new Datatable($data, Datatable::DATATABLE_ANASTUDY, $this->_getSession()->getFkProfile()->getName());
+
+        if($validation == 0)
+        {
+            $datatable = new Datatable($data, Datatable::DATATABLE_ANASTUDY2, $this->_getSession()->getFkProfile()->getName());
+        }
+        else
+        {
+            if($verification == 1)
+            {
+                $datatable = new Datatable($data, Datatable::DATATABLE_ANASTUDY, $this->_getSession()->getFkProfile()->getName());
+            }
+            else
+            {
+                $datatable = new Datatable($data, Datatable::DATATABLE_ANASTUDY2, $this->_getSession()->getFkProfile()->getName());
+            }
+        }
+
         $viewModel = new ViewModel($datatable->getDatatable());
         $viewModel->setVariable('study', $Study);
         $viewModel->setVariable('error', (isset($error) ? $error : ""));
