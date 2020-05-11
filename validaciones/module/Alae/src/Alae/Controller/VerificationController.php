@@ -197,20 +197,28 @@ class VerificationController extends BaseController
                         AND (
                                 ((s.sampleName LIKE 'CS1%' OR s.sampleName LIKE 'LLOQ%' OR s.sampleName LIKE 'LLQC%') AND s.accuracy NOT BETWEEN " . $min1  . " AND " . $max1 . " AND s.useRecord = 1)
                                 OR (REGEXP(s.sampleName, :regexp1) = 1 AND s.sampleName NOT LIKE 'CS1%' AND s.accuracy NOT BETWEEN " . $min2 . " AND " . $max2 . " AND s.useRecord = 1)
+                                OR (REGEXP(s.sampleName, :regexp4) = 1 AND s.sampleName NOT LIKE 'CS1%' AND s.accuracy NOT BETWEEN " . $min2 . " AND " . $max2 . " AND s.useRecord = 1)
                                 OR (REGEXP(s.sampleName, :regexp2) = 1 AND s.accuracy NOT BETWEEN " . $min3 . " AND " . $max3 . " AND s.useRecord = 1)
+                                OR (REGEXP(s.sampleName, :regexp5) = 1 AND s.accuracy NOT BETWEEN " . $min3 . " AND " . $max3 . " AND s.useRecord = 1)
                                 OR (s.sampleName LIKE 'TZ%' AND s.accuracy NOT BETWEEN " . $min4 . " AND " . $max4 . " AND s.useRecord = 1)
                                 OR (REGEXP(s.sampleName, :regexp3) = 1 AND s.accuracy NOT BETWEEN " . $min5 . " AND " . $max5 . " AND s.useRecord = 1)
                                 OR (s.sampleName LIKE 'ULQC%' AND s.accuracy NOT BETWEEN " . $min5 . " AND " . $max5 . " AND s.useRecord = 1)
 
                                 OR ((s.sampleName LIKE 'CS1%' OR s.sampleName LIKE 'LLOQ%' OR s.sampleName LIKE 'LLQC%') AND s.accuracy BETWEEN " . $min1  . " AND " . $max1 . " AND s.useRecord = 0)
                                 OR (REGEXP(s.sampleName, :regexp1) = 1 AND s.sampleName NOT LIKE 'CS1%' AND s.accuracy BETWEEN " . $min2 . " AND " . $max2 . " AND s.useRecord = 0)
+                                OR (REGEXP(s.sampleName, :regexp4) = 1 AND s.sampleName NOT LIKE 'CS1%' AND s.accuracy BETWEEN " . $min2 . " AND " . $max2 . " AND s.useRecord = 0)
                                 OR (REGEXP(s.sampleName, :regexp2) = 1 AND s.accuracy BETWEEN " . $min3 . " AND " . $max3 . " AND s.useRecord = 0)
+                                OR (REGEXP(s.sampleName, :regexp5) = 1 AND s.accuracy BETWEEN " . $min3 . " AND " . $max3 . " AND s.useRecord = 0)
                                 OR (s.sampleName LIKE 'TZ%' AND s.accuracy BETWEEN " . $min4 . " AND " . $max4 . " AND s.useRecord = 0)
                                 OR (REGEXP(s.sampleName, :regexp3) = 1 AND s.accuracy BETWEEN " . $min5 . " AND " . $max5 . " AND s.useRecord = 0)
                                 OR (s.sampleName LIKE 'ULQC%' AND s.accuracy BETWEEN " . $min5 . " AND " . $max5 . " AND s.useRecord = 0)
                             )";
 
-                        $this->error($where, $parameters[0], array('regexp1' => '^CS[0-9]+(-[0-9]+)?$','regexp2' => '^QC[0-9]+(-[0-9]+)?$','regexp3' => '^((LD|HD|UL)?QC)[0-9]+(-[0-9]+)?$'), false);
+                        $this->error($where, $parameters[0], array( 'regexp1' => '^CS[0-9]+(-[0-9]+)?$',
+                                                                    'regexp2' => '^QC[0-9]+(-[0-9]+)?$',
+                                                                    'regexp3' => '^((LD|HD|UL)?QC)[0-9]+(-[0-9]+)?$',
+                                                                    'regexp4' => '^CS[0-9]+(-[0-9]+R[0-9]+)?$',
+                                                                    'regexp5' => '^QC[0-9]+(-[0-9]+R[0-9]+)?$'), false);
                         $this->V13_23($Batch);
                     }
                 //}
@@ -812,10 +820,11 @@ class VerificationController extends BaseController
         $query    = $this->getEntityManager()->createQuery("
             SELECT s.pkSampleBatch, s.sampleName, s.areaRatio, s.useRecord
             FROM Alae\Entity\SampleBatch s
-            WHERE (REGEXP(s.sampleName, :regexp) = 1 OR REGEXP(s.sampleName, :regexp2) = 1) AND  s.fkBatch = " . $Batch->getPkBatch() . "
+            WHERE (REGEXP(s.sampleName, :regexp) = 1 OR REGEXP(s.sampleName, :regexp2) = 1 OR REGEXP(s.sampleName, :regexp3) = 1) AND  s.fkBatch = " . $Batch->getPkBatch() . "
             ORDER BY s.sampleName ASC");
-        $query->setParameter('regexp', '^QC[0-9]+-[0-9]+R[0-9]+\\*$');
-        $query->setParameter('regexp2', '^CS[0-9]+-[0-9]+R[0-9]+\\*$');
+        $query->setParameter('regexp', '^QC[0-9]+-[0-9]+R[0-9]+\*$');
+        $query->setParameter('regexp2', '^CS[0-9]+-[0-9]+R[0-9]+\*$');
+        $query->setParameter('regexp3', 'QC-[0-9]+R[0-9]+\*$'); // Añadimos esta para incluir muestras tipo: LLQC-5R1 (es decir, %QC-xRy*)
         $elements = $query->getResult();
 
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V9.1"));
