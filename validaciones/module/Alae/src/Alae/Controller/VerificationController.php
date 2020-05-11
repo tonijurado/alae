@@ -889,7 +889,7 @@ class VerificationController extends BaseController
                         $this->error($where, $parameters[0], array(), false);
                     }   
                 }
-            } //die();
+            }
         }
     }
 
