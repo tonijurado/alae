@@ -145,24 +145,116 @@ class ReportController extends BaseController
         $request = $this->getRequest();
         if ($request->isGet())
         {
-            $study          = $this->getRepository('\\Alae\\Entity\\Study')->find($request->getQuery('id'));
-            $counterAnalyte = $this->counterAnalyte($study->getPkStudy());
-            $analytes       = $this->getRepository('\\Alae\\Entity\\AnalyteStudy')->findBy(array("fkStudy" => $study->getPkStudy()));
-            $cs_values      = array();
-            $qc_values      = array();
+            $study            = $this->getRepository('\\Alae\\Entity\\Study')->find($request->getQuery('id'));
+            $counterAnalyte   = $this->counterAnalyte($study->getPkStudy());
+            $analytes         = $this->getRepository('\\Alae\\Entity\\AnalyteStudy')->findBy(array("fkStudy" => $study->getPkStudy()));
+            
+            $cs_values        = [];
+            $csData           = [];
+            $qc_values        = [];
+            $qcData           = [];
+            $ldqc_values      = [];
+            $ldqcData         = [];
+            $hdqc_values      = [];
+            $hdqcData         = [];
+            $llqc_values      = [];
+            $llqcData         = [];
+            $ulqc_values      = [];
+            $ulqcData         = [];
+            $verifications    = [];
+            $verificationData = [];
             foreach ($analytes as $anaStudy)
             {
-                //OBTIENE LOS VALORES CS Y QC
-                $cs_values[] = explode(",", $anaStudy->getCsValues());
-                $qc_values[] = explode(",", $anaStudy->getQcValues());
+                $csData        = explode(",", $anaStudy->getCsValues());
+                $cs_valuesData = [];
+                $i             = 1;
+                foreach ($csData as $cs)
+                {
+                    $cs_valuesData = [
+                        "analyte"  => $anaStudy->getFkAnalyte()->getName(),
+                        "unit"     => $anaStudy->getFkUnit()->getName(),
+                        "sample"   => "CS".$i,
+                        "value"    => $cs,
+                    ];
+                    array_push($cs_values, $cs_valuesData);
+                    $i++;
+                }
+
+                $qcData        = explode(",", $anaStudy->getQcValues());
+                $qc_valuesData = [];
+                $i             = 1;
+                foreach ($qcData as $qc)
+                {
+                    $qc_valuesData = [
+                        "analyte"  => $anaStudy->getFkAnalyte()->getName(),
+                        "unit"     => $anaStudy->getFkUnit()->getName(),
+                        "sample"   => "QC".$i,
+                        "value"    => $qc
+                    ];
+                    array_push($qc_values, $qc_valuesData);
+                    $i++;
+                }
+
+                $ldqc_valuesData = [
+                    "analyte"    => $anaStudy->getFkAnalyte()->getName(),
+                    "unit"       => $anaStudy->getFkUnit()->getName(),
+                    "sample"     => "LDQC",
+                    "value"      => $anaStudy->getLdqcValues(),
+                ];
+                array_push($ldqc_values, $ldqc_valuesData);
+
+                $hdqc_valuesData = [
+                    "analyte"    => $anaStudy->getFkAnalyte()->getName(),
+                    "unit"       => $anaStudy->getFkUnit()->getName(),
+                    "sample"     => "HDQC",
+                    "value"      => $anaStudy->getHdqcValues(),
+                ];
+                array_push($hdqc_values, $hdqc_valuesData);
+
+                $llqc_valuesData = [
+                    "analyte"    => $anaStudy->getFkAnalyte()->getName(),
+                    "unit"       => $anaStudy->getFkUnit()->getName(),
+                    "sample"     => "LLQC",
+                    "value"      => $anaStudy->getLlqcValues(),
+                ];
+                array_push($llqc_values, $llqc_valuesData);
+
+                $ulqc_valuesData = [
+                    "analyte"    => $anaStudy->getFkAnalyte()->getName(),
+                    "unit"       => $anaStudy->getFkUnit()->getName(),
+                    "sample"     => "ULQC",
+                    "value"     => $anaStudy->getUlqcValues(),
+                ];
+                array_push($ulqc_values, $ulqc_valuesData);
+
+                $SampleVerificationStudy = $this->getRepository('\\Alae\\Entity\\SampleVerificationStudy')->findBy(array("fkAnalyteStudy" => $anaStudy->getPkAnalyteStudy()));
+
+                foreach ($SampleVerificationStudy as $sampleVerification) 
+                    {
+                        $verificationData = [
+                            "analyte"     => $anaStudy->getFkAnalyte()->getName(),
+                            "sample"      => $sampleVerification->getName(),
+                            "associated"  => $sampleVerification->getAssociated(),
+                            "value"       => $sampleVerification->getValue()
+                        ];
+
+                        array_push($verifications, $verificationData);
+                    }
             }
 
             $properties = array(
                 "study"          => $study,
+                "validation"     => $study->getValidation(),
+                "verification"   => $study->getVerification(),
                 "counterAnalyte" => $counterAnalyte,
                 "analytes"       => $analytes,
                 "cs_values"      => $cs_values,
-                "qc_values"      => $qc_values
+                "qc_values"      => $qc_values,
+                "ldqc_values"    => $ldqc_values,
+                "hdqc_values"    => $hdqc_values,
+                "llqc_values"    => $llqc_values,
+                "ulqc_values"    => $ulqc_values,
+                "verifications"  => $verifications
             );
 
             $viewModel = new ViewModel();
