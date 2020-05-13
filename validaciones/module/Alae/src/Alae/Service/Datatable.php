@@ -634,6 +634,18 @@ class Datatable
         case Datatable::DATATABLE_BATCH:
             $elements = '<input value="" type="submit"/>';
             break;
+        case Datatable::DATATABLE_VERIFICATION_SAMPLE:
+            $elements = '<span class="form-datatable-new"></span><input value="" type="submit"/>';
+        break;
+        case Datatable::DATATABLE_VERIFICATION_SAMPLE_ASSOC:
+            $elements = '<span class="form-datatable-new"></span><input value="" type="submit"/>';
+        break;
+        case Datatable::DATATABLE_VERIFICATION_SAMPLE_ASSOC_R:
+            $elements = '';
+        break;
+        case Datatable::DATATABLE_VERIFICATION_SAMPLE_BATCH_R:
+            $elements = '';
+		break;
         default :
             $elements = "";
             break;
