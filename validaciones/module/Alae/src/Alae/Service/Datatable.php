@@ -622,6 +622,9 @@ class Datatable
             case Datatable::DATATABLE_ANASTUDY:
                 $elements = '<span class="form-datatable-new"></span>';
                 break;
+            case Datatable::DATATABLE_ANASTUDY2:
+                $elements = '<span class="form-datatable-new"></span>';
+                break;
             case Datatable::DATATABLE_UNFILLED:
 		$elements = '<span class="form-download-excel" onclick="excel(5);"></span>';
 		break;
