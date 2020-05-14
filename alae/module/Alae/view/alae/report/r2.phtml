@@ -78,7 +78,7 @@
             <td  align="left"  height="20"  align="center" style="font-size: 13px;font-weight: bold">
                 Motivo de Rechazo:
             </td>
-            <td  align="left"  height="20">
+            <td  align="left"  width="800" height="20">
                 <?php echo htmlentities($errors); ?>
             </td>
         </tr>
@@ -124,6 +124,19 @@
             </td>
             <td  align="left"  height="20" style="">
                 <?php echo $var5; ?>
+            </td>
+            <td   align="left"  height="20">
+            </td>
+            <td   align="left"  height="20">
+            </td>
+        </tr>
+        <!-- Agregamos el CheckSum calculado dividiendo la Variabilidad IS entre el valor m, sumarle el valor numerico de la fecha de validación, pasando el valor a entero y mostrarlo en Hexadecimal --> 
+        <tr>
+            <td  align="left" height="20" style="font-size: 13px;">
+                CheckSum:
+            </td>
+            <td  align="left"  height="20" style="">
+                <?php echo dechex(intval(($varIs / Alae\Service\Helper::getformatDecimal($batch->getSlope())) + $batch->getValidationDate())); ?>
             </td>
             <td   align="left"  height="20">
             </td>

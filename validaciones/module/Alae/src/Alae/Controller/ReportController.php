@@ -278,7 +278,6 @@ class ReportController extends BaseController
         if ($request->isGet())
         {
             //GENERA LOS DATOS DEL REPORTE
-            
             ini_set('max_execution_time', 300000);
             $Batch = $this->getRepository('\\Alae\\Entity\\Batch')->find($request->getQuery('ba'));
             if ($Batch && $Batch->getPkBatch())
@@ -415,8 +414,7 @@ class ReportController extends BaseController
                         "fkStudy"   => $request->getQuery('id')
                     ));
 
-                    $varIs = $Batch->getIsCsQcAcceptedAvg(); //* ($AnaStudy[0]->getInternalStandard() / 100);
-                    
+                    $varIs = $Batch->getIsCsQcAcceptedAvg(); //* ($AnaStudy[0]->getInternalStandard() / 100);                   
                     $var5 = $Batch->getIsCsQcAcceptedAvg() * (5 / 100);
 					
 				

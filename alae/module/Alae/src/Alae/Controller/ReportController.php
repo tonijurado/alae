@@ -288,15 +288,21 @@ class ReportController extends BaseController
 
                     }
 
+                    //AND ((p.pkParameter BETWEEN 1 AND 8) OR (p.pkParameter BETWEEN 23 AND 29))
                     //GENERA LOS ERRORES
                     $query  = $this->getEntityManager()->createQuery("
                         SELECT DISTINCT(p.pkParameter) as pkParameter, p.messageError
                         FROM Alae\Entity\Error e, Alae\Entity\SampleBatch s, Alae\Entity\Parameter p
                         WHERE s.pkSampleBatch = e.fkSampleBatch
-                            AND e.fkParameter = p.pkParameter
-                            AND ((p.pkParameter BETWEEN 1 AND 8) OR (p.pkParameter BETWEEN 23 AND 29))
+                            AND e.fkParameter = p.pkParameter 
+							AND (p.status = 1) 
                             AND s.fkBatch = " . $Batch->getPkBatch() . "
                         ORDER BY p.pkParameter");
+
+                    //Toni: En el Select ANTERIOR la fila AND (p.status = 1) ) determina que ese parametro 
+					//NO DEBE DAR EL LOTE COMO RECHAZADO. Esto lo hace ya en verificationControler, 
+					//pero también lo quito aquí para que no salga en el Report 2.
+					// He hecho lo mismo en el REPORT 3
                     $errors = $query->getResult();
 
                     $message = array();
@@ -315,8 +321,7 @@ class ReportController extends BaseController
                         "fkStudy"   => $request->getQuery('id')
                     ));
 
-                    $varIs = $Batch->getIsCsQcAcceptedAvg() * ($AnaStudy[0]->getInternalStandard() / 100);
-                    
+                    $varIs = $Batch->getIsCsQcAcceptedAvg(); //* ($AnaStudy[0]->getInternalStandard() / 100);
                     $var5 = $Batch->getIsCsQcAcceptedAvg() * (5 / 100);
 
                     /*$properties = array(
