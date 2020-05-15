@@ -81,9 +81,9 @@ class AnalyteStudy
     /**
      * @var string
      *
-     * @ORM\Column(name="internal_standard", type="decimal", precision=19, scale=4, nullable=true)
+     * @ORM\Column(name="internal_standard", type="decimal", precision=19, scale=2, nullable=true)
      */
-    protected $internalStandard;
+    protected $internalStandard = '0.00';
 
     /**
      * @var boolean
@@ -169,30 +169,30 @@ class AnalyteStudy
     /**
      * @var string
      *
-     * @ORM\Column(name="retention", type="decimal", precision=19, scale=4, nullable=true)
+     * @ORM\Column(name="retention", type="decimal", precision=19, scale=2, nullable=true)
      */
-    protected $retention = 0;
+    protected $retention = '0.00';
 
     /**
      * @var string
      *
-     * @ORM\Column(name="acceptance", type="decimal", precision=19, scale=4, nullable=true)
+     * @ORM\Column(name="acceptance", type="decimal", precision=19, scale=2, nullable=true)
      */
-    protected $acceptance = 0;
+    protected $acceptance = '0.00';
 
     /**
      * @var string
      *
-     * @ORM\Column(name="retention_is", type="decimal", precision=19, scale=4, nullable=true)
+     * @ORM\Column(name="retention_is", type="decimal", precision=19, scale=2, nullable=true)
      */
-    protected $retentionIs = 0;
+    protected $retentionIs = '0.00';
 
     /**
      * @var string
      *
-     * @ORM\Column(name="acceptance_is", type="decimal", precision=19, scale=4, nullable=true)
+     * @ORM\Column(name="acceptance_is", type="decimal", precision=19, scale=2, nullable=true)
      */
-    protected $acceptanceIs = 0;
+    protected $acceptanceIs = '0.00';
 
     /**
      * @var \DateTime
