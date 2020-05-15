@@ -19,13 +19,16 @@
     <div class="association-form-buttons">
             
             <ul>
+            
             <?php if($AnaStudy->getFkUserAssociated()) { ?>
                 <p class="approve_notification"><?php printf("aprobado por: %s (%s). %s", $AnaStudy->getFkUserAssociated()->getUsername(), $AnaStudy->getFkUserAssociated()->getFkProfile()->getname(), $AnaStudy->getAssociateddAt()); ?></p>
-            <?php } else { ?>
-               
-                    <button class="btn" type="button" onclick="changeStatus('/study/associatedApprove',<?php echo $AnaStudy->getPkAnalyteStudy(); ?>)"><span class="btn-validate"></span>aprobar</button>
-                
-            <?php } ?>
+            <?php } else { 
+                    if ($user->isAdministrador() || $user->isDirectorEstudio()) { ?>
+                        <button class="btn" type="button" onclick="changeStatus('/study/associatedApprove',<?php echo $AnaStudy->getPkAnalyteStudy(); ?>)"><span class="btn-validate"></span>aprobar</button>
+            <?php 
+                    }
+            };
+             ?>
             </ul>
         </div>
 
