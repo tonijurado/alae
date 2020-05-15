@@ -197,7 +197,7 @@
                 if($verification == 1)
                 {
                     ?>
-                        <td  align="center" width ="100"  style="color:#000000;border: black 1px solid;font-size:11px;">
+                    <td  align="center" width ="100"  style="color:#000000;border: black 1px solid;font-size:11px;">
                         <?php echo number_format($anaStudy->getAcceptance(),2,'.',''); ?>
                     </td>
                     <td  align="center" width ="100"  style="color:#000000;border: black 1px solid;font-size:11px;">
@@ -286,7 +286,11 @@
                     <strong><?php echo $cs_value["sample"]; ?></strong>
                 </td>
                 <td align="right" width ="100"  style="color:#000000;border: black 1px solid;font-size:11px;">
-                    <strong><?php echo number_format($cs_value["value"],4,'.',''); ?></strong>
+                    <strong>
+                        <?php 
+                            echo empty($cs_value["value"]) ? '' : number_format($cs_value["value"], 2, '.', ''); 
+                        ?>
+                    </strong>
                 </td>
             </tr>
         <?php endforeach; ?>
@@ -316,7 +320,11 @@
                     <strong><?php echo $qc_value["sample"]; ?></strong>
                 </td>
                 <td align="right" width ="100"  style="color:#000000;border: black 1px solid;font-size:11px;">
-                    <strong><?php echo number_format($qc_value["value"],4,'.',''); ?></strong>
+                    <strong>
+                        <?php 
+                            echo empty($qc_value["value"]) ? '' : number_format($qc_value["value"], 2, '.', ''); 
+                        ?>
+                    </strong>
                 </td>
             </tr>
         <?php endforeach; ?>
@@ -333,7 +341,11 @@
                     <strong><?php echo $ldqc_value["sample"]; ?></strong>
                 </td>
                 <td align="right" width ="100"  style="color:#000000;border: black 1px solid;font-size:11px;">
-                    <strong><?php echo number_format($ldqc_value["value"],4,'.',''); ?></strong>
+                    <strong>
+                        <?php 
+                            echo empty($ldqc_value["value"]) ? '' : number_format($ldqc_value["value"], 2, '.', ''); 
+                        ?>
+                    </strong>
                 </td>
             </tr>
         <?php endforeach; ?>
@@ -350,7 +362,11 @@
                     <strong><?php echo $hdqc_value["sample"]; ?></strong>
                 </td>
                 <td align="right" width ="100"  style="color:#000000;border: black 1px solid;font-size:11px;">
-                    <strong><?php echo number_format($hdqc_value["value"],4,'.',''); ?></strong>
+                    <strong>
+                        <?php 
+                            echo empty($hdqc_value["value"]) ? '' : number_format($hdqc_value["value"], 2, '.', ''); 
+                        ?>
+                    </strong>
                 </td>
             </tr>
         <?php endforeach; ?>
@@ -367,7 +383,11 @@
                     <strong><?php echo $llqc_value["sample"]; ?></strong>
                 </td>
                 <td align="right" width ="100"  style="color:#000000;border: black 1px solid;font-size:11px;">
-                    <strong><?php echo number_format($llqc_value["value"],4,'.',''); ?></strong>
+                    <strong>
+                        <?php 
+                            echo empty($llqc_value["value"]) ? '' : number_format($llqc_value["value"], 2, '.', ''); 
+                        ?>
+                    </strong>
                 </td>
             </tr>
         <?php endforeach; ?>
@@ -384,7 +404,11 @@
                     <strong><?php echo $ulqc_value["sample"]; ?></strong>
                 </td>
                 <td align="right" width ="100"  style="color:#000000;border: black 1px solid;font-size:11px;">
-                    <strong><?php echo number_format($ulqc_value["value"],4,'.',''); ?></strong>
+                    <strong>
+                        <?php 
+                            echo empty($ulqc_value["value"]) ? '' : number_format($ulqc_value["value"], 2, '.', ''); 
+                        ?>
+                    </strong>
                 </td>
             </tr>
         <?php endforeach; ?>
