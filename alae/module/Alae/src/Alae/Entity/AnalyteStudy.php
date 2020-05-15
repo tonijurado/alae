@@ -67,9 +67,9 @@ class AnalyteStudy
     /**
      * @var string
      *
-     * @ORM\Column(name="internal_standard", type="decimal", precision=19, scale=4, nullable=false)
+     * @ORM\Column(name="internal_standard", type="decimal", precision=19, scale=2, nullable=false)
      */
-    protected $internalStandard;
+    protected $internalStandard = '0.00';
 
     /**
      * @var boolean
@@ -155,30 +155,30 @@ class AnalyteStudy
     /**
      * @var string
      *
-     * @ORM\Column(name="retention", type="decimal", precision=19, scale=4, nullable=false)
+     * @ORM\Column(name="retention", type="decimal", precision=19, scale=2, nullable=false)
      */
-    protected $retention = 0;
+    protected $retention = '0.00';
 
     /**
      * @var string
      *
-     * @ORM\Column(name="acceptance", type="decimal", precision=19, scale=4, nullable=false)
+     * @ORM\Column(name="acceptance", type="decimal", precision=19, scale=2, nullable=false)
      */
-    protected $acceptance = 0;
+    protected $acceptance = '0.00';
 
     /**
      * @var string
      *
-     * @ORM\Column(name="retention_is", type="decimal", precision=19, scale=4, nullable=false)
+     * @ORM\Column(name="retention_is", type="decimal", precision=19, scale=2, nullable=false)
      */
-    protected $retentionIs = 0;
+    protected $retentionIs = '0.00';
 
     /**
      * @var string
      *
-     * @ORM\Column(name="acceptance_is", type="decimal", precision=19, scale=4, nullable=false)
+     * @ORM\Column(name="acceptance_is", type="decimal", precision=19, scale=2, nullable=false)
      */
-    protected $acceptanceIs = 0;
+    protected $acceptanceIs = '0.00';
 
     public function __construct()
     {
