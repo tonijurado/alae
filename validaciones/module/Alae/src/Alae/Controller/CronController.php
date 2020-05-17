@@ -82,6 +82,7 @@ class CronController extends BaseController
     private function validateFile($fileName)
     {
         $response = $this->explodeFile($fileName);
+        //echo 'VALIDATE FILE: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxRESPONSE: ' . $response['study'];
         $this->_Study   = $this->_Analyte = null;
         //Linea WHERE original de la busqueda de abajo
         // WHERE s.code LIKE  '%" . $response['study'] . "%' AND s.closeFlag = 0 AND s.approve = 1
@@ -90,7 +91,7 @@ class CronController extends BaseController
         $query = $this->getEntityManager()->createQuery("
                 SELECT s
                 FROM Alae\Entity\Study s
-                    WHERE s.code LIKE  '%" . $response['study'] ."' AND s.closeFlag = 0 AND s.approve = 1
+                    WHERE s.code LIKE  '%" . $response['study'] ."' OR s.code LIKE '%" . $response['study'] ."-%' AND s.closeFlag = 0 AND s.approve = 1
                 ORDER BY s.code DESC")
             ->setMaxResults(1);
         $elements = $query->getResult();
@@ -129,6 +130,7 @@ class CronController extends BaseController
 
         foreach ($files as $file)
         {
+            //echo 'Fichero: ' . $file;
             $this->_other = array();
             if (!is_dir($file))
             {
@@ -143,8 +145,9 @@ class CronController extends BaseController
                         //if (preg_match("/^([a-zA-Z0-9]+-\d{4}(-[0-9]+)?)\+(M|O|R|X)[0-9]*\_(([a-zA-Z0-9](-|\.|,)?\s*)+|(\((\+|-)\)-[a-zA-Z0-9]+))\.txt$/i", $file))
                         //if (preg_match("/^([A-Z0-9]+(\-[0-9]{4}?)+[V]+([0-9]{2}?)?+(\_)+?(.)+(\.)+[t]+[x]+[t]$)/i", $file))
                         //if (preg_match("/^([A-Z0-9]+(\-[0-9]{4}?)+[V]+([0-9]{2}?)?+[+]+[O]+([0-9]?)+([0-9]?)?(\_)+?(.)+(\.)+[t]+[x]+[t]$)/i", $file))
-                        if (preg_match("/^([a-zA-Z0-9]+-\d{4}+[V]{1}+([0-9]{2}?)?+(([+])(M|O|R|X)([0-9]?)([0-9]?))?)*\_(([a-zA-Z0-9](-|\.|,)?\s*)+|(\((\+|-)\)-[a-zA-Z0-9]+))\.txt$/i", $file))
+                        if (preg_match("/^([a-zA-Z0-9]+\-\d{4}+[V]{1}([\+\-][0-9]{2}?)?+(([+])(M|O|R|X)([0-9]?)([0-9]?))?)*\_(([a-zA-Z0-9](-|\.|,)?\s*)+|(\((\+|-)\)-[a-zA-Z0-9]+))\.txt$/i", $file))
                         {
+                            //echo 'Entro en validateFile: ' . $file;
                             $this->validateFile($file);
                         }
                     }
