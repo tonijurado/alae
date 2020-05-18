@@ -142,10 +142,19 @@ class CronController extends BaseController
                     if(!$this->isRepeatedBatch($file))
                     {
                         
-                        //if (preg_match("/^([a-zA-Z0-9]+-\d{4}(-[0-9]+)?)\+(M|O|R|X)[0-9]*\_(([a-zA-Z0-9](-|\.|,)?\s*)+|(\((\+|-)\)-[a-zA-Z0-9]+))\.txt$/i", $file))
-                        //if (preg_match("/^([A-Z0-9]+(\-[0-9]{4}?)+[V]+([0-9]{2}?)?+(\_)+?(.)+(\.)+[t]+[x]+[t]$)/i", $file))
-                        //if (preg_match("/^([A-Z0-9]+(\-[0-9]{4}?)+[V]+([0-9]{2}?)?+[+]+[O]+([0-9]?)+([0-9]?)?(\_)+?(.)+(\.)+[t]+[x]+[t]$)/i", $file))
-                        if (preg_match("/^([a-zA-Z0-9]+\-\d{4}+[V]{1}([\+\-][0-9]{2}?)?+(([+])(M|O|R|X)([0-9]?)([0-9]?))?)*\_(([a-zA-Z0-9](-|\.|,)?\s*)+|(\((\+|-)\)-[a-zA-Z0-9]+))\.txt$/i", $file))
+                        /*Toni: 19/05/2020 Nueva expresión regular creada en regex101.com y validada con los siguientes lotes encargada de aceptar un lote o pasarlo
+                        a lotes no asignados:
+                        
+                            001-3126V01+O6_OH-MEM.txt
+                            001-3333V+O_MEM.txt
+                            001-3333V-O_MEM.txt
+                            001-3333V-01+O_MEM.txt
+                            001-3125V+O35_MEM.txt
+                            001-3126V01+O2_OH-MEM.txt
+                            001-3126V01+O6_OH-MEM.txt
+                        */
+
+                        if (preg_match("/^([a-zA-Z0-9]+\-\d{4}+)V([+\-0-9])([0-9]?)+([+\-]?)([MORX])([0-9]?)*\_([a-zA-Z0-9-])*\.txt$/i", $file))
                         {
                             //echo 'Entro en validateFile: ' . $file;
                             $this->validateFile($file);
