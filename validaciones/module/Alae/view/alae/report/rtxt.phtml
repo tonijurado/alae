@@ -1,6 +1,14 @@
 <?php
 
-$newfile = "files/newfile".$user.".txt";
+//Si se ejecuta en las instalaciones de ALAE, necesitamos una carpeta con permisos y usamos la de carga de lotes
+
+    $miruta = \Alae\Service\Helper::getVarsConfig("base_url");
+    if ($miruta == "http://www.test-alae.com/alae/validaciones/public") {
+        $newfile = "D:\\LotesValidacionesTest\\newfile".$user.".txt";
+    } else {
+        $newfile = $this->basePath() . '/txt/newfile' . $user . '.txt';
+    }
+
 $myfile = fopen($newfile, "w") or die("Error, no se puede crear el txt");
 $filecontentHash= "TABLA DE RESULTADOS ALAE"."\r\n"."Código del estudio:"."\t".$batch->getFkStudy()->getCode()."\t"."Parámetros de la Curva de Calibrado (Y= mX+b)"."\r\n"."Analito"."\t".$batch->getFkAnalyte()->getName()."\t"."m = ".Alae\Service\Helper::getformatDecimal($batch->getSlope())."\r\n"."Nombre del archivo exportado:"."\t".$batch->getFileName()."\t"."b = ".Alae\Service\Helper::getformatDecimal($batch->getIntercept())."\r\n"."Fecha de importación:"."\t".$batch->getCreatedAt()."\t"."r = ".$batch->getCorrelationCoefficient()."\r\n"."Resultado de la Evaluación:"."\t".($batch->getValidFlag() ? "ACEPTADO" : "RECHAZADO")."\t"."Motivo de Rechazo:"."\t".htmlentities($errors)."\r\n"."Usuario:"."\t".$batch->getFkUser()->getUsername()."\r\n"."Fecha de la Evaluación:"."\t".$batch->getValidationDate()."\r\n";
 fwrite($myfile, $filecontentHash);
