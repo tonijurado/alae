@@ -249,6 +249,7 @@ class CronController extends BaseController
         $fileSize = $data["size"];
         
         $Batch = $this->saveBatch($fileName, $fileSize);
+        
         //si el tamaño del archivo es menor que el tamaño del parametro
         if($fileSize < $value)
         {
