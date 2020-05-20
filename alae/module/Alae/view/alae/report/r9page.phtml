@@ -6,7 +6,7 @@
         <tr>
             <td  align="center"  colspan="3" style=" border: black 1px solid;padding:10px;font-size: 11px"><strong>Batch Results Table No</strong></td>
             <td  align="center" bgcolor="" colspan="9" style=" border: black 1px solid;padding:10px;font-size: 11px">
-                <strong><?php echo $name; ?></strong>
+                <strong><?php echo substr($name, 0, 4); ?></strong>
             </td>
         </tr>
         <tr>
@@ -21,9 +21,15 @@
                 <td  align="center" bgcolor="" colspan="3" style=" border: black 1px solid;padding:2px;font-size: 11px">
                     <strong>'<?php if($key != $aux) : list($key, $aux) = explode("_", $key); echo $key; $aux = $key; endif; ?></strong>
                 </td>
-                <td style="mso-number-format:'#,##0.00';" align="center"  bgcolor="" colspan="2"  style=" border: black 1px solid;padding:2px">
-                    <?php echo $value["calculatedConcentration"]; ?>
-                </td>
+                <?php if ($value["error"]): ?>
+                    <td style="mso-number-format:'#,##0.00';" align="center"  bgcolor="" colspan="2"  style=" border: black 1px solid;padding:2px;font-style:italic;">
+                        <?php echo $value["calculatedConcentration"]; ?>
+                    </td>
+                <?php else: ?>
+                    <td style="mso-number-format:'#,##0.00';" align="center"  bgcolor="" colspan="2"  style=" border: black 1px solid;padding:2px">
+                        <?php echo $value["calculatedConcentration"]; ?>
+                    </td>
+                <?php endif; ?>
                 <td  align="center" bgcolor="" colspan="1" style=" border: black 1px solid;padding:2px;font-size: 11px">
                     <?php echo $value["error"]; ?>
                 </td>

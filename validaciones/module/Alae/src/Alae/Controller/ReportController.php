@@ -992,7 +992,7 @@ class ReportController extends BaseController
                         $concentration[] = $error;
                         $accuracy[]      = number_format((float)$element[0]->getAccuracy(), 2, '.', '');
                     }
-                    //var_dump($properties);
+                   
                     $page .= $this->render('alae/report/r9page', array(
                         "name"          => $key,
                         "properties"    => $properties,
@@ -1000,7 +1000,7 @@ class ReportController extends BaseController
                         "accuracy"      => $accuracy
                     ));
                 }
-//die();
+
                 $properties = array(
                     "analyte"      => $analytes[0],
                     "filename"     => "Between_Run_Accuracy_and_Precision_of_dilution_Quality_Control_Samples" . date("Ymd-Hi"),

@@ -640,10 +640,9 @@ class ReportController extends BaseController
             
             foreach ($elements as $element)
             {
-                $error = ($element['codeError'] == '') ? number_format((float)$element[0]->getCalculatedConcentration(), 2, '.', '') : "RCS";
                 $properties[$element[0]->getFkBatch()->getFileName()][] = array(
                     "sampleName"              => $element[0]->getSampleName(),
-                    "calculatedConcentration" => $error,
+                    "calculatedConcentration" => number_format((float)$element[0]->getCalculatedConcentration(), 2, '.', ''),
                     "error"                   => $element['codeError']
                 );
 
@@ -667,7 +666,7 @@ class ReportController extends BaseController
                     
                     IF($centi == "S")
                     {
-                        $concentration[preg_replace('/-\d+/i', '', $element[0]->getSampleName())][] = $error;
+                        $concentration[preg_replace('/-\d+/i', '', $element[0]->getSampleName())][] = number_format((float)$element[0]->getCalculatedConcentration(), 2, '.', '');
                     }
                     
                 }    
@@ -814,7 +813,7 @@ class ReportController extends BaseController
                 ->leftJoin('Alae\Entity\Error', 'e', \Doctrine\ORM\Query\Expr\Join::WITH, 's.pkSampleBatch = e.fkSampleBatch')
                 ->leftJoin('Alae\Entity\Parameter', 'p', \Doctrine\ORM\Query\Expr\Join::WITH, 'e.fkParameter = p.pkParameter')
                 ->innerJoin('Alae\Entity\Batch', 'b', \Doctrine\ORM\Query\Expr\Join::WITH, 's.fkBatch = b.pkBatch')
-                ->where("s.sampleName LIKE 'QC%' AND s.sampleName NOT LIKE '%*%' AND b.validFlag = 1 AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id'))
+                ->where("(s.sampleName LIKE 'QC%' AND s.sampleName NOT LIKE '%DQC%') AND s.sampleName NOT LIKE '%*%' AND b.validFlag = 1 AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id'))
                 ->groupBy('b.pkBatch, s.pkSampleBatch')
                 ->orderBy('b.fileName, s.sampleName', 'ASC');
             $elements = $qb->getQuery()->getResult();
@@ -822,10 +821,10 @@ class ReportController extends BaseController
             $concentration = $accuracy = $properties = array();
             foreach ($elements as $element)
             {
-                $error = ($element['codeError'] == '' || $element['codeError'] == 'O') ? number_format((float)$element[0]->getCalculatedConcentration(), 2, '.', '') : "NVR";
+                $error = number_format((float)$element[0]->getCalculatedConcentration(), 2, '.', '');
                 $properties[$element[0]->getFkBatch()->getFileName()][] = array(
                     "sampleName"              => $element[0]->getSampleName(),
-                    "calculatedConcentration" => $error,
+                    "calculatedConcentration" => number_format((float)$element[0]->getCalculatedConcentration(), 2, '.', ''),
                     "accuracy"                => number_format((float)$element[0]->getAccuracy(), 2, '.', ''),
                     "error"                   => $element['codeError']
                 );
@@ -855,7 +854,7 @@ class ReportController extends BaseController
                 }
                 $accuracy[preg_replace('/-\d+/i', '', $element[0]->getSampleName())][] = number_format((float)$element[0]->getAccuracy(), 2, '.', '');
             }
-
+            
             $response = array(
                 "analyte"      => $analytes[0],
                 "qc_values"    => explode(",", $analytes[0]->getQcValues()),
@@ -940,7 +939,7 @@ class ReportController extends BaseController
                         $concentration[] = $error;
                         $accuracy[]      = number_format((float)$element[0]->getAccuracy(), 2, '.', '');
                     }
-                    //var_dump($properties);
+                   
                     $page .= $this->render('alae/report/r9page', array(
                         "name"          => $key,
                         "properties"    => $properties,
@@ -948,7 +947,7 @@ class ReportController extends BaseController
                         "accuracy"      => $accuracy
                     ));
                 }
-//die();
+
                 $properties = array(
                     "analyte"      => $analytes[0],
                     "filename"     => "Between_Run_Accuracy_and_Precision_of_dilution_Quality_Control_Samples" . date("Ymd-Hi"),

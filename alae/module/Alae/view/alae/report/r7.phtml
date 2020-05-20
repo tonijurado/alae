@@ -148,9 +148,15 @@ xmlns="http://www.w3.org/TR/REC-html40">
                             <strong>'<?php echo $list['name']; ?></strong>
                         </td>
                         <?php foreach ($list['par'] as $key => $value) : ?>
-                        <td  style="mso-number-format:'#,##0.00';" align="center"    style=" border: black 1px solid;padding:2px">
-                            <?php echo ($value[1] != "") ? "RCS" : $value[0]; ?>
-                        </td>
+							<?php if ($value[1] != ""): ?>
+								<td  style="mso-number-format:'#,##0.00';" align="center" style=" border: black 1px solid;padding:2px;font-style: italic;">
+									<?php echo $value[0]; ?>
+								</td>
+							<?php else : ?>
+								<td  style="mso-number-format:'#,##0.00';" align="center" style=" border: black 1px solid;padding:2px">
+									<?php echo $value[0]; ?>
+								</td>
+							<?php endif; ?>
                         <td  align="center"    style=" border: black 1px solid;padding:2px;font-size:10px">
                             <?php echo $value[1]; ?>
                         </td>
@@ -161,9 +167,15 @@ xmlns="http://www.w3.org/TR/REC-html40">
                             <strong></strong>
                         </td>
                         <?php foreach ($list['impar'] as $key => $value) : ?>
-                        <td  style="mso-number-format:'#,##0.00';" align="center"    style=" border: black 1px solid;padding:2px">
-                            <?php echo ($value[1] != "") ? "RCS" : $value[0]; ?>
-                        </td>
+							<?php if ($value[1] != ""): ?>
+								<td  style="mso-number-format:'#,##0.00';" align="center" style=" border: black 1px solid;padding:2px;font-style: italic;">
+									<?php echo $value[0]; ?>
+								</td>
+							<?php else : ?>
+								<td  style="mso-number-format:'#,##0.00';" align="center" style=" border: black 1px solid;padding:2px">
+									<?php echo $value[0]; ?>
+								</td>
+							<?php endif; ?>
                         <td  align="center"   style=" border: black 1px solid;padding:2px;font-size:10px">
                             <?php echo $value[1]; ?>
                         </td>
