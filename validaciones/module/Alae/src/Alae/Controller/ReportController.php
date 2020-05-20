@@ -1130,7 +1130,7 @@ class ReportController extends BaseController
                     $elements1 = $query->getResult();
 
                     $count1 = $elements1[0]['count1'];
-                    echo $count1;
+                    //echo $count1;
                     //número de muestras con “Record Modified = 1”
                     $query    = $this->getEntityManager()->createQuery("
                         SELECT COUNT(s.recordModified) as recordModified
@@ -1174,7 +1174,7 @@ class ReportController extends BaseController
                 $viewModel->setVariable('study', $studyName);
                 $viewModel->setVariable('countTot1', $countTot1);
                 $viewModel->setVariable('recordModified', $recordModifiedTot1);
-                $viewModel->setVariable('percent', $percent);
+                //$viewModel->setVariable('percent', $percent);
 
                 $viewModel->setVariable('filename', "listado_de_muestras_con_integracion_modificada" . date("Ymd-Hi"));
 

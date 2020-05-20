@@ -1,6 +1,7 @@
 <?php
 header('Content-Disposition: attachment; filename="' . $filename . '.xls";');
 header('Content-Type: application/vnd.ms-excel;charset=utf-8');
+$count=0;
 ?>
 <!DOCTYPE html>
 <html>
@@ -87,7 +88,10 @@ header('Content-Type: application/vnd.ms-excel;charset=utf-8');
                     % Muestras con integración modificada:
                 </td>
                 <td width="205" height="20" style="">
-                    <?php echo $percent; ?>
+                    <?php 
+                        $porcentaje = number_format($recordModified / $countTot1 * 100,2,",",".")."%";
+                        echo $porcentaje; 
+                    ?>
                 </td>
             </tr>
         </table>
