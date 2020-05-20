@@ -691,10 +691,9 @@ class ReportController extends BaseController
             
             foreach ($elements as $element)
             {
-                $error = ($element['codeError'] == '') ? number_format((float)$element[0]->getCalculatedConcentration(), 2, '.', '') : "RCS";
                 $properties[$element[0]->getFkBatch()->getFileName()][] = array(
                     "sampleName"              => $element[0]->getSampleName(),
-                    "calculatedConcentration" => $error,
+                    "calculatedConcentration" => number_format((float)$element[0]->getCalculatedConcentration(), 2, '.', ''),
                     "error"                   => $element['codeError']
                 );
 
@@ -718,7 +717,7 @@ class ReportController extends BaseController
                     
                     IF($centi == "S")
                     {
-                        $concentration[preg_replace('/-\d+/i', '', $element[0]->getSampleName())][] = $error;
+                        $concentration[preg_replace('/-\d+/i', '', $element[0]->getSampleName())][] = number_format((float)$element[0]->getCalculatedConcentration(), 2, '.', '');
                     }
                     
                 }    
@@ -873,10 +872,10 @@ class ReportController extends BaseController
             $concentration = $accuracy = $properties = array();
             foreach ($elements as $element)
             {
-                $error = ($element['codeError'] == '' || $element['codeError'] == 'O') ? number_format((float)$element[0]->getCalculatedConcentration(), 2, '.', '') : "NVR";
+                $error = number_format((float)$element[0]->getCalculatedConcentration(), 2, '.', '');
                 $properties[$element[0]->getFkBatch()->getFileName()][] = array(
                     "sampleName"              => $element[0]->getSampleName(),
-                    "calculatedConcentration" => $error,
+                    "calculatedConcentration" => number_format((float)$element[0]->getCalculatedConcentration(), 2, '.', ''),
                     "accuracy"                => number_format((float)$element[0]->getAccuracy(), 2, '.', ''),
                     "error"                   => $element['codeError']
                 );
@@ -906,7 +905,7 @@ class ReportController extends BaseController
                 }
                 $accuracy[preg_replace('/-\d+/i', '', $element[0]->getSampleName())][] = number_format((float)$element[0]->getAccuracy(), 2, '.', '');
             }
-
+            
             $response = array(
                 "analyte"      => $analytes[0],
                 "qc_values"    => explode(",", $analytes[0]->getQcValues()),
