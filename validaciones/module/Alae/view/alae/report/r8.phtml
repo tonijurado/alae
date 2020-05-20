@@ -121,6 +121,12 @@ xmlns="http://www.w3.org/TR/REC-html40">
                         <?php for($i = 1; $i <= $analyte->getQcNumber(); $i++) : ?>
                         <td  align="center"  colspan="4" style=" border: black 1px solid;padding:2px">QC<?php echo $i; ?></td>
                         <?php endfor; ?>
+                        <?php foreach ($llqc_values as $key => $value) : ?>
+                            <td  align="center"  colspan="4" style=" border: black 1px solid;padding:2px">LLQC</td>
+                        <?php endforeach; ?>
+                        <?php foreach ($ulqc_values as $key => $value) : ?>
+                            <td  align="center"  colspan="4" style=" border: black 1px solid;padding:2px">ULQC</td>
+                        <?php endforeach; ?>
 		    </tr>
 		    <tr><
 			<td  align="center"  colspan="2"  style="color:#000; border: black 1px solid;font-size:14px;padding:10px;font-style:bold;"></td>
@@ -129,10 +135,28 @@ xmlns="http://www.w3.org/TR/REC-html40">
                             <?php echo number_format($value, 2, '.', ''); ?>
                         </td>
                         <?php endforeach; ?>
+                        <?php foreach ($llqc_values as $key => $value) : ?>
+                        <td  style= "mso-number-format:'#,##0.00';" align="center"   colspan="4"  style=" border: black 1px solid;padding:2px">
+                            <?php echo number_format($value, 2, '.', ''); ?>
+                        </td>
+                        <?php endforeach; ?>
+                        <?php foreach ($ulqc_values as $key => $value) : ?>
+                        <td  style= "mso-number-format:'#,##0.00';" align="center"   colspan="4"  style=" border: black 1px solid;padding:2px">
+                            <?php echo number_format($value, 2, '.', ''); ?>
+                        </td>
+                        <?php endforeach; ?>
 		    </tr>
 		    <tr>
                 <td  align="center" colspan="2"  style="color:#000; border: black 1px solid;font-size:14px;padding:10px;font-style:bold;"></td>
             <?php foreach ($qc_values as $key => $value) : ?>
+                <td  align="center" colspan="2"  style=" border: black 1px solid;padding:2px">Conc Found</td>
+                <td  align="center" colspan="2"  style=" border: black 1px solid;padding:2px">% Nominal</td>
+            <?php endforeach; ?>
+            <?php foreach ($llqc_values as $key => $value) : ?>
+                <td  align="center" colspan="2"  style=" border: black 1px solid;padding:2px">Conc Found</td>
+                <td  align="center" colspan="2"  style=" border: black 1px solid;padding:2px">% Nominal</td>
+            <?php endforeach; ?>
+            <?php foreach ($ulqc_values as $key => $value) : ?>
                 <td  align="center" colspan="2"  style=" border: black 1px solid;padding:2px">Conc Found</td>
                 <td  align="center" colspan="2"  style=" border: black 1px solid;padding:2px">% Nominal</td>
             <?php endforeach; ?>
@@ -180,6 +204,40 @@ xmlns="http://www.w3.org/TR/REC-html40">
                             </td>
                             <?php endif; ?>
                             <?php if ($k == 6): ?>
+                            <td style="mso-number-format:'#,##0.00';" align="center" colspan="2" style=" border: black 1px solid;padding:2px">
+                                <?php echo $v['calculatedConcentration']; ?>
+                            </td>
+                            <?php if ($v['error']): ?>
+                                <td style="mso-number-format:'#,##0.00';" align="center" style=" border: black 1px solid;padding:2px;font-style:italic;">
+                                    <?php echo $v['accuracy']; ?>
+                                </td>
+                            <?php else: ?>
+                                <td style="mso-number-format:'#,##0.00';" align="center" style=" border: black 1px solid;padding:2px;">
+                                    <?php echo $v['accuracy']; ?>
+                                </td>
+                            <?php endif; ?>
+                            <td  align="center"    style=" border: black 1px solid;padding:2px;font-size:10px">
+                                <?php echo $v['error']; ?>
+                            </td>
+                            <?php endif; ?>
+                            <?php if ($k == 9): ?>
+                            <td style="mso-number-format:'#,##0.00';" align="center" colspan="2" style=" border: black 1px solid;padding:2px">
+                                <?php echo $v['calculatedConcentration']; ?>
+                            </td>
+                            <?php if ($v['error']): ?>
+                                <td style="mso-number-format:'#,##0.00';" align="center" style=" border: black 1px solid;padding:2px;font-style:italic;">
+                                    <?php echo $v['accuracy']; ?>
+                                </td>
+                            <?php else: ?>
+                                <td style="mso-number-format:'#,##0.00';" align="center" style=" border: black 1px solid;padding:2px;">
+                                    <?php echo $v['accuracy']; ?>
+                                </td>
+                            <?php endif; ?>
+                            <td  align="center"    style=" border: black 1px solid;padding:2px;font-size:10px">
+                                <?php echo $v['error']; ?>
+                            </td>
+                            <?php endif; ?>
+                            <?php if ($k == 12): ?>
                             <td style="mso-number-format:'#,##0.00';" align="center" colspan="2" style=" border: black 1px solid;padding:2px">
                                 <?php echo $v['calculatedConcentration']; ?>
                             </td>
@@ -255,6 +313,40 @@ xmlns="http://www.w3.org/TR/REC-html40">
                                 <?php echo $v['error']; ?>
                             </td>
                             <?php endif; ?>
+                            <?php if ($k == 10): ?>
+                            <td style="mso-number-format:'#,##0.00';" align="center" colspan="2" style=" border: black 1px solid;padding:2px">
+                                <?php echo $v['calculatedConcentration']; ?>
+                            </td>
+                            <?php if ($v['error']): ?>
+                                <td style="mso-number-format:'#,##0.00';" align="center" style=" border: black 1px solid;padding:2px;font-style:italic;">
+                                    <?php echo $v['accuracy']; ?>
+                                </td>
+                            <?php else: ?>
+                                <td style="mso-number-format:'#,##0.00';" align="center" style=" border: black 1px solid;padding:2px;">
+                                    <?php echo $v['accuracy']; ?>
+                                </td>
+                            <?php endif; ?>
+                            <td  align="center"    style=" border: black 1px solid;padding:2px;font-size:10px">
+                                <?php echo $v['error']; ?>
+                            </td>
+                            <?php endif; ?>
+                            <?php if ($k == 13): ?>
+                            <td style="mso-number-format:'#,##0.00';" align="center" colspan="2" style=" border: black 1px solid;padding:2px">
+                                <?php echo $v['calculatedConcentration']; ?>
+                            </td>
+                            <?php if ($v['error']): ?>
+                                <td style="mso-number-format:'#,##0.00';" align="center" style=" border: black 1px solid;padding:2px;font-style:italic;">
+                                    <?php echo $v['accuracy']; ?>
+                                </td>
+                            <?php else: ?>
+                                <td style="mso-number-format:'#,##0.00';" align="center" style=" border: black 1px solid;padding:2px;">
+                                    <?php echo $v['accuracy']; ?>
+                                </td>
+                            <?php endif; ?>
+                            <td  align="center"    style=" border: black 1px solid;padding:2px;font-size:10px">
+                                <?php echo $v['error']; ?>
+                            </td>
+                            <?php endif; ?>
                         <?php endforeach; ?>
 		    </tr>
             <tr>
@@ -297,6 +389,40 @@ xmlns="http://www.w3.org/TR/REC-html40">
                             </td>
                             <?php endif; ?>
                             <?php if ($k == 8): ?>
+                            <td style="mso-number-format:'#,##0.00';" align="center" colspan="2" style=" border: black 1px solid;padding:2px">
+                                <?php echo $v['calculatedConcentration']; ?>
+                            </td>
+                            <?php if ($v['error']): ?>
+                                <td style="mso-number-format:'#,##0.00';" align="center" style=" border: black 1px solid;padding:2px;font-style:italic;">
+                                    <?php echo $v['accuracy']; ?>
+                                </td>
+                            <?php else: ?>
+                                <td style="mso-number-format:'#,##0.00';" align="center" style=" border: black 1px solid;padding:2px;">
+                                    <?php echo $v['accuracy']; ?>
+                                </td>
+                            <?php endif; ?>
+                            <td  align="center"    style=" border: black 1px solid;padding:2px;font-size:10px">
+                                <?php echo $v['error']; ?>
+                            </td>
+                            <?php endif; ?>
+                            <?php if ($k == 11): ?>
+                            <td style="mso-number-format:'#,##0.00';" align="center" colspan="2" style=" border: black 1px solid;padding:2px">
+                                <?php echo $v['calculatedConcentration']; ?>
+                            </td>
+                            <?php if ($v['error']): ?>
+                                <td style="mso-number-format:'#,##0.00';" align="center" style=" border: black 1px solid;padding:2px;font-style:italic;">
+                                    <?php echo $v['accuracy']; ?>
+                                </td>
+                            <?php else: ?>
+                                <td style="mso-number-format:'#,##0.00';" align="center" style=" border: black 1px solid;padding:2px;">
+                                    <?php echo $v['accuracy']; ?>
+                                </td>
+                            <?php endif; ?>
+                            <td  align="center"    style=" border: black 1px solid;padding:2px;font-size:10px">
+                                <?php echo $v['error']; ?>
+                            </td>
+                            <?php endif; ?>
+                            <?php if ($k == 14): ?>
                             <td style="mso-number-format:'#,##0.00';" align="center" colspan="2" style=" border: black 1px solid;padding:2px">
                                 <?php echo $v['calculatedConcentration']; ?>
                             </td>
