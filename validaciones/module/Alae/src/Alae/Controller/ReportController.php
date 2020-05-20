@@ -980,10 +980,10 @@ class ReportController extends BaseController
                     $concentration = $accuracy = $properties = array();
                     foreach ($elements as $element)
                     {
-                        $error = ($element['codeError'] == '' || $element['codeError'] == 'O') ? number_format((float)$element[0]->getCalculatedConcentration(), 2, '.', '') : "NVR";
+                        $error = number_format((float)$element[0]->getCalculatedConcentration(), 2, '.', '');
                         $properties[$element[0]->getFkBatch()->getFileName()][] = array(
                             "sampleName"              => $element[0]->getSampleName(),
-                            "calculatedConcentration" => $error,
+                            "calculatedConcentration" => number_format((float)$element[0]->getCalculatedConcentration(), 2, '.', ''),
                             "dilutionFactor"          => number_format((float)$element[0]->getDilutionFactor(), 2, '.', ''),
                             "accuracy"                => number_format((float)$element[0]->getAccuracy(), 2, '.', ''),
                             "error"                   => $element['codeError']

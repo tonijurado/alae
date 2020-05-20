@@ -118,24 +118,25 @@ xmlns="http://www.w3.org/TR/REC-html40">
 		    </tr>
 		    <tr>
 			<td  align="center" colspan="2"  style="color:#000; border: black 1px solid;font-size:14px;padding:10px;font-style:bold;"><strong>Batch Results Table No.</strong></td>
-                        <?php for($i = 1; $i <= $analyte->getQcNumber(); $i++) : ?>
-                        <td  align="center"  colspan="4" style=" border: black 1px solid;padding:2px">QC<?php echo $i; ?></td>
-                        <?php endfor; ?>
                         <?php foreach ($llqc_values as $key => $value) : ?>
                             <td  align="center"  colspan="4" style=" border: black 1px solid;padding:2px">LLQC</td>
                         <?php endforeach; ?>
+                        <?php for($i = 1; $i <= $analyte->getQcNumber(); $i++) : ?>
+                        <td  align="center"  colspan="4" style=" border: black 1px solid;padding:2px">QC<?php echo $i; ?></td>
+                        <?php endfor; ?>
+                        
                         <?php foreach ($ulqc_values as $key => $value) : ?>
                             <td  align="center"  colspan="4" style=" border: black 1px solid;padding:2px">ULQC</td>
                         <?php endforeach; ?>
 		    </tr>
 		    <tr><
 			<td  align="center"  colspan="2"  style="color:#000; border: black 1px solid;font-size:14px;padding:10px;font-style:bold;"></td>
-			<?php foreach ($qc_values as $key => $value) : ?>
+                        <?php foreach ($llqc_values as $key => $value) : ?>
                         <td  style= "mso-number-format:'#,##0.00';" align="center"   colspan="4"  style=" border: black 1px solid;padding:2px">
                             <?php echo number_format($value, 2, '.', ''); ?>
                         </td>
                         <?php endforeach; ?>
-                        <?php foreach ($llqc_values as $key => $value) : ?>
+                        <?php foreach ($qc_values as $key => $value) : ?>
                         <td  style= "mso-number-format:'#,##0.00';" align="center"   colspan="4"  style=" border: black 1px solid;padding:2px">
                             <?php echo number_format($value, 2, '.', ''); ?>
                         </td>
@@ -148,14 +149,15 @@ xmlns="http://www.w3.org/TR/REC-html40">
 		    </tr>
 		    <tr>
                 <td  align="center" colspan="2"  style="color:#000; border: black 1px solid;font-size:14px;padding:10px;font-style:bold;"></td>
-            <?php foreach ($qc_values as $key => $value) : ?>
-                <td  align="center" colspan="2"  style=" border: black 1px solid;padding:2px">Conc Found</td>
-                <td  align="center" colspan="2"  style=" border: black 1px solid;padding:2px">% Nominal</td>
-            <?php endforeach; ?>
             <?php foreach ($llqc_values as $key => $value) : ?>
                 <td  align="center" colspan="2"  style=" border: black 1px solid;padding:2px">Conc Found</td>
                 <td  align="center" colspan="2"  style=" border: black 1px solid;padding:2px">% Nominal</td>
             <?php endforeach; ?>
+            <?php foreach ($qc_values as $key => $value) : ?>
+                <td  align="center" colspan="2"  style=" border: black 1px solid;padding:2px">Conc Found</td>
+                <td  align="center" colspan="2"  style=" border: black 1px solid;padding:2px">% Nominal</td>
+            <?php endforeach; ?>
+            
             <?php foreach ($ulqc_values as $key => $value) : ?>
                 <td  align="center" colspan="2"  style=" border: black 1px solid;padding:2px">Conc Found</td>
                 <td  align="center" colspan="2"  style=" border: black 1px solid;padding:2px">% Nominal</td>
