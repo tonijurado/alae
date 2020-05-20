@@ -11,7 +11,7 @@
 
 $myfile = fopen($newfile, "w") or die("Error, no se puede crear el txt");
 $filecontentHash= "TABLA DE RESULTADOS ALAE"."\r\n"."Código del estudio:"."\t".$batch->getFkStudy()->getCode()."\t"."Parámetros de la Curva de Calibrado (Y= mX+b)"."\r\n"."Analito"."\t".$batch->getFkAnalyte()->getName()."\t"."m = ".Alae\Service\Helper::getformatDecimal($batch->getSlope())."\r\n"."Nombre del archivo exportado:"."\t".$batch->getFileName()."\t"."b = ".Alae\Service\Helper::getformatDecimal($batch->getIntercept())."\r\n"."Fecha de importación:"."\t".$batch->getCreatedAt()."\t"."r = ".$batch->getCorrelationCoefficient()."\r\n"."Resultado de la Evaluación:"."\t".($batch->getValidFlag() ? "ACEPTADO" : "RECHAZADO")."\t"."Motivo de Rechazo:"."\t".htmlentities($errors)."\r\n"."Usuario:"."\t".$batch->getFkUser()->getUsername()."\r\n"."Fecha de la Evaluación:"."\t".$batch->getValidationDate()."\r\n";
-$filecontentHash = $filecontentHash . "5% IS"."\t"."PonerValor5%IS"."\r\n"."CheckSum"."\t".dechex(intval(($batch->getfileSize() / Alae\Service\Helper::getformatDecimal($batch->getSlope())) + $batch->getValidationDate()));
+$filecontentHash = $filecontentHash . "5% IS"."\t"."PonerValor5%IS"."\r\n"."CheckSum:"."\t".dechex(intval(($batch->getfileSize() / Alae\Service\Helper::getformatDecimal($batch->getSlope())) + $batch->getValidationDate()));
 fwrite($myfile, $filecontentHash);
 $filecontent= "Sample Name". "\t" . "Sample ID". "\t" . "Analyte peak name" . "\t" . "Sample Type" . "\t" . "File name" . "\t" . "Analyte peak area" . "\t" . "IS peak area" . "\t" . "Area ratio" . "\t" . "Analyte concentration" . "\t" . "Calculated concentration" . "\t" . "Dilution factor" . "\t" . "Accuracy" . "\t" . "Use record" . "\t" . "Acquisition date" . "\t" . "Analyte integration type" . "\t" . "IS integration type" . "\t" . "Record modified" . "\t" . "Rejection Reason" . "\t" . "Message"."\r\n";
 $filecontentHash=$filecontentHash.$tr1;
@@ -44,5 +44,7 @@ echo "Fecha de importación:"."\t".$batch->getCreatedAt()."\t"."r = ".$batch->ge
 echo "Resultado de la Evaluación:"."\t".($batch->getValidFlag() ? "ACEPTADO" : "RECHAZADO")."\t"."Motivo de Rechazo:"."\t".htmlentities($errors)."\r\n";
 echo "Usuario:"."\t".$batch->getFkUser()->getUsername()."\r\n";
 echo "Fecha de la Evaluación:"."\t".$batch->getValidationDate()."\r\n";
+echo "5% IS"."\t".$batch->getIsCsQcAcceptedAvg() * (5/100)."\r\n";
+echo "CheckSum"."\t".dechex(intval(($batch->getfileSize() / Alae\Service\Helper::getformatDecimal($batch->getSlope())) + $batch->getValidationDate()))."\r\n";
 echo $filecontent;
 ?>
