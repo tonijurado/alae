@@ -104,7 +104,7 @@ class ReportController extends BaseController
         $query    = $this->getEntityManager()->createQuery("
             SELECT b
             FROM Alae\Entity\Batch b
-            WHERE b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id') . "
+            WHERE b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id') . " AND b.validFlag is NOT NULL
             ORDER BY b.fileName ASC");
         $elements = $query->getResult();
         // $data     = '<option value="-1">Seleccione</option>';
