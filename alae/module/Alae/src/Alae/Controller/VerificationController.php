@@ -262,7 +262,7 @@ class VerificationController extends BaseController
         if ($continue && is_null($Batch->getFkParameter()))
         {
             $this->$function($Batch);
-            for ($i = 21; $i <= 25; $i++)
+            for ($i = 21; $i <= 26; $i++)
             {
                 $function = 'V' . $i;
                 $this->$function($Batch);
@@ -1344,8 +1344,8 @@ class VerificationController extends BaseController
      */
     protected function V26(\Alae\Entity\Batch $Batch)
     {
-        $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V26"));
-        $parameters2 = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V27"));
+        $parameters  = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V26"));
+        //$parameters2 = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V26.2"));
         
         $AnaStudy = $this->getRepository("\\Alae\\Entity\\AnalyteStudy")->findBy(array(
             "fkAnalyte" => $Batch->getFkAnalyte(),
@@ -1358,16 +1358,16 @@ class VerificationController extends BaseController
         $minTretIS = $AnaStudy[0]->getRetentionIS() - $AnaStudy[0]->getAcceptanceIs() / 100 * $AnaStudy[0]->getRetentionIS();
         $maxTretIS = $AnaStudy[0]->getRetentionIS() + $AnaStudy[0]->getAcceptanceIs() / 100 * $AnaStudy[0]->getRetentionIS();
         
-        $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V26"));
+        //$parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V26"));
         // Toni: Según mail de Natalia del día 08.12.2019, no se deberían evaluar para el control de tiempo de retención las muestras BLK
         // para conseguirlo, modificamos la primera parte del siguiente WHERE.
-
-        $where = " (s.sampleName <> 'BLK' AND s.analyteRetentionTime NOT BETWEEN $minTretAna AND $maxTretAna OR 
-                    s.isRetentionTime NOT BETWEEN $minTretIS AND $maxTretIS)
+        
+        $where = " ((s.sampleName <> 'BLK%' AND s.sampleType <> 'Solvent' AND s.isPeakArea <> 0 AND s.analytePeakArea <> 0) 
+                    AND (s.analyteRetentionTime NOT BETWEEN $minTretAna AND $maxTretAna) OR (s.isRetentionTime NOT BETWEEN $minTretIS AND $maxTretIS))
                    AND s.fkBatch = " . $Batch->getPkBatch();
         
         $this->error($where, $parameters[0], array(), false);
-
+/*
         $where2 = "(s.sampleName LIKE 'CS%' OR s.sampleName LIKE 'QC%') AND 
                    (s.analyteRetentionTime NOT BETWEEN $minTretAna AND $maxTretAna OR 
                     s.isRetentionTime NOT BETWEEN $minTretIS AND $maxTretIS)
@@ -1375,7 +1375,7 @@ class VerificationController extends BaseController
                    AND s.fkBatch = " . $Batch->getPkBatch();
         
         $this->error($where2, $parameters2[0], array(), false);
-
+*/
         /*$query = $this->getEntityManager()->createQuery("
             SELECT s.pkSampleBatch as pkSampleBatch, s.sampleName as sampleName, 
                    s.analyteRetentionTime as AnaRetentionTime, s.isRetentionTime as IsRetentionTime
