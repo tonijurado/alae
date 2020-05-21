@@ -1127,6 +1127,7 @@ class VerificationController extends BaseController
     protected function V23(\Alae\Entity\Batch $Batch)
     {
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V23"));
+        $parameters1 = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V23.1"));
         $value      = $Batch->getIsCsQcAcceptedAvg() * ($parameters[0]->getMinValue() / 100);
         
         //TYPE Unknown
@@ -1138,12 +1139,21 @@ class VerificationController extends BaseController
         $this->error($where, $parameters[0], array(), false);
 
         //SampleName CS, TYPE Standard
-        $where = "s.sampleName LIKE 'CS%' AND s.sampleType = 'Standard' AND s.isPeakArea < $value AND s.fkBatch = " . $Batch->getPkBatch();
+        $where = "s.sampleName LIKE 'CS%' AND s.sampleType = 'Standard' AND s.isPeakArea < $value AND s.useRecord = 0 AND s.fkBatch = " . $Batch->getPkBatch();
         $this->error($where, $parameters[0], array(), false);
 
+        //SampleName CS, TYPE Standard y UseRecord=1 --> Se rechaza LOTE V23.1
+        $where = "s.sampleName LIKE 'CS%' AND s.sampleType = 'Standard' AND s.isPeakArea < $value AND s.useRecord = 1 AND s.fkBatch = " . $Batch->getPkBatch();
+        $this->error($where, $parameters1[0], array(), false);
+
         //SampleName QC, TYPE Quality Control
-        $where = "s.sampleName LIKE 'QC%' AND s.sampleType = 'Quality Control' AND s.isPeakArea < $value AND s.fkBatch = " . $Batch->getPkBatch();
+        $where = "s.sampleName LIKE '%QC%' AND s.sampleType = 'Quality Control' AND s.isPeakArea < $value AND s.useRecord = 0 AND s.fkBatch = " . $Batch->getPkBatch();
         $this->error($where, $parameters[0], array(), false);
+
+        //SampleName QC, TYPE Quality Control y UseRecord=1 --> Se rechaza LOTE V23.1
+        $where = "s.sampleName LIKE '%QC%' AND s.sampleType = 'Quality Control' AND s.isPeakArea < $value AND s.useRecord = 1 AND s.fkBatch = " . $Batch->getPkBatch();
+        $this->error($where, $parameters1[0], array(), false);
+
     }
 
     protected function V24(\Alae\Entity\Batch $Batch)
