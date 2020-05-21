@@ -660,33 +660,110 @@ class VerificationController extends BaseController
         }
     }
 
-    /**
+/**
      * Verificacion de accuracy
      * V10.1: Accuracy (CS1) - NO CUMPLE ACCURACY
      * V10.2: Accuracy (CS2-CSx) - NO CUMPLE ACCURACY
      * V10.3: Accuracy (QC) - NO CUMPLE ACCURACY
-     * V10.4: Accuracy (DQC) - NO CUMPLE ACCURACY
+     * V10.4: Accuracy (TZ) - NO CUMPLE ACCURACY
+     * V10.5: Accuracy (DQC) - NO CUMPLE ACCURACY
      * @param \Alae\Entity\Batch $Batch
+     * 
+     * TONI 03/04/2020: Incorporamos en esta verificación también los pasos para VERIFICAR que si NO SE CUMPLE ACCURACY pero está marcado el USE RECORD = 1, 
+     * se genere un error de USE RECORD y se rechace el lote.
+     * Después de cada verificación, he repetido el código pero añadiendo que s.useRecord = 1, de esta forma identifico las muestras que NO CUMPLEN ACCURACY pero tienen USE RECORD = 1
+     * 
      */
-    protected function V10(\Alae\Entity\Batch $Batch)
+    protected function V10(\Alae\Entity\Batch $Batch) //Esta es copia identica de VALIDACIONES aunque no aplica a TZ, LLQC ni PID ya que en muestras estas no existen.
     {
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.1"));
-        $where      = "s.sampleName LIKE 'CS1%' AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.fkBatch = " . $Batch->getPkBatch();
+        $where      = "(s.sampleName LIKE 'CS1%' OR s.sampleName LIKE 'LLQC%' OR s.sampleName LIKE 'PID%' OR s.sampleName LIKE 'LL_LLOQ%') AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.fkBatch = " . $Batch->getPkBatch();
         $this->error($where, $parameters[0], array(), false);
 
+        //REPITO la consulta anterior pero ahora Verificamos el USE RECORD de las muestras que no cumple accuracy de V10.1
+        //Si ese USE RECORD = 1, se debe identificar la muestra como error y se anula lote gracias al parámetro de la tblParameters 
+            $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.1.1"));
+            $where      = "(s.sampleName LIKE 'CS1%' OR s.sampleName LIKE 'LLQC%' OR s.sampleName LIKE 'PID%' OR s.sampleName LIKE 'LL_LLOQ%') AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.useRecord = 1 AND s.fkBatch = " . $Batch->getPkBatch();
+            $this->error($where, $parameters[0], array(), false);
+        //Fin de la comprobación del USE RECORD = 1 para muestras que no cumplen Accuracy para la V10.1
+
+        
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.2"));
         $where      = "REGEXP(s.sampleName, :regexp) = 1 AND s.sampleName NOT LIKE 'CS1%' AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.fkBatch = " . $Batch->getPkBatch();
         //$this->error($where, $parameters[0], array('regexp' => '^CS[0-9]+(-[0-9]+)?$'), false);
         $this->error($where, $parameters[0], array('regexp' => '^CS[0-9]+(-[0-9]+(R[0-9]+)?)?$'), false);
 
+        //REPITO la consulta anterior pero ahora Verificamos el USE RECORD de las muestras que no cumple accuracy de V10.2
+        //Si ese USE RECORD = 1, se debe identificar la muestra como error y se anula lote gracias al parámetro de la tblParameters 
+            $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.2.1"));
+            $where      = "REGEXP(s.sampleName, :regexp) = 1 AND s.sampleName NOT LIKE 'CS1%' AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.useRecord = 1 AND s.fkBatch = " . $Batch->getPkBatch();
+            //$this->error($where, $parameters[0], array('regexp' => '^CS[0-9]+(-[0-9]+)?$'), false);
+            $this->error($where, $parameters[0], array('regexp' => '^CS[0-9]+(-[0-9]+(R[0-9]+)?)?$'), false);
+        //Fin de la comprobación del USE RECORD = 1 para muestras que no cumplen Accuracy para la V10.2
+
+
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.3"));
-        $where      = "REGEXP(s.sampleName, :regexp) = 1 AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.fkBatch = " . $Batch->getPkBatch();
+        $where      = "(REGEXP(s.sampleName, :regexp) = 1) AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.fkBatch = " . $Batch->getPkBatch();
         //$this->error($where, $parameters[0], array('regexp' => '^QC[0-9]+(-[0-9]+)?$'), false);
         $this->error($where, $parameters[0], array('regexp' => '^QC[0-9]+(-[0-9]+(R[0-9]+)?)?$'), false);
 
+        $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.3"));
+        $where      = "(s.sampleType = 'Quality Control' AND 
+                        (s.sampleName LIKE 'ULQC%' OR
+                        s.sampleName LIKE 'AS%' OR
+                        s.sampleName LIKE 'TZ%' OR
+                        s.sampleName LIKE 'FT%' OR
+                        s.sampleName LIKE 'ST%' OR
+                        s.sampleName LIKE 'LT%' OR
+                        s.sampleName LIKE 'PP%' OR
+                        s.sampleName LIKE 'SLP%'))
+                        AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.fkBatch = " . $Batch->getPkBatch();
+        //$this->error($where, $parameters[0], array('regexp' => '^QC[0-9]+(-[0-9]+)?$'), false);
+        $this->error($where, $parameters[0], array(), false);
+
+        //REPITO la consulta anterior pero ahora Verificamos el USE RECORD de las muestras que no cumple accuracy de V10.3
+        //Si ese USE RECORD = 1, se debe identificar la muestra como error y se anula lote gracias al parámetro de la tblParameters 
+            $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.3.1"));
+            $where      = "(s.sampleType = 'Quality Control' AND 
+                            (s.sampleName LIKE 'ULQC%' OR
+                            s.sampleName LIKE 'AS%' OR
+                            s.sampleName LIKE 'TZ%' OR
+                            s.sampleName LIKE 'FT%' OR
+                            s.sampleName LIKE 'ST%' OR
+                            s.sampleName LIKE 'LT%' OR
+                            s.sampleName LIKE 'PP%' OR
+                            s.sampleName LIKE 'SLP%'))
+                            AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.useRecord = 1 AND s.fkBatch = " . $Batch->getPkBatch();
+            //$this->error($where, $parameters[0], array('regexp' => '^QC[0-9]+(-[0-9]+)?$'), false);
+            $this->error($where, $parameters[0], array(), false);
+        
+        //Fin de la comprobación del USE RECORD = 1 para muestras que no cumplen Accuracy para la V10.3 
+
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.4"));
+        $where      = "s.sampleName LIKE 'TZ%' AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.fkBatch = " . $Batch->getPkBatch();
+        $this->error($where, $parameters[0], array(), false);
+
+        //REPITO la consulta anterior pero ahora Verificamos el USE RECORD de las muestras que no cumple accuracy de V10.4
+        //Si ese USE RECORD = 1, se debe identificar la muestra como error y se anula lote gracias al parámetro de la tblParameters 
+            $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.4.1"));
+            $where      = "s.sampleName LIKE 'TZ%' AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.useRecord = 1 AND s.fkBatch = " . $Batch->getPkBatch();
+            $this->error($where, $parameters[0], array(), false);
+
+        //Fin de la comprobación del USE RECORD = 1 para muestras que no cumplen Accuracy para la V10.4 
+
+        $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.5"));
         $where      = "REGEXP(s.sampleName, :regexp) = 1 AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.fkBatch = " . $Batch->getPkBatch();
         $this->error($where, $parameters[0], array('regexp' => '^((L|H)?DQC)[0-9]+(-[0-9]+)?$'), false);
+
+        //REPITO la consulta anterior pero ahora Verificamos el USE RECORD de las muestras que no cumple accuracy de V10.5
+        //Si ese USE RECORD = 1, se debe identificar la muestra como error y se anula lote gracias al parámetro de la tblParameters 
+            $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.5.1"));
+            $where      = "REGEXP(s.sampleName, :regexp) = 1 AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.useRecord = 1 AND s.fkBatch = " . $Batch->getPkBatch();
+            $this->error($where, $parameters[0], array('regexp' => '^((L|H)?DQC)[0-9]+(-[0-9]+)?$'), false);
+        
+        //Fin de la comprobación del USE RECORD = 1 para muestras que no cumplen Accuracy para la V10.5 
+
+
     }
 
     /**

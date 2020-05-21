@@ -925,7 +925,7 @@ class VerificationController extends BaseController
      * Después de cada verificación, he repetido el código pero añadiendo que s.useRecord = 1, de esta forma identifico las muestras que NO CUMPLEN ACCURACY pero tienen USE RECORD = 1
      * 
      */
-    protected function V10(\Alae\Entity\Batch $Batch)
+    protected function V10(\Alae\Entity\Batch $Batch) //Se copia esta de validaciones que es correcta en Muestras, aunque no afecte a muestras TZ, LLQC ni PID
     {
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.1"));
         $where      = "(s.sampleName LIKE 'CS1%' OR s.sampleName LIKE 'LLQC%' OR s.sampleName LIKE 'PID%' OR s.sampleName LIKE 'LL_LLOQ%') AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.fkBatch = " . $Batch->getPkBatch();
