@@ -585,13 +585,13 @@ class VerificationController extends BaseController
         }
     }
 
-    /**
+    /*
      * Verificar muestras reinyectadas [QCRx*]
      * V9.1: Accuracy (QCRx*) - QCR* ACCURACY FUERA DE RANGO
      * V9.2: Use record = 0 ( QCRx*) - QCR* USE RECORD NO VALIDO
      * V9.3: Que tanto V 9.1 como V 9.2 se cumplan - QCR* NO VALIDO
      * @param \Alae\Entity\Batch $Batch
-     */
+     
     protected function V9(\Alae\Entity\Batch $Batch)
     {
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V9.1"));
@@ -619,7 +619,7 @@ class VerificationController extends BaseController
             $areaRatioInj = $SampleName['areaRatio'];
             $injName = $SampleName['sampleName'];
             $useRecord = $SampleName['useRecord'];
-            $originName  = preg_replace(array('/R[0-9]+/', '/\*/'), '', $SampleName['sampleName']);
+            $originName  = preg_replace(array('/R[0-9]+/', '/\* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXBORRA TODAS LAS X/'), '', $SampleName['sampleName']);
 
             $query    = $this->getEntityManager()->createQuery("
             SELECT s.areaRatio
@@ -659,7 +659,101 @@ class VerificationController extends BaseController
             }
         }
     }
+    */
+        /**
+     * V9: Muestras Reinyectadas
+     * Verificar muestras reinyectadas [QCRx*]
+     * V9.1: Accuracy (QCRx*) - QCR* ACCURACY FUERA DE RANGO
+     * V9.2: Use record = 0 ( QCRx*) - QCR* USE RECORD NO VALIDO
+     * V9.3: Que tanto V 9.1 como V 9.2 se cumplan - QCR* NO VALIDO
+     * @param \Alae\Entity\Batch $Batch
+     */
+    protected function V9(\Alae\Entity\Batch $Batch)
+    {
+        $query    = $this->getEntityManager()->createQuery("
+            SELECT s.pkSampleBatch, s.sampleName, s.areaRatio, s.useRecord
+            FROM Alae\Entity\SampleBatch s
+            WHERE (REGEXP(s.sampleName, :regexp) = 1 OR REGEXP(s.sampleName, :regexp2) = 1 OR REGEXP(s.sampleName, :regexp3) = 1) AND  s.fkBatch = " . $Batch->getPkBatch() . "
+            ORDER BY s.sampleName ASC");
+        $query->setParameter('regexp', '^QC[0-9]+-[0-9]+R[0-9]+\*$');
+        $query->setParameter('regexp2', '^CS[0-9]+-[0-9]+R[0-9]+\*$');
+        $query->setParameter('regexp3', 'QC-[0-9]+R[0-9]+\*$'); // Añadimos esta para incluir muestras tipo: LLQC-5R1 (es decir, %QC-xRy*)
+        $elements = $query->getResult();
 
+        $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V9.1"));
+        $min = $parameters[0]->getMinValue();
+        $max = $parameters[0]->getMaxValue();
+
+        $parameters2 = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V9.2"));
+        $parameters3 = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V9.3"));
+        
+        //Toni: 
+
+        if (count($elements) > 0)
+        {
+            foreach ($elements as $temp)
+            {
+                $areaRatioInj = $temp['areaRatio'];
+                $useRecordInj = $temp['useRecord'];
+                    //echo 'UseRecord = ' . $useRecordInj . ' /// ';
+                $originName  = preg_replace(array('/R[0-9]+/', '/\*/'), '', $temp['sampleName']);
+                    //echo $originName . ' /// ';
+                    //die();
+                $query2    = $this->getEntityManager()->createQuery("
+                SELECT s.sampleName, s.areaRatio
+                FROM Alae\Entity\SampleBatch s
+                WHERE s.fkBatch = " . $Batch->getPkBatch() . " and s.sampleName = '". $originName . "'
+                ORDER BY s.sampleName ASC");
+                $elements2 = $query2->getResult();
+                foreach ($elements2 as $temp2)
+                {
+                    $sampleNameOrig = $temp2['sampleName'];
+                    $areaRatioOrig = $temp2['areaRatio'];
+                }
+
+                $dif = (($areaRatioOrig - $areaRatioInj) / $areaRatioOrig) * 100;
+
+                $centi91 = "N";
+                if ($dif <= $min || $dif >= $max) //Verificamos el ratio de +- 15%, si no cumple, generamos error para las muestras reinyectadas junto a esta
+                {
+                    $centi91 = "S";
+                    $where = "s.sampleName = '" . $temp['sampleName'] . "' AND s.fkBatch = " . $Batch->getPkBatch();
+                    $this->error($where, $parameters[0], array(), false);
+                }
+
+                $centi92 = "N";
+                if($useRecordInj == 1) //Si alguna muestra tiene useRecord <> 0 generamos error ya que todas las muestras reinyectadas deben tener useRecord=0
+                {
+                    $centi92 = "S";
+                    $where = "s.sampleName = '" . $temp['sampleName'] . "' AND s.fkBatch = " . $Batch->getPkBatch();
+                    $this->error($where, $parameters2[0], array(), false);
+                }
+                //echo 'Centi 91 calculos -> ' . $centi91 . ' // centi92 UseRecord == 0 ->' . $centi92;
+                if($centi91 == "S" || $centi92 == "S")
+                {
+                    $where = "s.sampleName = '" . $temp['sampleName'] . "' AND s.fkBatch = " . $Batch->getPkBatch();
+                    $this->error($where, $parameters3[0], array(), false);
+
+                    $pos = strpos($temp["sampleName"], '*');
+                    $pos = $pos - 1;
+                    $reinyect =  trim(substr($temp["sampleName"], -3, $pos), '*');
+
+                    $query2    = $this->getEntityManager()->createQuery("
+                    SELECT s.sampleName, s.areaRatio
+                    FROM Alae\Entity\SampleBatch s
+                    WHERE s.fkBatch = " . $Batch->getPkBatch() . " and s.sampleName LIKE '%". $reinyect . "%' AND s.sampleName NOT LIKE  '%\*%'
+                    ORDER BY s.sampleName ASC");
+                    $elements2 = $query2->getResult();
+
+                    foreach ($elements2 as $temp2)
+                    {
+                        $where = "s.sampleName = '" . $temp2['sampleName'] . "' AND s.fkBatch = " . $Batch->getPkBatch();
+                        $this->error($where, $parameters3[0], array(), false);
+                    }   
+                }
+            }
+        }
+    }
 /**
      * Verificacion de accuracy
      * V10.1: Accuracy (CS1) - NO CUMPLE ACCURACY
