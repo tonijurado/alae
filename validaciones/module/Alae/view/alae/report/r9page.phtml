@@ -19,7 +19,7 @@
             <?php foreach($values as $value) : ?>
             <tr>
                 <td  align="center" bgcolor="" colspan="3" style=" border: black 1px solid;padding:2px;font-size: 11px">
-                    <strong>'<?php if($key != $aux) : list($key, $aux) = explode("_", $key); echo $key; $aux = $key; endif; ?></strong>
+                    <strong><?php if($key != $aux) : list($key, $aux) = explode("_", $key); echo $key; $aux = $key; endif; ?></strong>
                 </td>
                 <?php if ($value["error"]): ?>
                     <td style="mso-number-format:'#,##0.00';" align="center"  bgcolor="" colspan="2"  style=" border: black 1px solid;padding:2px;font-style:italic;">
