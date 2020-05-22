@@ -309,6 +309,7 @@ class CronController extends BaseController
         $Batch->setSerial((string) $response['batch']);
         $Batch->setFileName($fileName);
         $Batch->setFileSize($fileSize);
+        $Batch->setCurveFlag(0);
         $Batch->setFkUser($this->_getSystem());
         $this->getEntityManager()->persist($Batch);
         $this->getEntityManager()->flush();
