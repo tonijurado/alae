@@ -1395,28 +1395,22 @@ class VerificationController extends BaseController
             {
                 for ($i = 1; $i <= 1; $i++)
                 {
-                    $analyteConcentration = \Alae\Service\Conversion::conversion(
+
+                    $CalculatedConcentration = \Alae\Service\Conversion::conversion(
                         $AnaStudy->getFkUnit()->getName(),
-                        $Batch->getAnalyteConcentrationUnits(),
+                        $Batch->getcalculatedConcentrationUnits(),
+                        //$Batch->getAnalyteConcentrationUnits(),
                         $cs_values[$i - 1]
                     );
                 }
             }
         }
 
-        /*$query = $this->getEntityManager()->createQuery("
-            SELECT s.analyteConcentration
-            FROM Alae\Entity\SampleBatch s
-            WHERE s.sampleName LIKE 'CS1%' AND s.fkBatch = " . $Batch->getPkBatch() . "
-            ORDER BY s.sampleName DESC")
-            ->setMaxResults(1);
-        $analyteConcentration = $query->getSingleScalarResult();
-*/      
         $query    = $this->getEntityManager()->createQuery("
             SELECT s.pkSampleBatch
             FROM Alae\Entity\SampleBatch s
-            WHERE (REGEXP(s.sampleName, :regexp) = 1)
-            AND s.analyteConcentration >= $analyteConcentration
+            WHERE REGEXP(s.sampleName, :regexp) = 1
+            AND s.calculatedConcentration >= $CalculatedConcentration
             AND s.sampleType = 'Unknown'
             AND s.fkBatch = " . $Batch->getPkBatch() . "
             ORDER BY s.pkSampleBatch");
