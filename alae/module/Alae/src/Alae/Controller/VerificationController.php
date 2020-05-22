@@ -1471,14 +1471,14 @@ class VerificationController extends BaseController
         // Toni: Según mail de Natalia del día 08.12.2019, no se deberían evaluar para el control de tiempo de retención las muestras BLK
         // para conseguirlo, modificamos la primera parte del siguiente WHERE.
         
-        $where = " ((s.sampleName <> 'BLK%' AND s.sampleType <> 'Solvent' AND s.isPeakArea <> 0 AND s.analytePeakArea <> 0) 
-                    AND (s.analyteRetentionTime NOT BETWEEN $minTretAna AND $maxTretAna) OR (s.isRetentionTime NOT BETWEEN $minTretIS AND $maxTretIS))
+        $where = " (s.sampleName NOT LIKE 'BLK%' AND s.sampleType <> 'Solvent' AND s.isPeakArea <> 0 AND s.analytePeakArea <> 0) 
+                    AND ((s.analyteRetentionTime NOT BETWEEN $minTretAna AND $maxTretAna) OR (s.isRetentionTime NOT BETWEEN $minTretIS AND $maxTretIS))
                    AND s.useRecord <> 1 AND s.fkBatch = " . $Batch->getPkBatch();
         
         $this->error($where, $parameters[0], array(), false);
         //Repetimos la condición con UseRecord=1 para en este caso SI ANULAR LOTE
-        $where = " ((s.sampleName <> 'BLK%' AND s.sampleType <> 'Solvent' AND s.isPeakArea <> 0 AND s.analytePeakArea <> 0) 
-                    AND (s.analyteRetentionTime NOT BETWEEN $minTretAna AND $maxTretAna) OR (s.isRetentionTime NOT BETWEEN $minTretIS AND $maxTretIS))
+        $where = " (s.sampleName NOT LIKE 'BLK%' AND s.sampleType <> 'Solvent' AND s.isPeakArea <> 0 AND s.analytePeakArea <> 0) 
+                    AND ((s.analyteRetentionTime NOT BETWEEN $minTretAna AND $maxTretAna) OR (s.isRetentionTime NOT BETWEEN $minTretIS AND $maxTretIS))
                    AND s.useRecord = 1 AND s.fkBatch = " . $Batch->getPkBatch();
         
         $this->error($where, $parameters2[0], array(), false);
