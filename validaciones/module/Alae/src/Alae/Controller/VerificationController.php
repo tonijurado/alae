@@ -411,6 +411,19 @@ class VerificationController extends BaseController
         
     }
 
+    /*
+     * Actualiza curve flag
+     */
+    protected function curve($pkParameter)
+    {
+        $sql = "
+            UPDATE Alae\Entity\Batch b
+            SET b.curveFlag = 1
+            WHERE b.pkBatch = " . $pkParameter;
+        $query = $this->getEntityManager()->createQuery($sql);
+        $query->execute();
+    }
+
     /**
      * V5: Sample Type - SAMPLE TYPE ERRÓNEO
      * @param \Alae\Entity\Batch $Batch
@@ -1400,6 +1413,8 @@ class VerificationController extends BaseController
             {
                 $where = "s.sampleName LIKE 'CS%' AND s.fkBatch = " . $Batch->getPkBatch();
                 $this->error($where, $parameters[0]);
+
+                $this->curve($Batch->getPkBatch());
             }
         }
     }
@@ -1454,6 +1469,8 @@ class VerificationController extends BaseController
             $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V18"));
             $where = "s.pkSampleBatch in (" . implode(",", $pkSampleBatch) . ") AND s.fkBatch = " . $Batch->getPkBatch();
             $this->error($where, $parameters[0]);
+
+            $this->curve($Batch->getPkBatch());
         }
     }
 
@@ -1493,6 +1510,8 @@ class VerificationController extends BaseController
             {
                 $where = "s.sampleName LIKE 'CS1%' AND s.fkBatch = " . $Batch->getPkBatch();
                 $this->error($where, $parameters[0]);
+
+                $this->curve($Batch->getPkBatch());
             }
         
 
@@ -1531,6 +1550,8 @@ class VerificationController extends BaseController
             {
                 $where = "s.sampleName LIKE 'CS" .$AnaStudy[0]->getCsNumber(). "%' AND s.fkBatch = " . $Batch->getPkBatch();
                 $this->error($where, $parameters[0]);
+
+                $this->curve($Batch->getPkBatch());
             }
         
     }
@@ -1548,6 +1569,7 @@ class VerificationController extends BaseController
             //$this->evaluation($Batch, false, $parameters[0]);
             $where = "s.sampleName LIKE 'CS%' AND s.fkBatch = " . $Batch->getPkBatch();
             $this->error($where, $parameters[0]); //Toni: Descomento esta línea ya que estaba comentada y no hacía nada...
+            $this->curve($Batch->getPkBatch());
         }
     }
 
@@ -1686,6 +1708,8 @@ class VerificationController extends BaseController
         {
             $where = "s.sampleName LIKE 'BLK%' AND s.fkBatch = " . $Batch->getPkBatch();
             $this->error($where, $parameters[0]);
+            $this->curve($Batch->getPkBatch());
+            
         }
 
         $query    = $this->getEntityManager()->createQuery("
@@ -1714,6 +1738,7 @@ class VerificationController extends BaseController
             {
                 $where = "s.sampleName LIKE 'ZS%' AND s.sampleName NOT LIKE 'ZS_NT%' AND s.sampleName NOT LIKE 'ZS_BC%' AND s.fkBatch = " . $Batch->getPkBatch();
                 $this->error($where, $parameters[0]);
+                $this->curve($Batch->getPkBatch());
             }
         
     }

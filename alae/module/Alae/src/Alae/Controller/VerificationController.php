@@ -238,6 +238,19 @@ class VerificationController extends BaseController
         return '<select name="reason_'.$id.'" style="width:100%;">'.$options.'</select>';
     }
 
+    /*
+     * Actualiza curve flag
+     */
+    protected function curve($pkParameter)
+    {
+        $sql = "
+            UPDATE Alae\Entity\Batch b
+            SET b.curveFlag = 1
+            WHERE b.pkBatch = " . $pkParameter;
+        $query = $this->getEntityManager()->createQuery($sql);
+        $query->execute();
+    }
+
     /**
      * Varificaciones desde la 13 hasta la 25
      * @param \Alae\Entity\Batch $Batch
@@ -1078,6 +1091,7 @@ class VerificationController extends BaseController
         {
             $where = "s.sampleName LIKE 'CS%' AND s.fkBatch = " . $Batch->getPkBatch();
             $this->error($where, $parameters[0]);
+            $this->curve($Batch->getPkBatch());
         }
     }
 
@@ -1126,6 +1140,7 @@ class VerificationController extends BaseController
             $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V16"));
             $where = "s.pkSampleBatch in (" . implode(",", $pkSampleBatch) . ") AND s.fkBatch = " . $Batch->getPkBatch();
             $this->error($where, $parameters[0]);
+            $this->curve($Batch->getPkBatch());
         }
     }
 
@@ -1141,6 +1156,7 @@ class VerificationController extends BaseController
         if (($Batch->getCorrelationCoefficient() * 100) < $parameters[0]->getMinValue())
         {
             $this->evaluation($Batch, false, $parameters[0]);
+            $this->curve($Batch->getPkBatch());
         }
     }
 
@@ -1226,6 +1242,7 @@ class VerificationController extends BaseController
         {
             $where = "s.sampleName LIKE 'BLK%' AND s.fkBatch = " . $Batch->getPkBatch();
             $this->error($where, $parameters[0]);
+            $this->curve($Batch->getPkBatch());
         }
 
         $query    = $this->getEntityManager()->createQuery("
@@ -1246,6 +1263,7 @@ class VerificationController extends BaseController
         {
             $where = "s.sampleName LIKE 'ZS%' AND s.fkBatch = " . $Batch->getPkBatch();
             $this->error($where, $parameters[0]);
+            $this->curve($Batch->getPkBatch());
         }
     }
 

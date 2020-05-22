@@ -72,6 +72,13 @@ class Batch
     protected $acceptedFlag;
 
     /**
+     * @var boolean
+     *
+     * @ORM\Column(name="curve_flag", type="boolean")
+     */
+    protected $curveFlag;
+
+    /**
      * @var string
      *
      * @ORM\Column(name="justification", type="string", length=250, nullable=true)
@@ -313,6 +320,16 @@ class Batch
     public function setAcceptedFlag($acceptedFlag)
     {
         $this->acceptedFlag = $acceptedFlag;
+    }
+
+    public function getCurveFlag()
+    {
+        return $this->curveFlag;
+    }
+
+    public function setCurveFlag($curveFlag)
+    {
+        $this->curveFlag = $curveFlag;
     }
 
     public function getJustification()
