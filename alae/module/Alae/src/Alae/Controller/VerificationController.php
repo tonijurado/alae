@@ -1454,7 +1454,7 @@ class VerificationController extends BaseController
     protected function V26(\Alae\Entity\Batch $Batch)
     {
         $parameters  = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V26"));
-        //$parameters2 = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V26.2"));
+        $parameters2 = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V26.1"));
         
         $AnaStudy = $this->getRepository("\\Alae\\Entity\\AnalyteStudy")->findBy(array(
             "fkAnalyte" => $Batch->getFkAnalyte(),
@@ -1473,9 +1473,16 @@ class VerificationController extends BaseController
         
         $where = " ((s.sampleName <> 'BLK%' AND s.sampleType <> 'Solvent' AND s.isPeakArea <> 0 AND s.analytePeakArea <> 0) 
                     AND (s.analyteRetentionTime NOT BETWEEN $minTretAna AND $maxTretAna) OR (s.isRetentionTime NOT BETWEEN $minTretIS AND $maxTretIS))
-                   AND s.fkBatch = " . $Batch->getPkBatch();
+                   AND s.useRecord <> 1 AND s.fkBatch = " . $Batch->getPkBatch();
         
         $this->error($where, $parameters[0], array(), false);
+        //Repetimos la condición con UseRecord=1 para en este caso SI ANULAR LOTE
+        $where = " ((s.sampleName <> 'BLK%' AND s.sampleType <> 'Solvent' AND s.isPeakArea <> 0 AND s.analytePeakArea <> 0) 
+                    AND (s.analyteRetentionTime NOT BETWEEN $minTretAna AND $maxTretAna) OR (s.isRetentionTime NOT BETWEEN $minTretIS AND $maxTretIS))
+                   AND s.useRecord = 1 AND s.fkBatch = " . $Batch->getPkBatch();
+        
+        $this->error($where, $parameters2[0], array(), false);
+
 /*
         $where2 = "(s.sampleName LIKE 'CS%' OR s.sampleName LIKE 'QC%') AND 
                    (s.analyteRetentionTime NOT BETWEEN $minTretAna AND $maxTretAna OR 
