@@ -499,7 +499,8 @@ class VerificationController extends BaseController
      * V8: Muestras Reinyectadas
      * @param \Alae\Entity\Batch $Batch
      */
-    protected function V8(\Alae\Entity\Batch $Batch)
+    
+    protected function V81(\Alae\Entity\Batch $Batch)
     {
         $query    = $this->getEntityManager()->createQuery("
             SELECT s.pkSampleBatch, s.sampleName, s.areaRatio, s.useRecord
