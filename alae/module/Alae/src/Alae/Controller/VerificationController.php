@@ -39,8 +39,10 @@ class VerificationController extends BaseController
             $Batch = $this->getRepository()->find($this->getEvent()->getRouteMatch()->getParam('id'));
             for ($i = 4; $i < 12; $i++)
             {
-                $function = 'V' . $i;
-                $this->$function($Batch);
+                if ($i <> 8) { //Nos saltamos la 8
+                    $function = 'V' . $i;
+                    $this->$function($Batch);
+                }
             }
             
             $response = $this->V12($Batch);
