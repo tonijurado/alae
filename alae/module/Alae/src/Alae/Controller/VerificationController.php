@@ -39,8 +39,10 @@ class VerificationController extends BaseController
             $Batch = $this->getRepository()->find($this->getEvent()->getRouteMatch()->getParam('id'));
             for ($i = 4; $i < 12; $i++)
             {
-                $function = 'V' . $i;
-                $this->$function($Batch);
+                if ($i <> 8) { //Nos saltamos la 8
+                    $function = 'V' . $i;
+                    $this->$function($Batch);
+                }
             }
             
             $response = $this->V12($Batch);
@@ -512,7 +514,8 @@ class VerificationController extends BaseController
      * V8: Muestras Reinyectadas
      * @param \Alae\Entity\Batch $Batch
      */
-    protected function V8(\Alae\Entity\Batch $Batch)
+    
+    protected function V81(\Alae\Entity\Batch $Batch)
     {
         $query    = $this->getEntityManager()->createQuery("
             SELECT s.pkSampleBatch, s.sampleName, s.areaRatio, s.useRecord
@@ -1413,28 +1416,22 @@ class VerificationController extends BaseController
             {
                 for ($i = 1; $i <= 1; $i++)
                 {
-                    $analyteConcentration = \Alae\Service\Conversion::conversion(
+
+                    $CalculatedConcentration = \Alae\Service\Conversion::conversion(
                         $AnaStudy->getFkUnit()->getName(),
-                        $Batch->getAnalyteConcentrationUnits(),
+                        $Batch->getcalculatedConcentrationUnits(),
+                        //$Batch->getAnalyteConcentrationUnits(),
                         $cs_values[$i - 1]
                     );
                 }
             }
         }
 
-        /*$query = $this->getEntityManager()->createQuery("
-            SELECT s.analyteConcentration
-            FROM Alae\Entity\SampleBatch s
-            WHERE s.sampleName LIKE 'CS1%' AND s.fkBatch = " . $Batch->getPkBatch() . "
-            ORDER BY s.sampleName DESC")
-            ->setMaxResults(1);
-        $analyteConcentration = $query->getSingleScalarResult();
-*/      
         $query    = $this->getEntityManager()->createQuery("
             SELECT s.pkSampleBatch
             FROM Alae\Entity\SampleBatch s
-            WHERE (REGEXP(s.sampleName, :regexp) = 1)
-            AND s.analyteConcentration >= $analyteConcentration
+            WHERE REGEXP(s.sampleName, :regexp) = 1
+            AND s.calculatedConcentration >= $CalculatedConcentration
             AND s.sampleType = 'Unknown'
             AND s.fkBatch = " . $Batch->getPkBatch() . "
             ORDER BY s.pkSampleBatch");

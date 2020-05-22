@@ -460,8 +460,9 @@ class ReportController extends BaseController
                         FROM Alae\Entity\Error e, Alae\Entity\SampleBatch s, Alae\Entity\Parameter p
                         WHERE s.pkSampleBatch = e.fkSampleBatch
                             AND e.fkParameter = p.pkParameter
-                            AND ((p.pkParameter BETWEEN 1 AND 8) OR (p.pkParameter BETWEEN 23 AND 29))
+                            AND p.status = 1
                             AND s.fkBatch = " . $Batch->getPkBatch());
+                            //AND ((p.pkParameter BETWEEN 1 AND 8) OR (p.pkParameter BETWEEN 23 AND 29))
                     $elements = $query->getResult();
 
                     $message = array();

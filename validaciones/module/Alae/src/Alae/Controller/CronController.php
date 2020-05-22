@@ -580,8 +580,16 @@ class CronController extends BaseController
                     if (isset($setters[$key]))
                     {
                         $value1 = $setters[$key]; 
-                        //$SampleBatch->$setters[$key]($value);
-                        $SampleBatch->$value1(trim($value));
+                        //$SampleBatch->$setters[$key](trim($value));
+                        if (str_replace(' ', '', $value) == null || $value == 'Quality Control') {
+                            $SampleBatch->$value1(trim($value));
+                        } else{
+                            $SampleBatch->$value1(str_replace(' ','', $value));
+                        }
+
+                        //Quitamos TODOS los espacios de la cadena (Toni 22-05-2020)
+                        //$value2 = str_replace(' ','',$value);
+                        //echo 'Value: ' . $value . 'Value1: ' . $value1 . "\n";                        
                     }
                 }
                 $SampleBatch->setFkBatch($Batch);
