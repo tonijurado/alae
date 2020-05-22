@@ -508,8 +508,8 @@ class StudyController extends BaseController
                 "retention_max" => number_format($max, 2, '.', ''),
                 "retention_is" => number_format($anaStudy->getRetentionIs(), 2, '.', ''),
                 "acceptance_is" => number_format($anaStudy->getAcceptanceIs(), 2, '.', ''),
-                "retention_min_is" => $min_is,
-                "retention_max_is" => $max_is,
+                "retention_min_is" => number_format($min_is, 2, '.', ''),
+                "retention_max_is" => number_format($max_is, 2, '.', ''),
                 "edit"       => $buttons
             );
         }
