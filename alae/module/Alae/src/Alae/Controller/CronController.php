@@ -456,7 +456,7 @@ class CronController extends BaseController
     private function saveSampleBatch($headers, $data, $Batch)
     {
         $setters = $this->setter($headers, $this->getSampleBatch());
-
+        $i=0;
         foreach ($data as $row)
         {
             $SampleBatch = new \Alae\Entity\SampleBatch();
@@ -469,7 +469,15 @@ class CronController extends BaseController
                     {
                         $value1 = $setters[$key]; 
                         //$SampleBatch->$setters[$key](trim($value));
-                        $SampleBatch->$value1(trim($value));
+                        if (str_replace(' ', '', $value) == null || $value == 'Quality Control') {
+                            $SampleBatch->$value1(trim($value));
+                        } else{
+                            $SampleBatch->$value1(str_replace(' ','', $value));
+                        }
+
+                        //Quitamos TODOS los espacios de la cadena (Toni 22-05-2020)
+                        //$value2 = str_replace(' ','',$value);
+                        //echo 'Value: ' . $value . 'Value1: ' . $value1 . "\n";                        
                     }
                 }
                 $SampleBatch->setFkBatch($Batch);
