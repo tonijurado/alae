@@ -158,8 +158,18 @@ class BatchController extends BaseController
                 }
                 if($this->_getSession()->isAdministrador() || $this->_getSession()->isDirectorEstudio() || $this->_getSession()->isLaboratorio())
                 {
-                    $validation = is_null($batch->getValidFlag()) ? '<a href="' . \Alae\Service\Helper::getVarsConfig("base_url") . '/verification/index/' . $batch->getPkBatch() . '" class="btn" type="button"><span class="btn-validate"></span>validar</a>' : "";
+                    $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V1.1"));
+                    $value      = $parameters[0]->getMinValue();
+                    if($batch->getFileSize() < $value)
+                    {
+                        $validation = "";
+                    }
+                    else
+                    {
+                        $validation = is_null($batch->getValidFlag()) ? '<a href="' . \Alae\Service\Helper::getVarsConfig("base_url") . '/verification/index/' . $batch->getPkBatch() . '" class="btn" type="button"><span class="btn-validate"></span>validar</a>' : "";
+                    }
                 }
+
             }
 
             $data[] = array(

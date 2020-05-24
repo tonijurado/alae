@@ -153,6 +153,8 @@ class BatchController extends BaseController
                 ORDER BY b.fileName ASC");
         $elements = $query->getResult();
 
+        $nominal = "";
+
         //MUESTRA LOS LOTES EN PANTALLA
         foreach ($elements as $batch)
         {
@@ -166,18 +168,30 @@ class BatchController extends BaseController
                 }
                 if($this->_getSession()->isAdministrador() || $this->_getSession()->isDirectorEstudio() || $this->_getSession()->isLaboratorio())
                 {
-                    $batchNominal = $this->getRepository("\\Alae\\Entity\\BatchNominal")->findBy(array("fkBatch" => $batch->getPkBatch()));
-            
-                    if ($batchNominal)
+                
+                    //verificar tamaño de archivo
+                    $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V1"));
+                    $value      = $parameters[0]->getMinValue();
+                    if($batch->getFileSize() < $value)
                     {
-                        $nominal = is_null($batch->getValidFlag()) ? '<a href="' . \Alae\Service\Helper::getVarsConfig("base_url") . '/batch/nominal/' . $batch->getPkBatch() . '?state='.$state. '" class="btn" type="button"><span class="btn-validate"></span>Valor nominal</a>' : "";
+                        $nominal = "";
+                        $validation = "";
                     }
                     else
                     {
-                        $nominal = "";
+                        //verificar si existe batchNominal
+                        $batchNominal = $this->getRepository("\\Alae\\Entity\\BatchNominal")->findBy(array("fkBatch" => $batch->getPkBatch()));
+                        if ($batchNominal)
+                        {
+                            $nominal = is_null($batch->getValidFlag()) ? '<a href="' . \Alae\Service\Helper::getVarsConfig("base_url") . '/batch/nominal/' . $batch->getPkBatch() . '?state='.$state. '" class="btn" type="button"><span class="btn-validate"></span>Valor nominal</a>' : "";
+                        }
+                        else
+                        {
+                            $nominal = "";
+                        }
+
+                        $validation = is_null($batch->getValidFlag()) ? '<a href="' . \Alae\Service\Helper::getVarsConfig("base_url") . '/verification/index/' . $batch->getPkBatch() . '?state='.$state. '" class="btn" type="button"><span class="btn-validate"></span>validar</a>' : "";
                     }
-                        
-                    $validation = is_null($batch->getValidFlag()) ? '<a href="' . \Alae\Service\Helper::getVarsConfig("base_url") . '/verification/index/' . $batch->getPkBatch() . '?state='.$state. '" class="btn" type="button"><span class="btn-validate"></span>validar</a>' : "";
                 }
             }
 
