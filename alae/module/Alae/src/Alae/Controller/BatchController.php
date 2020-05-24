@@ -162,7 +162,7 @@ class BatchController extends BaseController
                     $value      = $parameters[0]->getMinValue();
                     if($batch->getFileSize() < $value)
                     {
-                        $validation = "";
+                        $validation = "Error Tamaño";
                     }
                     else
                     {

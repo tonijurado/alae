@@ -175,7 +175,7 @@ class BatchController extends BaseController
                     if($batch->getFileSize() < $value)
                     {
                         $nominal = "";
-                        $validation = "";
+                        $validation = "Error Tamaño";
                     }
                     else
                     {
