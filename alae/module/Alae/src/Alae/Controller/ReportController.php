@@ -1139,6 +1139,166 @@ class ReportController extends BaseController
         }
     }
 
+    public function rtxtAction()
+    {
+        
+        $request = $this->getRequest();
+        $page    = "";
+        $user = $this->_getSession()->getPkUser();
+        if ($request->isGet())
+        {
+            //GENERA LOS DATOS DEL REPORTE
+            ini_set('max_execution_time', 300000);
+            $Batch = $this->getRepository('\\Alae\\Entity\\Batch')->find($request->getQuery('ba'));
+            if ($Batch && $Batch->getPkBatch())
+            {
+                $qb       = $this->getEntityManager()->createQueryBuilder();
+                $qb
+                        ->select('s.sampleName, s.analytePeakName, s.sampleType, s.fileName, s.analytePeakArea, s.isPeakArea, s.areaRatio, s.analyteConcentration, s.calculatedConcentration, s.dilutionFactor, s.accuracy, s.useRecord,
+                     s.acquisitionDate, s.analyteRetentionTime, s.isRetentionTime, s.analyteIntegrationType, s.isIntegrationType, s.recordModified,
+                    GROUP_CONCAT(DISTINCT p.codeError) as codeError,
+                    GROUP_CONCAT(DISTINCT p.messageError) as messageError')
+                        ->from('Alae\Entity\SampleBatch', 's')
+                        ->leftJoin('Alae\Entity\Error', 'e', \Doctrine\ORM\Query\Expr\Join::WITH, 's.pkSampleBatch = e.fkSampleBatch')
+                        ->leftJoin('Alae\Entity\Parameter', 'p', \Doctrine\ORM\Query\Expr\Join::WITH, 'e.fkParameter = p.pkParameter')
+                        ->where("s.fkBatch = " . $Batch->getPkBatch())
+                        ->groupBy('s.pkSampleBatch')
+                        ->orderBy('s.pkSampleBatch', 'ASC');
+                $elements = $qb->getQuery()->getResult();
+
+                if (count($elements) > 0)
+                {
+                    $tr1 = $tr2 = "";
+
+                    foreach ($elements as $sampleBatch)
+                    {
+                        $row1     = $row2     = "";
+                        $isTable2 = false;
+
+                        foreach ($sampleBatch as $key => $value)
+                        {
+                            switch ($key)
+                            {
+                                case "sampleName":
+                                    $row1 .= $value."\t";
+                                    break;
+                                case "sampleId":
+                                    $row1 .= $value."\t";
+                                    break;
+                                case "sampleType":
+                                    $row1 .= $value."\t";
+                                    break;
+                                case "fileName":
+                                    $row1 .= $value."\t";
+                                    break;
+                                case "analytePeakName":
+                                    $row1 .= $value."\t";
+                                    break;
+                                case "analytePeakArea":
+                                case "isPeakArea":
+                                case "areaRatio":
+                                    $row1 .= $value."\t";
+                                    break;
+                                case "analyteConcentration":
+                                    $value = number_format($value, 2, '.', '');
+                                    $row1 .= $value."\t";
+                                    break;
+                                case "calculatedConcentration":
+                                    $value = number_format($value, 2, '.', '');
+                                    $row1 .= $value."\t";
+                                    break;
+                                case "dilutionFactor":
+                                case "accuracy":
+                                    $value = number_format($value, 2, '.', '');
+                                    $row1 .= $value."\t";
+                                    break;
+                                case "useRecord":
+                                    $row1 .= $value."\t";
+                                    break;
+                                case "recordModified":
+                                    $row1 .= $value."\t";
+                                    break;
+                                case "acquisitionDate":
+                                    $value = $value->format('d.m.Y H:i:s');
+                                    $row1 .= $value."\t";
+                                    break;
+                                case "analyteIntegrationType":
+                                case "isIntegrationType":
+                                    $row1 .= $value."\t";
+                                    break;
+                                case "codeError":
+                                    $row1 .= $value."\t";
+                                    break;
+                                case "messageError":
+                                    $value = str_replace(",", " // ", $value);
+                                    $row1 .= htmlentities($value)."\t";
+                                    break;
+                                default:
+                                    $row1 .= $value."\t";
+                                    break;
+                            }
+                        }
+                        
+                        $tr1 .= $row1."\r\n";
+                        $tr2 .= sprintf("<tr>%s</tr>", $row2);
+
+                    }
+
+                    //AND ((p.pkParameter BETWEEN 1 AND 8) OR (p.pkParameter BETWEEN 23 AND 29))
+                    //GENERA LOS ERRORES
+                    $query  = $this->getEntityManager()->createQuery("
+                        SELECT DISTINCT(p.pkParameter) as pkParameter, p.messageError
+                        FROM Alae\Entity\Error e, Alae\Entity\SampleBatch s, Alae\Entity\Parameter p
+                        WHERE s.pkSampleBatch = e.fkSampleBatch
+                            AND e.fkParameter = p.pkParameter
+                            AND s.fkBatch = " . $Batch->getPkBatch() . "
+                        ORDER BY p.pkParameter");
+                    $errors = $query->getResult();
+
+                    $message = array();
+                    if (!is_null($Batch->getFkParameter()))
+                    {
+                        $message[$Batch->getFkParameter()->getPkParameter()] = $Batch->getFkParameter()->getMessageError();
+                    }
+                    foreach ($errors as $data)
+                    {
+                        $message[$data['pkParameter']] = $data['messageError'];
+                    }
+                    ksort($message);
+                    
+                    $response = array(
+                        "user"  => $user,
+                        "batch"  => $Batch,
+                        "tr1"    => $tr1,
+                        "tr2"    => $tr2,
+                        "errors" => implode(" // ", $message),
+                        "filename"     => "tabla_alae_de_cada_lote_analitico" . date("Ymd-Hi")
+                    );
+                    $viewModel = new ViewModel($response);
+                    $viewModel->setTerminal(true);
+                    //$viewModel->setVariable('filename', "tabla_alae_de_cada_lote_analitico" . date("Ymd-Hi").".txt");
+                    return $viewModel;
+                }
+                else
+                {
+                    return $this->redirect()->toRoute('report', array(
+                                'controller' => 'report',
+                                'action'     => 'index',
+                                'id'         => 1
+                    ));
+                }
+            }
+            else
+            {
+                return $this->redirect()->toRoute('report', array(
+                            'controller' => 'report',
+                            'action'     => 'index',
+                            'id'         => 1
+                ));
+            }
+        }
+    }
+
     public function graphicsAction()
     {
 
