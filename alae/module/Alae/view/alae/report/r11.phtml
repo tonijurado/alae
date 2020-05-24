@@ -43,6 +43,7 @@ header('Content-Type: application/vnd.ms-excel;charset=utf-8');
                 <td  align="center"   style=" border: black 1px solid;font-size:11px;padding:10px">IS integration Type</td>
                 <td align="center"   style="border: black 1px solid;font-size:11px;padding:10px"> Tabla de resultados del lote</td>
             </tr>
+            <?php $count = 0; ?>
             <?php foreach ($list as $key => $value) : ?>
             <tr>
                 <td align="center"  height="20px"  style="color:#000; border: black 1px solid;font-size:11px;padding:4px">
@@ -87,7 +88,7 @@ header('Content-Type: application/vnd.ms-excel;charset=utf-8');
                     % Muestras con integración modificada:
                 </td>
                 <td width="205" height="20" style="">
-                    <?php echo $percent; ?>
+                    <?php echo number_format($recordModified/$countTot1,4, '.', '')*100 . '%'; ?>
                 </td>
             </tr>
         </table>
