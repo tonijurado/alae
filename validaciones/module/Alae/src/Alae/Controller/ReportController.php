@@ -1098,7 +1098,6 @@ class ReportController extends BaseController
      */
     public function r11Action()
     {
-        //echo 'r11';die();
         $request = $this->getRequest();
         if ($request->isGet())
         {
@@ -1120,6 +1119,7 @@ class ReportController extends BaseController
                 ini_set('max_execution_time', 9000);
                 $message = array();
 
+                /*
                 foreach ($batch as $Batch)
                 {
                     //número total de muestras
@@ -1132,7 +1132,6 @@ class ReportController extends BaseController
                     $elements1 = $query->getResult();
 
                     $count1 = $elements1[0]['count1'];
-                    //echo $count1;
                     //número de muestras con “Record Modified = 1”
                     $query    = $this->getEntityManager()->createQuery("
                         SELECT COUNT(s.recordModified) as recordModified
@@ -1144,26 +1143,45 @@ class ReportController extends BaseController
 
                     $recordModified =  $elements2[0]['recordModified'];
                     //echo '-' . $recordModified; die();
-                    $query    = $this->getEntityManager()->createQuery("
-                        SELECT s.sampleName, s.analyteIntegrationType, s.isIntegrationType
-                        FROM Alae\Entity\SampleBatch s
-                        WHERE s.fkBatch = " . $Batch->getPkBatch() ." AND
-                        s.recordModified = 1
-                        ORDER By s.sampleName");
-                    $results = $query->getResult();
-
+                
                     $countTot1 = $countTot1 + $count1;
                     $recordModifiedTot1 = $recordModifiedTot1 + $recordModified;
+                }
+                */
 
-                    foreach ($results as $row1) 
-                    {
-                        $message[] = array(
-                            "sampleName"   => $row1['sampleName'],
-                            "analyteIntegrationType"    => $row1['analyteIntegrationType'],
-                            "isIntegrationType" => $row1['isIntegrationType'],
-                            "filename"     => $Batch->getFileName()
-                        );
-                    }
+                //CONTAMOS EL TOTAL DE MUESTRAS ANALIZADAS
+
+                $query    = $this->getEntityManager()->createQuery("
+                SELECT COUNT(s.pkSampleBatch) as count1
+                FROM Alae\Entity\SampleBatch s
+                JOIN Alae\Entity\Batch b
+                WITH s.fkBatch = b.pkBatch
+                WHERE s.fkBatch IN (SELECT b1.pkBatch FROM Alae\Entity\Batch b1 WHERE b1.fkStudy = " . $Study->getPkStudy() . ")");
+                $elements1 = $query->getResult();
+                $countTot1 = $elements1[0]['count1'];
+
+
+                // LISTAMOS SOLAMENTE LAS recordModified = 1
+                $query    = $this->getEntityManager()->createQuery("
+                SELECT s.sampleName, s.analyteIntegrationType, s.isIntegrationType, b.fileName
+                FROM Alae\Entity\SampleBatch s
+                JOIN Alae\Entity\Batch b
+                WITH s.fkBatch = b.pkBatch
+                WHERE s.fkBatch IN (SELECT b1.pkBatch FROM Alae\Entity\Batch b1 WHERE b1.fkStudy = " . $Study->getPkStudy() . ") AND
+                s.recordModified = 1
+                ORDER By b.fileName");
+                $results = $query->getResult();
+
+                $recordModifiedTot1 = 0;
+                foreach ($results as $row1) 
+                {
+                    $message[] = array(
+                        "sampleName"   => $row1['sampleName'],
+                        "analyteIntegrationType"    => $row1['analyteIntegrationType'],
+                        "isIntegrationType" => $row1['isIntegrationType'],
+                        "filename"     => $row1['fileName']
+                    );
+                    $recordModifiedTot1 = $recordModifiedTot1 + 1;
                 }
 
                 //% de muestras modificadas sobre el número total de muestras
@@ -1175,8 +1193,8 @@ class ReportController extends BaseController
                 $viewModel->setVariable('analyte', $AnalyteName);
                 $viewModel->setVariable('study', $studyName);
                 $viewModel->setVariable('countTot1', $countTot1);
-                $viewModel->setVariable('recordModified', $recordModifiedTot1);
-                //$viewModel->setVariable('percent', $percent);
+                $viewModel->setVariable('recordModified1', $recordModifiedTot1);
+                $viewModel->setVariable('percent', $percent);
 
                 $viewModel->setVariable('filename', "listado_de_muestras_con_integracion_modificada" . date("Ymd-Hi"));
 
