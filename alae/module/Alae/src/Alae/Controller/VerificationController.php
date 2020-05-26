@@ -341,9 +341,11 @@ class VerificationController extends BaseController
      */
     protected function V4(\Alae\Entity\Batch $Batch)
     {
+    /*
         $where = "
         (
             (s.sampleName LIKE 'BLK%' AND s.sampleType <> 'Blank') OR
+            (s.sampleName LIKE 'ZS%' AND s.sampleType <> 'Blank') OR
             (s.sampleName LIKE 'CS%' AND s.sampleType <> 'Standard') OR
             (s.sampleName LIKE '%QC%' AND s.sampleType <> 'Quality Control') OR
             (REGEXP(s.sampleName, :regexp1) = 1 AND s.sampleType <> 'Solvent') OR
@@ -358,6 +360,81 @@ class VerificationController extends BaseController
                 "regexp2" => "^[0-9]+(-)[0-9]+\.[0-9]+$"
             )
         );
+    */
+
+    //La parte superior comentada es el SampleType Erroneo de ALAE1. Lo cambiamos por el SampleType mejorado de Validaciones que incluye muestras que no existen en ALAE
+    //pero que contempla todas las opciones.
+    $where = "
+    (
+        (s.sampleType = 'Blank' AND (s.sampleName NOT LIKE 'BLK%' AND 
+                                    s.sampleName NOT LIKE 'SEL%' AND 
+                                    s.sampleName NOT LIKE 'ZS-%')
+        )
+                                    OR
+
+        (s.sampleType = 'Standard' AND (s.sampleName NOT LIKE 'CS%') 
+        )
+                                    OR
+        (s.sampleType = 'Solvent' AND (s.sampleName NOT LIKE 'REC%' AND 
+                                      s.sampleName NOT LIKE 'FM%' AND 
+                                      s.sampleName NOT LIKE 'EGC%' AND
+                                      s.sampleName NOT LIKE 'ES%')
+        ) 
+                                    OR
+        (s.sampleType = 'Quality Control' AND (s.sampleName NOT LIKE 'QC%' AND
+                                              s.sampleName NOT LIKE 'LLQC%' AND
+                                              s.sampleName NOT LIKE 'ULQC%' AND
+                                              s.sampleName NOT LIKE 'LDQC%' AND
+                                              s.sampleName NOT LIKE 'HDQC%' AND
+                                              s.sampleName NOT LIKE 'PID%' AND
+                                              s.sampleName NOT LIKE 'AS%' AND
+                                              s.sampleName NOT LIKE 'LL_LLOQ%' AND
+                                              s.sampleName NOT LIKE 'TZ%' AND
+                                              s.sampleName NOT LIKE 'ME%' AND
+                                              s.sampleName NOT LIKE 'FT%' AND
+                                              s.sampleName NOT LIKE 'ST%' AND
+                                              s.sampleName NOT LIKE 'LT%' AND
+                                              s.sampleName NOT LIKE 'PP%' AND
+                                              s.sampleName NOT LIKE 'SLP%'
+                                              )
+        )
+                                    OR
+        (s.sampleName = 'ZS_BC%' AND (s.sampleType <> 'Unknown')) 
+                                    OR
+        (s.sampleName = 'ZS_NT%' AND (s.sampleType <> 'Unknown'))
+        OR
+        (s.sampleType = 'Unknown' AND (s.sampleName  LIKE 'BLK%' OR 
+                                        s.sampleName LIKE 'SEL%' OR 
+                                        s.sampleName LIKE 'ZS-%' OR
+                                        s.sampleName LIKE 'CS%' OR
+                                        s.sampleName LIKE 'REC%' OR 
+                                        s.sampleName LIKE 'FM%' OR 
+                                        s.sampleName LIKE 'EGC%' OR
+                                        s.sampleName LIKE 'ES%' OR
+                                        s.sampleName LIKE 'QC%' OR
+                                        s.sampleName LIKE 'LLQC%' OR
+                                        s.sampleName LIKE 'ULQC%' OR
+                                        s.sampleName LIKE 'LDQC%' OR
+                                        s.sampleName LIKE 'HDQC%' OR
+                                        s.sampleName LIKE 'PID%' OR
+                                        s.sampleName LIKE 'AS%' OR
+                                        s.sampleName LIKE 'LL_LLOQ%' OR
+                                        s.sampleName LIKE 'TZ%' OR
+                                        s.sampleName LIKE 'ME%' OR
+                                        s.sampleName LIKE 'FT%' OR
+                                        s.sampleName LIKE 'ST%' OR
+                                        s.sampleName LIKE 'LT%' OR
+                                        s.sampleName LIKE 'PP%' OR
+                                        s.sampleName LIKE 'SLP%'))
+
+    ) AND s.fkBatch = " . $Batch->getPkBatch();
+    
+    
+
+    $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V5"));
+    //echo 'V5 antes this ' . $where;
+    
+    $this->error($where, $fkParameter[0]);
     }
 
     /**

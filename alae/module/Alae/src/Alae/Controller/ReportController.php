@@ -15,7 +15,7 @@
    * r#action donde el número corresponde a cada uno de los reportes existentes.
    * Cada una de estas funciones enviará a formato excel o formato pdf el resultado.
  * @author Maria Quiroz
-   Fecha de creación: 19/05/2014
+ * Fecha de creación: 19/05/2014
  */
 
 namespace Alae\Controller;
@@ -580,16 +580,33 @@ class ReportController extends BaseController
     public function r5Action()
     {
         //REPORTE 5 EXCEL
+        $criteriosErrorAceptados = 'e.fkParameter >= 25 AND e.fkParameter <=33 AND e.fkParameter NOT IN ( 34, 35, 36, 37, 38, 39, 40, 41, 45, 47, 48, 49, 50, 51, 52, 54 ) ';
         $request = $this->getRequest();
+
         if ($request->isGet())
         {
             //OBTIENE LOS DATOS DEL REPORTE
+            // Hacemos esta query para "filtrar" solamente los lotes que cumplen con las condiciones de la curva.
+            // Es un Join de 3 tablas.
+
+            $query = $this->getEntityManager()->createQuery("
+                SELECT b
+                FROM Alae\Entity\Batch b 
+                JOIN Alae\Entity\SampleBatch sb WITH b.pkBatch = sb.fkBatch
+                JOIN Alae\Entity\Error e WITH sb.pkSampleBatch = e.fkSampleBatch
+                WHERE b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id') . " AND " . $criteriosErrorAceptados . "
+                ORDER BY b.fileName ASC");
+
+            $batch = $query->getResult();
+
+            /*
             $query = $this->getEntityManager()->createQuery("
                 SELECT b
                 FROM Alae\Entity\Batch b
-                WHERE b.validFlag = 1 AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id') . "
+                WHERE b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id') . "
                 ORDER BY b.fileName ASC");
             $batch = $query->getResult();
+            */
 
             if (count($batch) > 0)
             {
@@ -619,6 +636,9 @@ class ReportController extends BaseController
     public function r6Action()
     {
         //REPORTE 6 EXCEL
+
+        $criteriosErrorAceptados = 'e.fkParameter >= 25 AND e.fkParameter <=33 AND e.fkParameter NOT IN ( 34, 35, 36, 37, 38, 39, 40, 41, 45, 47, 48, 49, 50, 51, 52, 54 ) ';
+
         $request = $this->getRequest();
 
         if ($request->isGet())
@@ -632,7 +652,7 @@ class ReportController extends BaseController
                 ->leftJoin('Alae\Entity\Error', 'e', \Doctrine\ORM\Query\Expr\Join::WITH, 's.pkSampleBatch = e.fkSampleBatch')
                 ->leftJoin('Alae\Entity\Parameter', 'p', \Doctrine\ORM\Query\Expr\Join::WITH, 'e.fkParameter = p.pkParameter')
                 ->innerJoin('Alae\Entity\Batch', 'b', \Doctrine\ORM\Query\Expr\Join::WITH, 's.fkBatch = b.pkBatch')
-                ->where("s.sampleName LIKE 'CS%' AND b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id'))
+                ->where("s.sampleName LIKE 'CS%' AND " . $criteriosErrorAceptados . " AND b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id'))
                 ->groupBy('b.pkBatch, s.pkSampleBatch')
                 ->orderBy('b.fileName, s.sampleName', 'ASC');
             $elements = $qb->getQuery()->getResult();
@@ -704,16 +724,25 @@ class ReportController extends BaseController
     {
         //REPORTE 7 EXCEL
         $request = $this->getRequest();
+        $criteriosErrorAceptados = 'e.fkParameter >= 25 AND e.fkParameter <=33 AND e.fkParameter NOT IN ( 34, 35, 36, 37, 38, 39, 40, 41, 45, 47, 48, 49, 50, 51, 52, 54 ) ';
         if ($request->isGet())
         {
             
             $analytes = $this->getRepository('\\Alae\\Entity\\AnalyteStudy')->findBy(array("fkAnalyte" => $request->getQuery('an'), "fkStudy" => $request->getQuery('id')));
             $query    = $this->getEntityManager()->createQuery("
                 SELECT b
+                FROM Alae\Entity\Batch b 
+                JOIN Alae\Entity\SampleBatch sb WITH b.pkBatch = sb.fkBatch
+                JOIN Alae\Entity\Error e WITH sb.pkSampleBatch = e.fkSampleBatch
+                WHERE b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id') . " AND " . $criteriosErrorAceptados . "
+                ORDER BY b.fileName ASC");
+/*
+                SELECT b
                 FROM Alae\Entity\Batch b
                 WHERE b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id') . "
                 ORDER BY b.fileName ASC");
-            $batch    = $query->getResult();
+*/
+                $batch    = $query->getResult();
 
             if (count($batch) > 0)
             {
@@ -801,6 +830,7 @@ class ReportController extends BaseController
     public function r8Action()
     {
         //REPORTE 8 EXCEL
+        $criteriosErrorAceptados = 'e.fkParameter >= 25 AND e.fkParameter <=33 AND e.fkParameter NOT IN ( 34, 35, 36, 37, 38, 39, 40, 41, 45, 47, 48, 49, 50, 51, 52, 54 ) ';
         $request = $this->getRequest();
 
         if ($request->isGet())
@@ -814,7 +844,7 @@ class ReportController extends BaseController
                 ->leftJoin('Alae\Entity\Error', 'e', \Doctrine\ORM\Query\Expr\Join::WITH, 's.pkSampleBatch = e.fkSampleBatch')
                 ->leftJoin('Alae\Entity\Parameter', 'p', \Doctrine\ORM\Query\Expr\Join::WITH, 'e.fkParameter = p.pkParameter')
                 ->innerJoin('Alae\Entity\Batch', 'b', \Doctrine\ORM\Query\Expr\Join::WITH, 's.fkBatch = b.pkBatch')
-                ->where("(s.sampleName LIKE 'QC%' AND s.sampleName NOT LIKE '%DQC%') AND s.sampleName NOT LIKE '%*%' AND b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id'))
+                ->where("(s.sampleName LIKE 'QC%' AND s.sampleName NOT LIKE '%DQC%') AND s.sampleName NOT LIKE '%*%' AND " . $criteriosErrorAceptados . " AND b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id'))
                 ->groupBy('b.pkBatch, s.pkSampleBatch')
                 ->orderBy('b.fileName, s.sampleName', 'ASC');
             $elements = $qb->getQuery()->getResult();
@@ -971,13 +1001,11 @@ class ReportController extends BaseController
     }
 
     /**
-     * Summary of calibration curve parameter
-     * $_GET['id'] = pkStudy
-     * $_GET['an'] = pkAnalyte
+    * r4 Excel
      */
-    public function r10Action()
+    public function r4eAction()
     {
-        //REPORTE 4 EXCEL r10
+
         $request = $this->getRequest();
         if ($request->isGet())
         {
@@ -1044,7 +1072,7 @@ class ReportController extends BaseController
      * $_GET['id'] = pkStudy
      * $_GET['an'] = pkAnalyte
      */
-    public function r11Action()
+    public function r10Action()
     {
         $request = $this->getRequest();
         if ($request->isGet())
@@ -1159,7 +1187,7 @@ class ReportController extends BaseController
         }
     }
 
-    public function rtxtAction()
+    public function r11Action()
     {
         
         $request = $this->getRequest();
