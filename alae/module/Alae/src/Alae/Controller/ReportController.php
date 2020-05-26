@@ -1074,6 +1074,7 @@ class ReportController extends BaseController
      */
     public function r10Action()
     {
+/*
         $request = $this->getRequest();
         if ($request->isGet())
         {
@@ -1086,7 +1087,33 @@ class ReportController extends BaseController
             $Study   = $this->getRepository("\\Alae\\Entity\\Study")->find($request->getQuery('id'));
             $AnalyteName = $Analyte->getName();
             $studyName = $Study->getCode();
-
+*/
+            $request = $this->getRequest();
+            $criteriosErrorAceptados = 'e.fkParameter >= 25 AND e.fkParameter <=33 AND e.fkParameter NOT IN ( 34, 35, 36, 37, 38, 39, 40, 41, 45, 47, 48, 49, 50, 51, 52, 54 ) ';
+            if ($request->isGet())
+            {
+                
+                $analytes = $this->getRepository('\\Alae\\Entity\\AnalyteStudy')->findBy(array("fkAnalyte" => $request->getQuery('an'), "fkStudy" => $request->getQuery('id')));
+                $query    = $this->getEntityManager()->createQuery("
+                    SELECT b.pkBatch
+                    FROM Alae\Entity\Batch b 
+                    JOIN Alae\Entity\SampleBatch sb WITH b.pkBatch = sb.fkBatch
+                    JOIN Alae\Entity\Error e WITH sb.pkSampleBatch = e.fkSampleBatch
+                    WHERE b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id') . " AND " . $criteriosErrorAceptados . "
+                    GROUP BY b.pkBatch
+                    ORDER BY b.fileName ASC");
+    /*
+                    SELECT b
+                    FROM Alae\Entity\Batch b
+                    WHERE b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id') . "
+                    ORDER BY b.fileName ASC");
+    */
+                    $batch    = $query->getResult();
+                    foreach($batch as $mifila){
+                        $misLotes = $misLotes . $mifila['pkBatch'] . ',';
+                    }
+                    $misLotes = substr($misLotes, 0, -1);
+                    echo $misLotes;
             $countTot1 = 0;
             $recordModifiedTot1 = 0;
 
@@ -1132,10 +1159,10 @@ class ReportController extends BaseController
                 FROM Alae\Entity\SampleBatch s
                 JOIN Alae\Entity\Batch b
                 WITH s.fkBatch = b.pkBatch
-                WHERE s.fkBatch IN (SELECT b1.pkBatch FROM Alae\Entity\Batch b1 WHERE b1.fkStudy = " . $Study->getPkStudy() . ")");
+                WHERE s.fkBatch IN ( " . $misLotes . ")");
                 $elements1 = $query->getResult();
                 $countTot1 = $elements1[0]['count1'];
-
+                
 
                 // LISTAMOS SOLAMENTE LAS recordModified = 1
                 $query    = $this->getEntityManager()->createQuery("
@@ -1143,7 +1170,7 @@ class ReportController extends BaseController
                 FROM Alae\Entity\SampleBatch s
                 JOIN Alae\Entity\Batch b
                 WITH s.fkBatch = b.pkBatch
-                WHERE s.fkBatch IN (SELECT b1.pkBatch FROM Alae\Entity\Batch b1 WHERE b1.fkStudy = " . $Study->getPkStudy() . ") AND
+                WHERE s.fkBatch IN ( " . $misLotes . ") AND
                 s.recordModified = 1
                 ORDER By b.fileName");
                 $results = $query->getResult();
@@ -1162,6 +1189,9 @@ class ReportController extends BaseController
 
                 //% de muestras modificadas sobre el número total de muestras
                 $percent =  ($recordModifiedTot1 / $countTot1) * 100 ;
+
+                echo 'countTot1 = ' . $countTot1 . ' RecordModifiedTot1 = ' . $recordModifiedTot1 . ' Percent = ' . $percent;
+                //die();
 
                 $viewModel = new ViewModel();
                 $viewModel->setTerminal(true);
