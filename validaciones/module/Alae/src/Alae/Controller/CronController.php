@@ -73,6 +73,19 @@ class CronController extends BaseController
         return true;
     }
 
+        /*
+     * Actualiza curve flag
+     */
+    protected function curve($pkParameter)
+    {
+        $sql = "
+            UPDATE Alae\Entity\Batch b
+            SET b.curveFlag = 1
+            WHERE b.pkBatch = " . $pkParameter;
+        $query = $this->getEntityManager()->createQuery($sql);
+        $query->execute();
+    }
+
     /**
      * Realizamos la búsqueda del estudio y analito al cual pertenece el lote.
      *      1.- Buscamos las coincidencias que tenga el nombre del fichero con los estudios que estén definidos
@@ -255,6 +268,7 @@ class CronController extends BaseController
         {
             echo "FALLO EXPORT TAMAÑO.";
             $this->execute(\Alae\Service\Verification::updateBatch("b.pkBatch = " . $Batch->getPkBatch(), "V1"));
+            $this->curve($Batch->getPkBatch());
         }  
             
         if(count($data["data"]) > 0)
@@ -276,6 +290,7 @@ class CronController extends BaseController
                 {
                     echo "EXPORT ERRONEO. SIN ESTUDIO";
                     $this->execute(\Alae\Service\Verification::updateBatch("b.pkBatch = " . $Batch->getPkBatch(), "V2"));
+                    $this->curve($Batch->getPkBatch());
                 }
             }
         }
@@ -511,6 +526,45 @@ class CronController extends BaseController
         }
     }
 
+
+    /*
+     * Registra errores detectados en el fichero export
+     */
+    protected function errorCurve($where, $fkParameter, $pkBatch, $parameters = array(), $isValid = true)
+    {
+        $sql = "
+            SELECT s
+            FROM Alae\Entity\SampleBatch s
+            WHERE $where";
+        $query = $this->getEntityManager()->createQuery($sql);
+        if(count($parameters) > 0)
+            foreach ($parameters as $key => $value)
+                $query->setParameter($key, $value);
+        $elements = $query->getResult();
+
+        $pkParameter = array();
+        foreach($elements as $sampleBatch)
+        {
+            $Error = new \Alae\Entity\Error();
+            $Error->setFkSampleBatch($sampleBatch);
+            $Error->setFkParameter($fkParameter);
+            $this->getEntityManager()->persist($Error);
+            $this->getEntityManager()->flush();
+            $pkParameter[] = $sampleBatch->getPkSampleBatch();
+            $this->curve($pkBatch);
+        }
+
+        if(!$isValid && count($pkParameter) > 0)
+        {
+            $sql = "
+                UPDATE Alae\Entity\SampleBatch s
+                SET s.validFlag = 0
+                WHERE s.pkSampleBatch in (" . implode(",", $pkParameter) . ")";
+            $query = $this->getEntityManager()->createQuery($sql);
+            $query->execute();
+        }
+    }
+
     /*
      * Verifica que el fichero haya superado las verificaciones 2 y 3
      */
@@ -520,7 +574,8 @@ class CronController extends BaseController
         $study = substr($response['study'], 0, 4);
         $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V3"));
         $where = "s.analytePeakName <> '" . $response['analyte'] . "' AND s.fkBatch = " . $Batch->getPkBatch();
-        $this->error($where, $fkParameter[0], array(), false);
+        //$this->error($where, $fkParameter[0], array(), false);
+        $this->errorCurve($where, $fkParameter[0], $Batch->getPkBatch(), array(), false);
 
         /*$query = $this->getEntityManager()->createQuery("SELECT COUNT(s.pkSampleBatch) FROM Alae\Entity\SampleBatch s WHERE $where");
         $count = $query->getSingleScalarResult();

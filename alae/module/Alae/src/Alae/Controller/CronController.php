@@ -217,11 +217,13 @@ class CronController extends BaseController
             else
             {
                 $this->execute(\Alae\Service\Verification::updateBatch("b.pkBatch = " . $Batch->getPkBatch(), "V1"));
+                $this->curve($Batch->getPkBatch());
             }
         }
         else
         {
             $this->execute(\Alae\Service\Verification::updateBatch("b.pkBatch = " . $Batch->getPkBatch(), "V1"));
+            $this->curve($Batch->getPkBatch());
         }
     }
 
@@ -448,6 +450,44 @@ class CronController extends BaseController
         }
     }
 
+
+    protected function errorCurve($where, $fkParameter, $pkBatch, $parameters = array(), $isValid = true)
+    {
+        $sql = "
+            SELECT s
+            FROM Alae\Entity\SampleBatch s
+            WHERE $where";
+        $query = $this->getEntityManager()->createQuery($sql);
+        if(count($parameters) > 0)
+            foreach ($parameters as $key => $value)
+                $query->setParameter($key, $value);
+        $elements = $query->getResult();
+
+        $pkParameter = array();
+        foreach($elements as $sampleBatch)
+        {
+            $Error = new \Alae\Entity\Error();
+            $Error->setFkSampleBatch($sampleBatch);
+            $Error->setFkParameter($fkParameter);
+            $this->getEntityManager()->persist($Error);
+            $this->getEntityManager()->flush();
+            $pkParameter[] = $sampleBatch->getPkSampleBatch();
+            $this->curve($pkBatch);
+        }
+
+        if(!$isValid && count($pkParameter) > 0)
+        {
+            $sql = "
+                UPDATE Alae\Entity\SampleBatch s
+                SET s.validFlag = 0
+                WHERE s.pkSampleBatch in (" . implode(",", $pkParameter) . ")";
+            $query = $this->getEntityManager()->createQuery($sql);
+            $query->execute();
+        }
+    }
+
+
+
     /*
      * Verifica que el fichero haya superado las verificaciones 2 y 3
      */
@@ -457,12 +497,14 @@ class CronController extends BaseController
 
         $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V2"));
         $where = "s.analytePeakName <> '" . $Analyte->getShortening() . "' AND s.fkBatch = " . $Batch->getPkBatch();
-        $this->error($where, $fkParameter[0], array(), false);
+        //$this->error($where, $fkParameter[0], array(), false);
+        $this->errorCurve($where, $fkParameter[0], $Batch->getPkBatch(), array(), false);
 
         $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V3"));
         $fileName = $response['batch'] . "-" . $response['study'];
         $where = "s.fileName NOT LIKE '$fileName%' AND s.fkBatch = " . $Batch->getPkBatch();
-        $this->error($where, $fkParameter[0], array(), false);
+        //$this->error($where, $fkParameter[0], array(), false);
+        $this->errorCurve($where, $fkParameter[0], $Batch->getPkBatch(), array(), false);
     }
 
     /*

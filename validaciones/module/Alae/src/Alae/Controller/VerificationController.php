@@ -411,6 +411,75 @@ class VerificationController extends BaseController
         
     }
 
+    //FUNCION ERROR QUE MARCA COMO ERROR A LA CURVA
+    protected function errorCurve($where, $fkParameter, $pkBatch, $parameters = array(), $isValid = true)
+    {
+        //echo 'paso1';
+        $sql = "
+            SELECT s
+            FROM Alae\Entity\SampleBatch s
+            WHERE $where";
+        
+        $query = $this->getEntityManager()->createQuery($sql);
+        //echo '- Paso2 - countParameters = ' . count($parameters);
+        if(count($parameters) > 0)
+            foreach ($parameters as $key => $value)
+                //echo $key . '-' . $value;
+                $query->setParameter($key, $value);
+                //echo $query;
+        $elements = $query->getResult();
+        //echo $elements . '-'; //************* */
+        $pkParameter = array();
+        foreach($elements as $sampleBatch)
+        {
+            $Error = new \Alae\Entity\Error();
+            $Error->setFkSampleBatch($sampleBatch);
+            $Error->setFkParameter($fkParameter);
+            $this->getEntityManager()->persist($Error);
+            $this->getEntityManager()->flush();
+
+           
+//            if($fkParameter->getStatus())
+//            {
+                $pkParameter[] = $sampleBatch->getPkSampleBatch();
+                $this->curve($pkBatch);
+//            }
+        }
+
+		//*******
+		//NO DEBERÍA RECHAZAR UN LOTE SI TODOS LOS pkParameter tienen status = 0
+		//*******
+		//$contadorParameter = count($pkParameter); echo $contadorParameter . "-" . $fkParameter; die();		
+        if(!$isValid && count($pkParameter) > 0)
+        {
+            $sql = "
+                UPDATE Alae\Entity\SampleBatch s
+                SET s.validFlag = 0
+                WHERE s.pkSampleBatch in (" . implode(",", $pkParameter) . ")";
+            $query = $this->getEntityManager()->createQuery($sql);
+            $query->execute();
+        }
+
+        /*
+         * DEBE MARCAR COMO MALA validFlag = 0 las muestras que pasan por error.
+         * Al pasar muestras que NO anulan lote, no se marcan como erróneas y las verificaciones del número de CS válido o QC válidos
+         * o muestras consecutivas erróneas no funcionan bien.
+         *
+            $sql = "
+                UPDATE Alae\Entity\SampleBatch s
+                SET s.validFlag = 0
+                WHERE $where";
+            $query = $this->getEntityManager()->createQuery($sql);
+            $query->execute();    
+
+
+         /* 
+          * FIN DE LA PRUEBA DE TONI PARA MARCAR COMO validFlag = 0 las muestras que entrar en error
+          */
+
+        
+    }
+
     /*
      * Actualiza curve flag
      */
@@ -539,7 +608,8 @@ class VerificationController extends BaseController
         $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V5"));
         //echo 'V5 antes this ' . $where;
         
-        $this->error($where, $fkParameter[0]);
+        //$this->error($where, $fkParameter[0]);
+        $this->errorCurve($where, $fkParameter[0], $Batch->getPkBatch());
     }
 
     /**
@@ -577,7 +647,8 @@ class VerificationController extends BaseController
 						} //**
 						*/
                     $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V6"));
-                    $this->error($where, $fkParameter[0]);
+                    //$this->error($where, $fkParameter[0]);
+                    $this->errorCurve($where, $fkParameter[0], $Batch->getPkBatch());
                 }
             }
 
@@ -594,7 +665,8 @@ class VerificationController extends BaseController
 
                     $where = "s.sampleName LIKE 'QC" . $i . "%' AND s.analyteConcentration <> " . $value . " AND s.fkBatch = " . $Batch->getPkBatch();
                     $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V6"));
-                    $this->error($where, $fkParameter[0]);
+                    //$this->error($where, $fkParameter[0]);
+                    $this->errorCurve($where, $fkParameter[0], $Batch->getPkBatch());
                 }
             }
 
@@ -607,7 +679,8 @@ class VerificationController extends BaseController
 
             $where = "s.sampleName LIKE 'LDQC%' AND s.analyteConcentration <> " . $valueLDQC . " AND s.fkBatch = " . $Batch->getPkBatch();
             $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V6"));
-            $this->error($where, $fkParameter[0]);
+            //$this->error($where, $fkParameter[0]);
+            $this->errorCurve($where, $fkParameter[0], $Batch->getPkBatch());
             //LDQC
 
             //HDQC
@@ -619,7 +692,8 @@ class VerificationController extends BaseController
 
             $where = "s.sampleName LIKE 'HDQC%' AND s.analyteConcentration <> " . $valueHDQC . " AND s.fkBatch = " . $Batch->getPkBatch();
             $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V6"));
-            $this->error($where, $fkParameter[0]);
+            //$this->error($where, $fkParameter[0]);
+            $this->errorCurve($where, $fkParameter[0], $Batch->getPkBatch());
             //HDQC
 
             //LLQC
@@ -631,7 +705,8 @@ class VerificationController extends BaseController
 
             $where = "s.sampleName LIKE 'LLQC%' AND s.analyteConcentration <> " . $valueLLQC . " AND s.fkBatch = " . $Batch->getPkBatch();
             $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V6"));
-            $this->error($where, $fkParameter[0]);
+            //$this->error($where, $fkParameter[0]);
+            $this->errorCurve($where, $fkParameter[0], $Batch->getPkBatch());
             //LLQC
 
             //ULQC
@@ -643,7 +718,8 @@ class VerificationController extends BaseController
 
             $where = "s.sampleName LIKE 'ULQC%' AND s.analyteConcentration <> " . $valueULQC . " AND s.fkBatch = " . $Batch->getPkBatch();
             $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V6"));
-            $this->error($where, $fkParameter[0]);
+            //$this->error($where, $fkParameter[0]);
+            $this->errorCurve($where, $fkParameter[0], $Batch->getPkBatch());
             //ULQC
         }
         //fin cs, etc
@@ -724,7 +800,8 @@ class VerificationController extends BaseController
             
             $where = "s.sampleName LIKE '$sample1%' AND s.sampleName NOT LIKE '%NT%' AND s.sampleName NOT LIKE '%BC%' AND s.analyteConcentration <> " . $value . " AND s.fkBatch = " . $Batch->getPkBatch();
                     $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V6"));
-                    $this->error($where, $fkParameter[0]);
+                    //$this->error($where, $fkParameter[0]);
+                    $this->errorCurve($where, $fkParameter[0], $Batch->getPkBatch());
         }
         //fin SampleVerificationStudy
 
@@ -738,7 +815,8 @@ class VerificationController extends BaseController
             //$where = "s.sampleName = '$sample' AND s.analyteConcentration <> " . $value . " AND s.fkBatch = " . $Batch->getPkBatch();
             $where = "s.sampleName LIKE '$sample%' AND s.analyteConcentration <> " . $value . " AND s.fkBatch = " . $Batch->getPkBatch();
                     $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V6"));
-                    $this->error($where, $fkParameter[0]);
+                    //$this->error($where, $fkParameter[0]);
+                    $this->errorCurve($where, $fkParameter[0], $Batch->getPkBatch());
         }
     }
 
@@ -772,7 +850,8 @@ class VerificationController extends BaseController
             {
                 $where = "s.pkSampleBatch IN (" . implode(",", $pkSampleBatch) . ")";
                // echo 'where = ' . $where;
-                $this->error($where, $parameters[0]);
+                //$this->error($where, $parameters[0]);
+                $this->errorCurve($where, $parameters[0], $Batch->getPkBatch());
             }
         }
         //die();
@@ -796,7 +875,8 @@ class VerificationController extends BaseController
             if(count($pkSampleBatch) > 0)
             {
                 $where = "s.pkSampleBatch IN (" . implode(",", $pkSampleBatch) . ")";
-                $this->error($where, $parameters[0]);
+                //$this->error($where, $parameters[0]);
+                $this->errorCurve($where, $parameters[0], $Batch->getPkBatch());
             }
         }
     }
@@ -825,7 +905,8 @@ class VerificationController extends BaseController
             }
 
             $where = "s.sampleName IN (" . implode(",", $sampleNames) . ") AND s.fkBatch = " . $Batch->getPkBatch();
-            $this->error($where, $parameters[0]);
+            //$this->error($where, $parameters[0]);
+            $this->errorCurve($where, $parameters[0], $Batch->getPkBatch());
         }
     }
 
@@ -896,6 +977,7 @@ class VerificationController extends BaseController
                     $centi92 = "S";
                     $where = "s.sampleName = '" . $temp['sampleName'] . "' AND s.fkBatch = " . $Batch->getPkBatch();
                     $this->error($where, $parameters2[0], array(), false);
+                    $this->errorCurve($where, $parameters2[0], $Batch->getPkBatch(), array(), false);
                 }
                 //echo 'Centi 91 calculos -> ' . $centi91 . ' // centi92 UseRecord == 0 ->' . $centi92;
                 if($centi91 == "S" || $centi92 == "S")
@@ -948,7 +1030,8 @@ class VerificationController extends BaseController
         //Si ese USE RECORD = 1, se debe identificar la muestra como error y se anula lote gracias al parámetro de la tblParameters 
             $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.1.1"));
             $where      = "(s.sampleName LIKE 'CS1%' OR s.sampleName LIKE 'LLQC%' OR s.sampleName LIKE 'PID%' OR s.sampleName LIKE 'LL_LLOQ%') AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.useRecord = 1 AND s.fkBatch = " . $Batch->getPkBatch();
-            $this->error($where, $parameters[0], array(), false);
+            //$this->error($where, $parameters[0], array(), false);
+            $this->errorCurve($where, $parameters[0], $Batch->getPkBatch());
         //Fin de la comprobación del USE RECORD = 1 para muestras que no cumplen Accuracy para la V10.1
 
         
@@ -961,8 +1044,8 @@ class VerificationController extends BaseController
         //Si ese USE RECORD = 1, se debe identificar la muestra como error y se anula lote gracias al parámetro de la tblParameters 
             $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.2.1"));
             $where      = "REGEXP(s.sampleName, :regexp) = 1 AND s.sampleName NOT LIKE 'CS1%' AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.useRecord = 1 AND s.fkBatch = " . $Batch->getPkBatch();
-            //$this->error($where, $parameters[0], array('regexp' => '^CS[0-9]+(-[0-9]+)?$'), false);
-            $this->error($where, $parameters[0], array('regexp' => '^CS[0-9]+(-[0-9]+(R[0-9]+)?)?$'), false);
+            //$this->error($where, $parameters[0], array('regexp' => '^CS[0-9]+(-[0-9]+(R[0-9]+)?)?$'), false);
+            $this->errorCurve($where, $parameters[0], $Batch->getPkBatch(), array('regexp' => '^CS[0-9]+(-[0-9]+(R[0-9]+)?)?$'), false);
         //Fin de la comprobación del USE RECORD = 1 para muestras que no cumplen Accuracy para la V10.2
 
 
@@ -999,7 +1082,8 @@ class VerificationController extends BaseController
                             s.sampleName LIKE 'SLP%'))
                             AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.useRecord = 1 AND s.fkBatch = " . $Batch->getPkBatch();
             //$this->error($where, $parameters[0], array('regexp' => '^QC[0-9]+(-[0-9]+)?$'), false);
-            $this->error($where, $parameters[0], array(), false);
+            //$this->error($where, $parameters[0], array(), false);
+            $this->errorCurve($where, $parameters[0], $Batch->getPkBatch(), array(), false);            
         
         //Fin de la comprobación del USE RECORD = 1 para muestras que no cumplen Accuracy para la V10.3 
 
@@ -1011,8 +1095,8 @@ class VerificationController extends BaseController
         //Si ese USE RECORD = 1, se debe identificar la muestra como error y se anula lote gracias al parámetro de la tblParameters 
             $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.4.1"));
             $where      = "s.sampleName LIKE 'TZ%' AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.useRecord = 1 AND s.fkBatch = " . $Batch->getPkBatch();
-            $this->error($where, $parameters[0], array(), false);
-
+            //$this->error($where, $parameters[0], array(), false);
+            $this->errorCurve($where, $parameters[0], $Batch->getPkBatch(), array(), false);
         //Fin de la comprobación del USE RECORD = 1 para muestras que no cumplen Accuracy para la V10.4 
 
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.5"));
@@ -1023,7 +1107,8 @@ class VerificationController extends BaseController
         //Si ese USE RECORD = 1, se debe identificar la muestra como error y se anula lote gracias al parámetro de la tblParameters 
             $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.5.1"));
             $where      = "REGEXP(s.sampleName, :regexp) = 1 AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.useRecord = 1 AND s.fkBatch = " . $Batch->getPkBatch();
-            $this->error($where, $parameters[0], array('regexp' => '^((L|H)?DQC)[0-9]+(-[0-9]+)?$'), false);
+            //$this->error($where, $parameters[0], array('regexp' => '^((L|H)?DQC)[0-9]+(-[0-9]+)?$'), false);
+            $this->errorCurve($where, $parameters[0], $Batch->getPkBatch(), array('regexp' => '^((L|H)?DQC)[0-9]+(-[0-9]+)?$'), false);
         
         //Fin de la comprobación del USE RECORD = 1 para muestras que no cumplen Accuracy para la V10.5 
 
@@ -1057,7 +1142,8 @@ class VerificationController extends BaseController
         {
             $ids = implode(",", $pkSampleBatch);
             $where = "s.pkSampleBatch in ($ids) AND s.fkBatch = " . $Batch->getPkBatch();
-            $this->error($where, $parameters[0], array(), false);
+            //$this->error($where, $parameters[0], array(), false);
+            $this->errorCurve($where, $parameters[0], $Batch->getPkBatch(), array(), false);            
         }
     }
 
@@ -1336,6 +1422,7 @@ class VerificationController extends BaseController
 		AND s.sampleType <> 'Solvent' AND s.isPeakArea < $value 
         AND s.fkBatch = " . $Batch->getPkBatch();
         $this->error($where, $parameters[0], array(), false);
+        
 
         $parameters2 = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V14.2"));
         
@@ -1345,7 +1432,8 @@ class VerificationController extends BaseController
         AND s.sampleType <> 'Solvent' AND s.isPeakArea < $value
         AND s.useRecord = 1
         AND s.fkBatch = " . $Batch->getPkBatch();
-        $this->error($where2, $parameters2[0], array(), false);
+        //$this->error($where2, $parameters2[0], array(), false);
+        $this->errorCurve($where, $parameters2[0], $Batch->getPkBatch(), array(), false);
     }
 
     /**
@@ -1412,9 +1500,9 @@ class VerificationController extends BaseController
             if ($value < $parameters[0]->getMinValue())
             {
                 $where = "s.sampleName LIKE 'CS%' AND s.fkBatch = " . $Batch->getPkBatch();
-                $this->error($where, $parameters[0]);
-
-                $this->curve($Batch->getPkBatch());
+                //$this->error($where, $parameters[0]);
+                $this->errorCurve($where, $parameters[0], $Batch->getPkBatch());
+                //$this->curve($Batch->getPkBatch());
             }
         }
     }
@@ -1468,9 +1556,9 @@ class VerificationController extends BaseController
         {
             $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V18"));
             $where = "s.pkSampleBatch in (" . implode(",", $pkSampleBatch) . ") AND s.fkBatch = " . $Batch->getPkBatch();
-            $this->error($where, $parameters[0]);
-
-            $this->curve($Batch->getPkBatch());
+            //$this->error($where, $parameters[0]);
+            $this->errorCurve($where, $parameters[0], $Batch->getPkBatch());
+            //$this->curve($Batch->getPkBatch());
         }
     }
 
@@ -1509,9 +1597,9 @@ class VerificationController extends BaseController
             if ($value < $parameters[0]->getMinValue())
             {
                 $where = "s.sampleName LIKE 'CS1%' AND s.fkBatch = " . $Batch->getPkBatch();
-                $this->error($where, $parameters[0]);
-
-                $this->curve($Batch->getPkBatch());
+                //$this->error($where, $parameters[0]);
+                $this->errorCurve($where, $parameters[0], $Batch->getPkBatch());
+                //$this->curve($Batch->getPkBatch());
             }
         
 
@@ -1549,9 +1637,9 @@ class VerificationController extends BaseController
             if ($value < $parameters[0]->getMinValue())
             {
                 $where = "s.sampleName LIKE 'CS" .$AnaStudy[0]->getCsNumber(). "%' AND s.fkBatch = " . $Batch->getPkBatch();
-                $this->error($where, $parameters[0]);
-
-                $this->curve($Batch->getPkBatch());
+                //$this->error($where, $parameters[0]);
+                $this->errorCurve($where, $parameters[0], $Batch->getPkBatch());
+                //$this->curve($Batch->getPkBatch());
             }
         
     }
@@ -1568,8 +1656,9 @@ class VerificationController extends BaseController
         {
             //$this->evaluation($Batch, false, $parameters[0]);
             $where = "s.sampleName LIKE 'CS%' AND s.fkBatch = " . $Batch->getPkBatch();
-            $this->error($where, $parameters[0]); //Toni: Descomento esta línea ya que estaba comentada y no hacía nada...
-            $this->curve($Batch->getPkBatch());
+            //$this->error($where, $parameters[0]); //Toni: Descomento esta línea ya que estaba comentada y no hacía nada...
+            //$this->curve($Batch->getPkBatch());
+            $this->errorCurve($where, $parameters[0], $Batch->getPkBatch());
         }
     }
 
@@ -1707,9 +1796,9 @@ class VerificationController extends BaseController
         if ($value < $parameters[0]->getMinValue())
         {
             $where = "s.sampleName LIKE 'BLK%' AND s.fkBatch = " . $Batch->getPkBatch();
-            $this->error($where, $parameters[0]);
-            $this->curve($Batch->getPkBatch());
-            
+            //$this->error($where, $parameters[0]);
+            //$this->curve($Batch->getPkBatch());
+            $this->errorCurve($where, $parameters[0], $Batch->getPkBatch());            
         }
 
         $query    = $this->getEntityManager()->createQuery("
@@ -1737,8 +1826,9 @@ class VerificationController extends BaseController
             if ($value < $parameters[0]->getMinValue())
             {
                 $where = "s.sampleName LIKE 'ZS%' AND s.sampleName NOT LIKE 'ZS_NT%' AND s.sampleName NOT LIKE 'ZS_BC%' AND s.fkBatch = " . $Batch->getPkBatch();
-                $this->error($where, $parameters[0]);
-                $this->curve($Batch->getPkBatch());
+                //$this->error($where, $parameters[0]);
+                //$this->curve($Batch->getPkBatch());
+                $this->errorCurve($where, $parameters[0], $Batch->getPkBatch());
             }
         
     }
