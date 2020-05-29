@@ -875,7 +875,7 @@ class VerificationController extends BaseController
                 {
                     $where = "s.sampleName = '" . $temp['sampleName'] . "' AND s.fkBatch = " . $Batch->getPkBatch();
                     //$this->error($where, $parameters3[0], array(), false);
-                    $this->errorCurve($where, $parameters3[0], $Batch->getPkBatch(), array(), false);
+                    $this->error($where, $parameters3[0], array(), false);
                     $pos = strpos($temp["sampleName"], '*');
                     $pos = $pos - 1;
                     $reinyect =  trim(substr($temp["sampleName"], -3, $pos), '*');
@@ -891,7 +891,7 @@ class VerificationController extends BaseController
                     {
                         $where = "s.sampleName = '" . $temp2['sampleName'] . "' AND s.fkBatch = " . $Batch->getPkBatch();
                         //$this->error($where, $parameters3[0], array(), false);
-                        $this->errorCurve($where, $parameters3[0], $Batch->getPkBatch(), array(), false);
+                        $this->error($where, $parameters3[0], array(), false);
                     }   
                 }
             }
