@@ -1,0 +1,386 @@
+<?php
+header('Content-Disposition: attachment; filename="'. $filename .'.xls";');
+header('Content-Type: application/vnd.ms-excel;charset=utf-8');
+?>
+<html xmlns:v="urn:schemas-microsoft-com:vml"
+xmlns:o="urn:schemas-microsoft-com:office:office"
+xmlns:x="urn:schemas-microsoft-com:office:excel"
+xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+<meta charset="UTF-8">
+<meta name=ProgId content=Excel.Sheet>
+<meta name=Generator content="Microsoft Excel 11">
+<!--[if gte mso 9]><xml>
+ <o:DocumentProperties>
+  <o:Author>Pat Willener</o:Author>
+  <o:Company>Good Day Books</o:Company>
+ </o:DocumentProperties>
+ <o:OfficeDocumentSettings>
+  <o:RelyOnVML/>
+  <o:AllowPNG/>
+ </o:OfficeDocumentSettings>
+</xml><![endif]-->
+<style>
+<!--
+@page
+	{mso-page-orientation:landscape;}
+
+-->
+</style>
+<!--[if gte mso 9]><xml>
+ <x:ExcelWorkbook>
+  <x:ExcelWorksheets>
+   <x:ExcelWorksheet>
+    <x:Name>between_run_accuracy_and_precision_of_quality_control_samples</x:Name>
+    <x:WorksheetOptions>
+     <x:Print>
+      <x:ValidPrinterInfo/>
+      <x:PaperSizeIndex>9</x:PaperSizeIndex>
+      <x:HorizontalResolution>600</x:HorizontalResolution>
+      <x:VerticalResolution>600</x:VerticalResolution>
+     </x:Print>
+     <x:Selected/>
+     <x:Panes>
+      <x:Pane>
+       <x:Number>1</x:Number>
+       <x:ActiveRow>1</x:ActiveRow>
+      </x:Pane>
+     </x:Panes>
+     <x:ProtectContents>False</x:ProtectContents>
+     <x:ProtectObjects>False</x:ProtectObjects>
+     <x:ProtectScenarios>False</x:ProtectScenarios>
+    </x:WorksheetOptions>
+   </x:ExcelWorksheet>
+  </x:ExcelWorksheets>
+  <x:WindowHeight>8835</x:WindowHeight>
+  <x:WindowWidth>15180</x:WindowWidth>
+  <x:WindowTopX>120</x:WindowTopX>
+  <x:WindowTopY>105</x:WindowTopY>
+  <x:ProtectStructure>False</x:ProtectStructure>
+  <x:ProtectWindows>False</x:ProtectWindows>
+ </x:ExcelWorkbook>
+</xml><![endif]-->
+
+<title></title>
+</head>
+<body>
+<div class="Section1">
+	<div class="table-container">
+	    <table width="900" border="0" cellspacing="0" cellpadding="0"  style="background-color:#fff;padding:10px 0 0 0;">
+		<tr>
+		    <td width="238" align="left" height="20">
+			Study No:
+		    </td>
+		    <td width="205" height="20" style="">
+                        <?php echo $analyte->getFkStudy()->getCode(); ?>
+		    </td>
+		</tr>
+		<tr>
+		    <td width="238" align="left" height="20"  style="padding:10px 0 0 0;">
+			Table
+		    </td>
+		</tr>
+		<tr>
+		    <td width="238" colspan="2" align="left" height="20"  style="padding:10px 0 0 0;">
+			<strong>Between-Run Accuracy and Precision of Quality Control Samples </strong>
+		    </td>
+		</tr>
+		<tr>
+		    <td width="238" align="left" height="20"  style="padding: 10px 0 0 0">
+			Analyte:
+		    </td>
+		    <td width="205" height="20" style="">
+                        <?php echo $analyte->getFkAnalyte()->getName(); ?>
+		    </td>
+		</tr>
+		<tr>
+		    <td width="238" align="left" height="20"  style="padding: 10px 00 0">
+			Biological Matrix
+		    </td>
+		    <td width="205" height="20" style="">
+
+		    </td>
+		</tr>
+                <tr>
+		    <td width="238" align="left" height="20"  style="padding: 10px 00 0">
+			Concentration Units:
+		    </td>
+		    <td width="205" height="20" style="">
+                        <?php echo $analyte->getFkUnit()->getName(); ?>
+		    </td>
+		</tr>
+	    </table>
+	    <div class="cler"></div>
+	    <div class="table-row">
+		<table width="900" border="0" cellspacing="0" cellpadding="0"  style="background-color:#fff;margin-top:10px;text-aling:center;">
+		    <tr>
+			<td  colspan="2" align="center"></td>
+		    </tr>
+		    <tr>
+			<td  align="center" colspan="2"  style="color:#000; border: black 1px solid;font-size:14px;padding:10px;font-style:bold;"><strong>Batch Results Table No.</strong></td>
+                        <?php for($i = 1; $i <= $analyte->getQcNumber(); $i++) : ?>
+                        <td  align="center"  colspan="4" style=" border: black 1px solid;padding:2px">QC<?php echo $i; ?></td>
+                        <?php endfor; ?>
+                        
+		    </tr>
+		    <tr><
+			<td  align="center"  colspan="2"  style="color:#000; border: black 1px solid;font-size:14px;padding:10px;font-style:bold;"></td>
+			<?php foreach ($qc_values as $key => $value) : ?>
+                        <td  style= "mso-number-format:'#,##0.00';" align="center"   colspan="4"  style=" border: black 1px solid;padding:2px">
+                            <?php echo number_format($value, 2, '.', ''); ?>
+                        </td>
+                        <?php endforeach; ?>
+                        
+		    </tr>
+		    <tr>
+                <td  align="center" colspan="2"  style="color:#000; border: black 1px solid;font-size:14px;padding:10px;font-style:bold;"></td>
+            <?php foreach ($qc_values as $key => $value) : ?>
+                <td  align="center" colspan="2"  style=" border: black 1px solid;padding:2px">Conc Found</td>
+                <td  align="center" colspan="2"  style=" border: black 1px solid;padding:2px">% Nominal</td>
+            <?php endforeach; ?>
+            
+		    </tr>
+                    <?php foreach($elements as $key => $value) : ?>
+		    <tr>
+                        <td  align="center"   colspan="2"  style="color:#000; border: black 1px solid;font-size:14px;padding:10px;font-style:bold;">
+                            <strong><?php
+                            list($key, $aux) = explode("_", $key);
+                            echo $key; ?></strong>
+                        </td>
+                        <?php foreach ($value as $k => $v) : ?>
+                            <?php if ($k == 0): ?>
+                            <td style="mso-number-format:'#,##0.00';" align="center" colspan="2" style=" border: black 1px solid;padding:2px">
+                                <?php echo $v['calculatedConcentration']; ?>
+                            </td>
+                            <?php if ($v['error']): ?>
+                                <td style="mso-number-format:'#,##0.00';" align="center" style=" border: black 1px solid;padding:2px;font-style:italic;">
+                                    <?php echo $v['accuracy']; ?>
+                                </td>
+                            <?php else: ?>
+                                <td style="mso-number-format:'#,##0.00';" align="center" style=" border: black 1px solid;padding:2px;">
+                                    <?php echo $v['accuracy']; ?>
+                                </td>
+                            <?php endif; ?>
+                            <td  align="center"    style=" border: black 1px solid;padding:2px;font-size:10px">
+                                <?php echo $v['error']; ?>
+                            </td>
+                            <?php endif; ?>
+                            <?php if ($k == 2): ?>
+                            <td style="mso-number-format:'#,##0.00';" align="center" colspan="2" style=" border: black 1px solid;padding:2px">
+                                <?php echo $v['calculatedConcentration']; ?>
+                            </td>
+                            <?php if ($v['error']): ?>
+                                <td style="mso-number-format:'#,##0.00';" align="center" style=" border: black 1px solid;padding:2px;font-style:italic;">
+                                    <?php echo $v['accuracy']; ?>
+                                </td>
+                            <?php else: ?>
+                                <td style="mso-number-format:'#,##0.00';" align="center" style=" border: black 1px solid;padding:2px;">
+                                    <?php echo $v['accuracy']; ?>
+                                </td>
+                            <?php endif; ?>
+                            <td  align="center"    style=" border: black 1px solid;padding:2px;font-size:10px">
+                                <?php echo $v['error']; ?>
+                            </td>
+                            <?php endif; ?>
+
+                            <?php if ($k == 4): ?>
+                            <td style="mso-number-format:'#,##0.00';" align="center" colspan="2" style=" border: black 1px solid;padding:2px">
+                                <?php echo $v['calculatedConcentration']; ?>
+                            </td>
+                            <?php if ($v['error']): ?>
+                                <td style="mso-number-format:'#,##0.00';" align="center" style=" border: black 1px solid;padding:2px;font-style:italic;">
+                                    <?php echo $v['accuracy']; ?>
+                                </td>
+                            <?php else: ?>
+                                <td style="mso-number-format:'#,##0.00';" align="center" style=" border: black 1px solid;padding:2px;">
+                                    <?php echo $v['accuracy']; ?>
+                                </td>
+                            <?php endif; ?>
+                            <td  align="center"    style=" border: black 1px solid;padding:2px;font-size:10px">
+                                <?php echo $v['error']; ?>
+                            </td>
+                            <?php endif; ?>
+
+                            <?php if ($k == 6): ?>
+                            <td style="mso-number-format:'#,##0.00';" align="center" colspan="2" style=" border: black 1px solid;padding:2px">
+                                <?php echo $v['calculatedConcentration']; ?>
+                            </td>
+                            <?php if ($v['error']): ?>
+                                <td style="mso-number-format:'#,##0.00';" align="center" style=" border: black 1px solid;padding:2px;font-style:italic;">
+                                    <?php echo $v['accuracy']; ?>
+                                </td>
+                            <?php else: ?>
+                                <td style="mso-number-format:'#,##0.00';" align="center" style=" border: black 1px solid;padding:2px;">
+                                    <?php echo $v['accuracy']; ?>
+                                </td>
+                            <?php endif; ?>
+                            <td  align="center"    style=" border: black 1px solid;padding:2px;font-size:10px">
+                                <?php echo $v['error']; ?>
+                            </td>
+                            <?php endif; ?>
+                            
+                            
+                            
+                        <?php endforeach; ?>
+		    </tr>
+                    <tr>
+                        <td  align="center"   colspan="2" style="color:#000; border: black 1px solid;font-size:14px;padding:10px;font-style:bold;">
+                            <strong></strong>
+                        </td>
+			<?php foreach ($value as $k => $v) : ?>
+                            <?php if ($k == 1): ?>
+                            <td style="mso-number-format:'#,##0.00';" align="center" colspan="2" style=" border: black 1px solid;padding:2px">
+                                <?php echo $v['calculatedConcentration']; ?>
+                            </td>
+                            <?php if ($v['error']): ?>
+                                <td style="mso-number-format:'#,##0.00';" align="center" style=" border: black 1px solid;padding:2px;font-style:italic;">
+                                    <?php echo $v['accuracy']; ?>
+                                </td>
+                            <?php else: ?>
+                                <td style="mso-number-format:'#,##0.00';" align="center" style=" border: black 1px solid;padding:2px;">
+                                    <?php echo $v['accuracy']; ?>
+                                </td>
+                            <?php endif; ?>
+                            <td  align="center"    style=" border: black 1px solid;padding:2px;font-size:10px">
+                                <?php echo $v['error']; ?>
+                            </td>
+                            <?php endif; ?>
+                            <?php if ($k == 3): ?>
+                            <td style="mso-number-format:'#,##0.00';" align="center" colspan="2" style=" border: black 1px solid;padding:2px">
+                                <?php echo $v['calculatedConcentration']; ?>
+                            </td>
+                            <?php if ($v['error']): ?>
+                                <td style="mso-number-format:'#,##0.00';" align="center" style=" border: black 1px solid;padding:2px;font-style:italic;">
+                                    <?php echo $v['accuracy']; ?>
+                                </td>
+                            <?php else: ?>
+                                <td style="mso-number-format:'#,##0.00';" align="center" style=" border: black 1px solid;padding:2px;">
+                                    <?php echo $v['accuracy']; ?>
+                                </td>
+                            <?php endif; ?>
+                            <td  align="center"    style=" border: black 1px solid;padding:2px;font-size:10px">
+                                <?php echo $v['error']; ?>
+                            </td>
+                            <?php endif; ?>
+                            <?php if ($k == 5): ?>
+                            <td style="mso-number-format:'#,##0.00';" align="center" colspan="2" style=" border: black 1px solid;padding:2px">
+                                <?php echo $v['calculatedConcentration']; ?>
+                            </td>
+                            <?php if ($v['error']): ?>
+                                <td style="mso-number-format:'#,##0.00';" align="center" style=" border: black 1px solid;padding:2px;font-style:italic;">
+                                    <?php echo $v['accuracy']; ?>
+                                </td>
+                            <?php else: ?>
+                                <td style="mso-number-format:'#,##0.00';" align="center" style=" border: black 1px solid;padding:2px;">
+                                    <?php echo $v['accuracy']; ?>
+                                </td>
+                            <?php endif; ?>
+                            <td  align="center"    style=" border: black 1px solid;padding:2px;font-size:10px">
+                                <?php echo $v['error']; ?>
+                            </td>
+                            <?php endif; ?>
+                            <?php if ($k == 7): ?>
+                            <td style="mso-number-format:'#,##0.00';" align="center" colspan="2" style=" border: black 1px solid;padding:2px">
+                                <?php echo $v['calculatedConcentration']; ?>
+                            </td>
+                            <?php if ($v['error']): ?>
+                                <td style="mso-number-format:'#,##0.00';" align="center" style=" border: black 1px solid;padding:2px;font-style:italic;">
+                                    <?php echo $v['accuracy']; ?>
+                                </td>
+                            <?php else: ?>
+                                <td style="mso-number-format:'#,##0.00';" align="center" style=" border: black 1px solid;padding:2px;">
+                                    <?php echo $v['accuracy']; ?>
+                                </td>
+                            <?php endif; ?>
+                            <td  align="center"    style=" border: black 1px solid;padding:2px;font-size:10px">
+                                <?php echo $v['error']; ?>
+                            </td>
+                            <?php endif; ?>
+                            
+                        <?php endforeach; ?>
+		    </tr>
+           
+                    <?php endforeach; ?>
+		    <tr>
+			<td colspan="20">
+                            &nbsp;
+			</td>
+		    </tr>
+		    <tr>
+			<td  align="center"   colspan="2"  style="color:#000; border: black 1px solid;font-size:14px;padding:10px;font-style:bold;">
+                            <strong>N</strong>
+                        </td>
+                        <?php foreach ($valuesCon as $key => $value) : ?>
+                        <td  align="center"   colspan="2" style=" border: black 1px solid;padding:2px;">
+                            =CONTAR(<?php echo implode(";",$value); ?>)
+                        </td>
+                        <td  align="center"   colspan="2" style=" border: black 1px solid;padding:2px;">
+                            =CONTAR(<?php echo implode(";",$valuesAcc[$key]); ?>)
+                        </td>
+                        <?php endforeach; ?>
+		    </tr>
+		    <tr>
+                        <td  align="center"   colspan="2"  style="color:#000; border: black 1px solid;font-size:14px;padding:10px;font-style:bold;">
+                            <strong>Mean</strong>
+                        </td>
+                        <?php foreach ($valuesCon as $key => $value) : ?>
+                        <td  align="center"   colspan="2" style=" border: black 1px solid;padding:2px;">
+                            =PROMEDIO(<?php echo implode(";",$value); ?>)
+                        </td>
+                        <td  align="center"   colspan="2" style=" border: black 1px solid;padding:2px;">
+                            =PROMEDIO(<?php echo implode(";",$valuesAcc[$key]); ?>)
+                        </td>
+                        <?php endforeach; ?>
+		    </tr>
+		    <tr>
+			<td  align="center"   colspan="2"  style="color:#000; border: black 1px solid;font-size:14px;padding:10px;font-style:bold;">
+                            <strong>SD (±) </strong>
+                        </td>
+                        <?php foreach ($valuesCon as $key => $value) : ?>
+                        <td  align="center"   colspan="2" style=" border: black 1px solid;padding:2px;">
+                            =REDONDEAR(DESVEST(<?php echo implode(";",$value); ?>);4)
+                        </td>
+                        <td  align="center"   colspan="2" style=" border: black 1px solid;padding:2px;">
+
+                        </td>
+                        <?php endforeach; ?>
+		    </tr>
+		    <tr>
+			<td align="center"   colspan="2"  style="color:#000; border: black 1px solid;font-size:14px;padding:10px;font-style:bold;">
+                            <strong>CV (%)</strong>
+                        </td>
+                        <?php foreach ($valuesCon as $key => $value) : ?>
+                        <td style ="mso-number-format:'#,##0.00';"  align="center"   colspan="2" style=" border: black 1px solid;padding:2px;">
+                            =DESVEST(<?php echo implode(";",$value); ?>)/PROMEDIO(<?php echo implode(";",$value); ?>) * 100
+                        </td>
+                        <td  align="center"   colspan="2" style=" border: black 1px solid;padding:2px;">
+
+                        </td>
+                        <?php endforeach; ?>
+		    </tr>
+		</table>
+		<table width="900" border="0" cellspacing="0" cellpadding="0"  style="margin-top:10px;text-aling:center;">
+		    <tr>
+			<td colspan="20" align="left" style="padding: 10px 0 2px 0;">Acceptance criteria: </td>
+		    </tr>
+		    <tr>
+			<td colspan="20" align="left" style="padding: wpx;">67% Total QCs must be 100 ± 15% nominal values</td>
+		    </tr>
+		    <tr>
+			<td colspan="20" align="left" style="padding: 2px;">50% QCs per level must be 100 ± 15% nominal values</td>
+		    </tr>
+		    <tr>
+			<td colspan="20" align="left" style="padding: 2px;">Mean % nominal 100 ± 15% </td>
+		    </tr>
+		    <tr>
+			<td colspan="20" align="left" style="padding: 10px;">CV (%) ≤ 15%  </td>
+		    </tr>
+		    <tr>
+			<td colspan="20" align="left" style="padding: 10px;">(2) RCS: Rejected Calibration Standard</td>
+		    </tr>
+		</table>
+	    </div>
+	</div>
+      </div>
+    </body>
+</html>

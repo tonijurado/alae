@@ -73,6 +73,19 @@ class CronController extends BaseController
         return true;
     }
 
+    /*
+     * Actualiza curve flag
+     */
+    protected function curve($pkParameter)
+    {
+        $sql = "
+            UPDATE Alae\Entity\Batch b
+            SET b.curveFlag = 1
+            WHERE b.pkBatch = " . $pkParameter;
+        $query = $this->getEntityManager()->createQuery($sql);
+        $query->execute();
+    }
+
     /**
      * Realizamos la búsqueda del estudio y analito al cual pertenece el lote.
      *      1.- Buscamos las coincidencias que tenga el nombre del fichero con los estudios que estén definidos
@@ -189,6 +202,7 @@ class CronController extends BaseController
         {
             echo "FALLO EXPORT TAMAÑO.";
             $this->execute(\Alae\Service\Verification::updateBatch("b.pkBatch = " . $Batch->getPkBatch(), "V1.1"));
+            $this->curve($Batch->getPkBatch());
         }  
 
         if(count($data["data"]) > 0)
