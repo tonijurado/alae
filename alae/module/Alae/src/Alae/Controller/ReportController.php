@@ -588,32 +588,12 @@ class ReportController extends BaseController
             //OBTIENE LOS DATOS DEL REPORTE
             // Hacemos esta query para "filtrar" solamente los lotes que cumplen con las condiciones de la curva.
             // Es un Join de 3 tablas.
-
-            $query = $this->getEntityManager()->createQuery("
-            SELECT b
-            FROM Alae\Entity\Batch b 
-            WHERE b.fileName NOT IN (
-                SELECT b1.fileName
-                FROM Alae\Entity\Batch b1
-                JOIN Alae\Entity\SampleBatch sb WITH b1.pkBatch = sb.fkBatch
-                JOIN Alae\Entity\Error e WITH sb.pkSampleBatch = e.fkSampleBatch
-                WHERE b1.fkAnalyte = " . $request->getQuery('an') . " AND b1.fkStudy = " . $request->getQuery('id') . " AND
-                    e.pkError IN (
-                        SELECT e1.pkError
-                        FROM Alae\Entity\Error e1 
-                        WHERE " . $criteriosErrorAceptados . "))
-            ORDER BY b.fileName ASC");
-
-            $batch = $query->getResult();
-
-            /*
             $query = $this->getEntityManager()->createQuery("
                 SELECT b
                 FROM Alae\Entity\Batch b
                 WHERE b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id') . "
                 ORDER BY b.fileName ASC");
             $batch = $query->getResult();
-            */
 
             if (count($batch) > 0)
             {
@@ -644,30 +624,17 @@ class ReportController extends BaseController
     {
         //REPORTE 6 EXCEL
        $request = $this->getRequest();
-       $criteriosErrorAceptados = 'e.fkParameter NOT IN ( 1,2,3,4,5,6,7,8,9,11,17,23,24,25,28,29,44,45,46,53 ) ';
+       //$criteriosErrorAceptados = 'e.fkParameter NOT IN ( 1,2,3,4,5,6,7,8,9,11,17,23,24,25,28,29,44,45,46,53 ) ';
        if ($request->isGet())
        {
            
            $analytes = $this->getRepository('\\Alae\\Entity\\AnalyteStudy')->findBy(array("fkAnalyte" => $request->getQuery('an'), "fkStudy" => $request->getQuery('id')));
            $query    = $this->getEntityManager()->createQuery("
-           SELECT b
-           FROM Alae\Entity\Batch b 
-           WHERE b.fileName NOT IN (
-               SELECT b1.fileName
-               FROM Alae\Entity\Batch b1
-               JOIN Alae\Entity\SampleBatch sb WITH b1.pkBatch = sb.fkBatch
-               JOIN Alae\Entity\Error e WITH sb.pkSampleBatch = e.fkSampleBatch
-               WHERE b1.fkAnalyte = " . $request->getQuery('an') . " AND b1.fkStudy = " . $request->getQuery('id') . " AND
-                   e.pkError IN (
-                       SELECT e1.pkError
-                       FROM Alae\Entity\Error e1 
-                       WHERE " . $criteriosErrorAceptados . "))
-           ORDER BY b.fileName ASC");/*
                SELECT b
                FROM Alae\Entity\Batch b
                WHERE b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id') . "
                ORDER BY b.fileName ASC");
-*/
+
                $batch    = $query->getResult();
 
            if (count($batch) > 0)
@@ -757,31 +724,17 @@ class ReportController extends BaseController
     {
         //REPORTE 7 EXCEL
         $request = $this->getRequest();
-        $criteriosErrorAceptados = 'e.fkParameter NOT IN ( 1,2,3,4,5,6,7,8,9,11,17,23,24,25,28,29,44,45,46,53 ) ';
+        //$criteriosErrorAceptados = 'e.fkParameter NOT IN ( 1,2,3,4,5,6,7,8,9,11,17,23,24,25,28,29,44,45,46,53 ) ';
         if ($request->isGet())
         {
             
             $analytes = $this->getRepository('\\Alae\\Entity\\AnalyteStudy')->findBy(array("fkAnalyte" => $request->getQuery('an'), "fkStudy" => $request->getQuery('id')));
             $query    = $this->getEntityManager()->createQuery("
-            SELECT b
-            FROM Alae\Entity\Batch b 
-            WHERE b.fileName NOT IN (
-                SELECT b1.fileName
-                FROM Alae\Entity\Batch b1
-                JOIN Alae\Entity\SampleBatch sb WITH b1.pkBatch = sb.fkBatch
-                JOIN Alae\Entity\Error e WITH sb.pkSampleBatch = e.fkSampleBatch
-                WHERE b1.fkAnalyte = " . $request->getQuery('an') . " AND b1.fkStudy = " . $request->getQuery('id') . " AND
-                    e.pkError IN (
-                        SELECT e1.pkError
-                        FROM Alae\Entity\Error e1 
-                        WHERE " . $criteriosErrorAceptados . "))
-            ORDER BY b.fileName ASC");
-/*
                 SELECT b
                 FROM Alae\Entity\Batch b
                 WHERE b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id') . "
                 ORDER BY b.fileName ASC");
-*/
+
                 $batch    = $query->getResult();
 
             if (count($batch) > 0)
@@ -862,11 +815,195 @@ class ReportController extends BaseController
         }
     }
 
+
+/**
+     * Calculo de las concentraciones de los QC
+     * $_GET['id'] = pkStudy
+     * $_GET['an'] = pkAnalyte
+     */
+    public function r8Action()
+    {
+        //REPORTE 8 EXCEL
+        $request = $this->getRequest();
+
+        if ($request->isGet())
+        {
+            //OBTIENE LOS DATOS DEL REPORTE
+            $analytes = $this->getRepository('\\Alae\\Entity\\AnalyteStudy')->findBy(array("fkAnalyte" => $request->getQuery('an'), "fkStudy" => $request->getQuery('id')));
+            $qb = $this->getEntityManager()->createQueryBuilder();
+            $qb
+                ->select('s', 'GROUP_CONCAT(DISTINCT p.codeError) as codeError')
+                ->from('Alae\Entity\SampleBatch', 's')
+                ->leftJoin('Alae\Entity\Error', 'e', \Doctrine\ORM\Query\Expr\Join::WITH, 's.pkSampleBatch = e.fkSampleBatch')
+                ->leftJoin('Alae\Entity\Parameter', 'p', \Doctrine\ORM\Query\Expr\Join::WITH, 'e.fkParameter = p.pkParameter')
+                ->innerJoin('Alae\Entity\Batch', 'b', \Doctrine\ORM\Query\Expr\Join::WITH, 's.fkBatch = b.pkBatch')
+                ->where("(s.sampleName LIKE 'QC%' AND s.sampleName NOT LIKE '%DQC%') AND s.sampleName NOT LIKE '%*%' AND b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id'))
+                ->groupBy('b.pkBatch, s.pkSampleBatch')
+                ->orderBy('b.fileName, s.sampleName', 'ASC');
+            $elements = $qb->getQuery()->getResult();
+            
+            
+            $propertiesData = [];
+            $concentration = $accuracy = $properties = array();
+            foreach ($elements as $element)
+            {
+                $propertiesValues = [];
+
+                $error = number_format((float)$element[0]->getCalculatedConcentration(), 2, '.', '');
+                $properties[$element[0]->getFkBatch()->getFileName()][] = array(
+                    "sampleName"              => $element[0]->getSampleName(),
+                    "calculatedConcentration" => number_format((float)$element[0]->getCalculatedConcentration(), 2, '.', ''),
+                    "accuracy"                => number_format((float)$element[0]->getAccuracy(), 2, '.', ''),
+                    "error"                   => $element['codeError']
+                );
+
+                $propertiesValues = [
+                    "batchName"              => $element[0]->getFkBatch()->getFileName(),
+                    "sampleName"              => $element[0]->getSampleName(),
+                    "calculatedConcentration" => number_format((float)$element[0]->getCalculatedConcentration(), 2, '.', ''),
+                    "accuracy"                => number_format((float)$element[0]->getAccuracy(), 2, '.', ''),
+                    "error"                   => $element['codeError']
+                ];
+
+                array_push($propertiesData, $propertiesValues);
+
+                if($element['codeError'] == '' || $element['codeError'] == 'O')
+                {
+                    //VERIFICAR QUE NO VAYAN AL RESUMEN DEL PIE LOS INYECTADOS
+                    $cadena = $element[0]->getSampleName(); 
+                    $cadena1 = substr($cadena,-2);
+                    
+                    $digito1 = $cadena1[0];
+                    $digito2 = $cadena1[1];
+
+                    if($digito1 == "R" && ($digito2 == '*' || ctype_digit($digito2)))
+                    {
+                        $centi = "N";
+                    }
+                    else
+                    {
+                        $centi = "S";
+                    }
+                    
+                    IF($centi == "S")
+                    {
+                        $concentration[preg_replace('/-\d+/i', '', $element[0]->getSampleName())][] = $error;
+                    }
+                }
+                $accuracy[preg_replace('/-\d+/i', '', $element[0]->getSampleName())][] = number_format((float)$element[0]->getAccuracy(), 2, '.', '');
+            }
+            
+            $qcCount = count(explode(",", $analytes[0]->getQcValues()));
+//echo $qcCount;die();
+            
+            $key = "";
+            
+            $elementRow = [];
+            $elementData = [];
+            $elementValues = [];
+            $l = 0;
+            $max = 0;
+
+            $query    = $this->getEntityManager()->createQuery("
+                SELECT DISTINCT max(SUBSTRING(s.sampleName, 5, 1)) as max1
+                FROM Alae\Entity\SampleBatch s
+                LEFT JOIN Alae\Entity\Error e WITH e.fkSampleBatch = s.pkSampleBatch
+                LEFT JOIN Alae\Entity\Parameter p WITH e.fkParameter = p.pkParameter
+                INNER JOIN Alae\Entity\Batch b WITH s.fkBatch = b.pkBatch
+                WHERE (s.sampleName LIKE 'QC%' AND s.sampleName NOT LIKE '%DQC%') AND s.sampleName NOT LIKE '%*%' AND b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id')."
+                ORDER BY b.fileName, s.sampleName ASC");
+                $results = $query->getResult();
+
+            foreach ($results as $row1) 
+            {
+                $max = $row1['max1'];
+            }
+
+            $query    = $this->getEntityManager()->createQuery("
+                SELECT distinct b.fileName
+                FROM Alae\Entity\SampleBatch s
+                LEFT JOIN Alae\Entity\Error e WITH e.fkSampleBatch = s.pkSampleBatch
+                LEFT JOIN Alae\Entity\Parameter p WITH e.fkParameter = p.pkParameter
+                INNER JOIN Alae\Entity\Batch b WITH s.fkBatch = b.pkBatch
+                WHERE (s.sampleName LIKE 'QC%' AND s.sampleName NOT LIKE '%DQC%') AND s.sampleName NOT LIKE '%*%' AND b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id')."
+                GROUP BY b.pkBatch, s.pkSampleBatch
+                ORDER BY b.fileName, s.sampleName ASC");
+                $results = $query->getResult();
+
+                foreach ($results as $row1) 
+                {
+                    $fileName = $row1['fileName'];
+                
+
+                    for ($j = 1; $j <= $max; $j++) {
+                        for ($i = 1; $i <= $qcCount; $i++) {
+                            $key = "QC".$i."-".$j;
+                            
+                            $cnt = count($propertiesData);
+                            
+                            foreach ($propertiesData as $data)
+                                if ($data['sampleName'] == $key AND $data['batchName'] == $fileName) {
+                                    
+                                    $elementValues = [
+                                        "batchName"              => $fileName,
+                                        "sampleName"              => $data['sampleName'],
+                                        "calculatedConcentration" => $data['calculatedConcentration'],
+                                        "accuracy"                => $data['accuracy'],
+                                        "error"                   => $data['error']
+                                    ];
+                                    
+                                    array_push($elementData, $elementValues);
+                                    $elementValues = [];
+                                    $l++;
+                                break;
+                            }
+                            if($l == $max)
+                            {
+                                array_push($elementRow, $elementData);
+                                
+                                $elementData = [];
+                                $l = 0;
+                            }
+                        }
+                    }
+                }
+                
+                //var_dump($elementRow[27]);die();
+            
+            
+            $response = array(
+                "analyte"      => $analytes[0],
+                "qc_values"    => explode(",", $analytes[0]->getQcValues()),
+                "elements"     => $properties,
+                "valuesCon"    => $concentration,
+                "valuesAcc"    => $accuracy,
+                "elementRow"    => $elementRow,
+                "filename"     => "between_run_accuracy_and_precision_of_quality_control_samples" . date("Ymd-Hi")
+            );
+
+            $viewModel = new ViewModel($response);
+            $viewModel->setTerminal(true);
+            return $viewModel;
+        }
+        else
+        {
+            return $this->redirect()->toRoute('report', array(
+                'controller' => 'report',
+                'action'     => 'index',
+                'id'         => 1
+            ));
+        }
+    }
+
+
+
+
    /**
      * Calculo de las concentraciones de los QC
      * $_GET['id'] = pkStudy
      * $_GET['an'] = pkAnalyte
      */
+/*
     public function r8Action()
     {
         //REPORTE 8 EXCEL
@@ -949,7 +1086,7 @@ class ReportController extends BaseController
             ));
         }
     }
-
+*/
    /**
      * Calculo de las concentraciones de los (L|H)DQC
      * $_GET['id'] = pkStudy
@@ -1115,7 +1252,7 @@ class ReportController extends BaseController
      */
     public function r10Action()
     {
-/*
+
         $request = $this->getRequest();
         if ($request->isGet())
         {
@@ -1128,35 +1265,24 @@ class ReportController extends BaseController
             $Study   = $this->getRepository("\\Alae\\Entity\\Study")->find($request->getQuery('id'));
             $AnalyteName = $Analyte->getName();
             $studyName = $Study->getCode();
-*/
+        }
+
             $request = $this->getRequest();
-            $criteriosErrorAceptados = 'e.fkParameter NOT IN ( 1,2,3,4,5,6,7,8,9,11,17,23,24,25,28,29,44,45,46,53 ) ';
+            //$criteriosErrorAceptados = 'e.fkParameter NOT IN ( 1,2,3,4,5,6,7,8,9,11,17,23,24,25,28,29,44,45,46,53 ) ';
             if ($request->isGet())
             {
                 
                 $analytes = $this->getRepository('\\Alae\\Entity\\AnalyteStudy')->findBy(array("fkAnalyte" => $request->getQuery('an'), "fkStudy" => $request->getQuery('id')));
                 $query    = $this->getEntityManager()->createQuery("
-                SELECT b
-                FROM Alae\Entity\Batch b 
-                WHERE b.fileName NOT IN (
-                    SELECT b1.fileName
-                    FROM Alae\Entity\Batch b1
-                    JOIN Alae\Entity\SampleBatch sb WITH b1.pkBatch = sb.fkBatch
-                    JOIN Alae\Entity\Error e WITH sb.pkSampleBatch = e.fkSampleBatch
-                    WHERE b1.fkAnalyte = " . $request->getQuery('an') . " AND b1.fkStudy = " . $request->getQuery('id') . " AND
-                        e.pkError IN (
-                            SELECT e1.pkError
-                            FROM Alae\Entity\Error e1 
-                            WHERE " . $criteriosErrorAceptados . "))
-                ORDER BY b.fileName ASC");    /*
                     SELECT b
                     FROM Alae\Entity\Batch b
                     WHERE b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id') . "
                     ORDER BY b.fileName ASC");
-    */
-                    $batch    = $query->getResult();
-                    foreach($batch as $mifila){
-                        $misLotes = $misLotes . $mifila['pkBatch'] . ',';
+
+                $batch    = $query->getResult();
+                //$Batch->getPkBatch()
+                foreach($batch as $mifila){
+                        $misLotes = $misLotes . $mifila->getPkBatch() . ',';
                     }
                     $misLotes = substr($misLotes, 0, -1);
                     echo $misLotes;

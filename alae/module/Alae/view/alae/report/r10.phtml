@@ -28,7 +28,7 @@ header('Content-Type: application/vnd.ms-excel;charset=utf-8');
                     Analyte:
                 </td>
                 <td width="205" height="20" style="">
-                    <?php echo $analyte; ?>
+                    <?php echo $analyte; $count=0; ?>
                 </td>
             </tr>
         </table>
@@ -59,7 +59,7 @@ header('Content-Type: application/vnd.ms-excel;charset=utf-8');
                     <?php echo substr($value['filename'], 0, -4); ?>
                 </td>
             </tr>
-            <?php $count++; endforeach; ?>
+            <?php $count=$count+1; endforeach; ?>
         </table>
 
         <table width="890" border="0" cellspacing="0" cellpadding="0"  style="background-color:#fff;padding:10px 0 0 0;">
