@@ -894,7 +894,6 @@ class ReportController extends BaseController
             }
             
             $qcCount = count(explode(",", $analytes[0]->getQcValues()));
-//echo $qcCount;die();
             
             $key = "";
             
@@ -968,9 +967,6 @@ class ReportController extends BaseController
                     }
                 }
                 
-                //var_dump($elementRow[27]);die();
-            
-            
             $response = array(
                 "analyte"      => $analytes[0],
                 "qc_values"    => explode(",", $analytes[0]->getQcValues()),

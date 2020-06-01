@@ -864,11 +864,12 @@ class ReportController extends BaseController
                 ->leftJoin('Alae\Entity\Error', 'e', \Doctrine\ORM\Query\Expr\Join::WITH, 's.pkSampleBatch = e.fkSampleBatch')
                 ->leftJoin('Alae\Entity\Parameter', 'p', \Doctrine\ORM\Query\Expr\Join::WITH, 'e.fkParameter = p.pkParameter')
                 ->innerJoin('Alae\Entity\Batch', 'b', \Doctrine\ORM\Query\Expr\Join::WITH, 's.fkBatch = b.pkBatch')
-                ->where("(s.sampleName LIKE 'QC%' OR s.sampleName LIKE 'LLQC%' OR s.sampleName LIKE 'ULQC%') AND s.sampleName NOT LIKE '%*%' AND b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id'))
+                ->where("(s.sampleName LIKE 'QC%' OR s.sampleName LIKE 'LLQC%' OR s.sampleName LIKE 'ULQC%') AND s.sampleName NOT LIKE '%DQC%' AND s.sampleName NOT LIKE '%*%' AND b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id'))
                 ->groupBy('b.pkBatch, s.pkSampleBatch')
                 ->orderBy('b.fileName, s.sampleName', 'ASC');
             $elements = $qb->getQuery()->getResult();
 
+            $propertiesData = [];
             $concentration = $accuracy = $properties = array();
             foreach ($elements as $element)
             {
@@ -880,10 +881,21 @@ class ReportController extends BaseController
                     "error"                   => $element['codeError']
                 );
 
+                $propertiesValues = [];
+                $propertiesValues = [
+                    "batchName"              => $element[0]->getFkBatch()->getFileName(),
+                    "sampleName"              => $element[0]->getSampleName(),
+                    "calculatedConcentration" => number_format((float)$element[0]->getCalculatedConcentration(), 2, '.', ''),
+                    "accuracy"                => number_format((float)$element[0]->getAccuracy(), 2, '.', ''),
+                    "error"                   => $element['codeError']
+                ];
+
+                array_push($propertiesData, $propertiesValues);
+
                 if($element['codeError'] == '' || $element['codeError'] == 'O')
                 {
                     //VERIFICAR QUE NO VAYAN AL RESUMEN DEL PIE LOS INYECTADOS
-                    $cadena = $element[0]->getSampleName(); 
+                    /*$cadena = $element[0]->getSampleName(); 
                     $cadena1 = substr($cadena,-2);
                     
                     $digito1 = $cadena1[0];
@@ -894,18 +906,230 @@ class ReportController extends BaseController
                         $centi = "N";
                     }
                     else
-                    {
+                    { 
                         $centi = "S";
                     }
                     
-                    IF($centi == "S")
+                    $centi = "S";
+                    if($centi == "S")
                     {
                         $concentration[preg_replace('/-\d+/i', '', $element[0]->getSampleName())][] = $error;
-                    }
+                    }*/
+                    $concentration[preg_replace('/-\d+/i', '', $element[0]->getSampleName())][] = $error;
                 }
                 $accuracy[preg_replace('/-\d+/i', '', $element[0]->getSampleName())][] = number_format((float)$element[0]->getAccuracy(), 2, '.', '');
             }
+
+            $qcCount = count(explode(",", $analytes[0]->getQcValues()));
+            $llqcCount = count(explode(",", $analytes[0]->getLlqcValues()));
+            $ulqcCount = count(explode(",", $analytes[0]->getUlqcValues()));
+
+            $totalCount = $qcCount + $llqcCount + $ulqcCount;
             
+            $key = "";
+            
+            $elementRow = [];
+            $elementData = [];
+            $elementValues = [];
+            $l = 0;
+            $max = 0;
+
+            $query    = $this->getEntityManager()->createQuery("
+                SELECT DISTINCT max(SUBSTRING(s.sampleName, 5, 1)) as max1
+                FROM Alae\Entity\SampleBatch s
+                LEFT JOIN Alae\Entity\Error e WITH e.fkSampleBatch = s.pkSampleBatch
+                LEFT JOIN Alae\Entity\Parameter p WITH e.fkParameter = p.pkParameter
+                INNER JOIN Alae\Entity\Batch b WITH s.fkBatch = b.pkBatch
+                WHERE (s.sampleName LIKE 'QC%') AND s.sampleName NOT LIKE '%DQC%' AND s.sampleName NOT LIKE '%*%' AND b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id')."
+                ORDER BY b.fileName, s.sampleName ASC");
+                $results = $query->getResult();
+
+            foreach ($results as $row1) 
+            {
+                $max = $row1['max1'];
+            }
+
+            $query    = $this->getEntityManager()->createQuery("
+                SELECT distinct b.fileName
+                FROM Alae\Entity\SampleBatch s
+                LEFT JOIN Alae\Entity\Error e WITH e.fkSampleBatch = s.pkSampleBatch
+                LEFT JOIN Alae\Entity\Parameter p WITH e.fkParameter = p.pkParameter
+                INNER JOIN Alae\Entity\Batch b WITH s.fkBatch = b.pkBatch
+                WHERE (s.sampleName LIKE 'QC%' OR s.sampleName LIKE 'LLQC%' OR s.sampleName LIKE 'ULQC%') AND s.sampleName NOT LIKE '%DQC%' AND s.sampleName NOT LIKE '%*%' AND b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id')."
+                GROUP BY b.pkBatch, s.pkSampleBatch
+                ORDER BY b.fileName, s.sampleName ASC");
+                $results = $query->getResult();
+
+                foreach ($results as $row1) 
+                {
+                    $fileName = $row1['fileName'];
+                    $ll = 0;
+                    for ($j = 1; $j <= $max; $j++) {
+
+                        $key = "LLQC"."-".$j;
+                        foreach ($propertiesData as $data)
+                            if ($data['sampleName'] == $key AND $data['batchName'] == $fileName) {
+                                
+                                $elementValues = [
+                                    "batchName"              => $fileName,
+                                    "sampleName"              => $data['sampleName'],
+                                    "calculatedConcentration" => $data['calculatedConcentration'],
+                                    "accuracy"                => $data['accuracy'],
+                                    "error"                   => $data['error']
+                                ];
+                                
+                                array_push($elementData, $elementValues);
+                                $elementValues = [];
+                                $ll++;
+                            break;
+                        }
+
+                        $elementValues1 = [];
+                        if($ll == 0)
+                        {
+                            $elementValues1 = [
+                                "batchName"              => $fileName,
+                                "sampleName"              => "",
+                                "calculatedConcentration" => "",
+                                "accuracy"                => "",
+                                "error"                   => ""
+                            ];
+                            
+                            array_push($elementData, $elementValues1);
+                        }
+
+
+
+                        for ($i = 1; $i <= $qcCount; $i++) {
+                            $key = "QC".$i."-".$j;
+                            foreach ($propertiesData as $data)
+                                if ($data['sampleName'] == $key AND $data['batchName'] == $fileName) {
+                                    
+                                    $elementValues = [
+                                        "batchName"              => $fileName,
+                                        "sampleName"              => $data['sampleName'],
+                                        "calculatedConcentration" => $data['calculatedConcentration'],
+                                        "accuracy"                => $data['accuracy'],
+                                        "error"                   => $data['error']
+                                    ];
+                                    
+                                    array_push($elementData, $elementValues);
+                                    $elementValues = [];
+                                    $l++;
+                                break;
+                            }
+                        }
+
+                        $key = "ULQC"."-".$j;
+                        foreach ($propertiesData as $data)
+                            if ($data['sampleName'] == $key AND $data['batchName'] == $fileName) {
+                                
+                                $elementValues = [
+                                    "batchName"              => $fileName,
+                                    "sampleName"              => $data['sampleName'],
+                                    "calculatedConcentration" => $data['calculatedConcentration'],
+                                    "accuracy"                => $data['accuracy'],
+                                    "error"                   => $data['error']
+                                ];
+                                
+                                array_push($elementData, $elementValues);
+                                $elementValues = [];
+                            break;
+                        }
+                        
+                        array_push($elementRow, $elementData);
+                        $elementData = [];
+                        $m = 0;
+
+                        for ($i = 1; $i <= $qcCount; $i++) {
+                            for ($k = 1; $k <= 4; $k++) {
+                                
+                                $key = "QC".$i."-".$j."R".$k;
+                                foreach ($propertiesData as $data)
+                                    if ($data['sampleName'] == $key AND $data['batchName'] == $fileName) {
+                                        $m++;
+                                        $elementValues = [
+                                            "batchName"              => $fileName,
+                                            "sampleName"              => $data['sampleName'],
+                                            "calculatedConcentration" => $data['calculatedConcentration'],
+                                            "accuracy"                => $data['accuracy'],
+                                            "error"                   => $data['error']
+                                        ];
+
+                                        $elementValues1 = [];
+                                        $elementValues1 = [
+                                            "batchName"              => "",
+                                            "sampleName"              => "",
+                                            "calculatedConcentration" => "",
+                                            "accuracy"                => "",
+                                            "error"                   => ""
+                                        ];
+                                        
+                                        if($i == 1)
+                                        {
+                                            array_push($elementData, $elementValues1);
+                                            array_push($elementData, $elementValues);
+                                        }
+
+                                        if($i == 2)
+                                        {
+                                            if($m == $i) {
+                                                array_push($elementData, $elementValues);
+                                            }
+                                            else
+                                            {
+                                                array_push($elementData, $elementValues1);
+                                                array_push($elementData, $elementValues1);
+                                                array_push($elementData, $elementValues);
+                                            }
+                                        }
+
+                                        if($i == 3)
+                                        {
+                                            if($m == $i) {
+                                                array_push($elementData, $elementValues);
+                                            }
+                                            else
+                                            {
+                                                array_push($elementData, $elementValues1);
+                                                array_push($elementData, $elementValues1);
+                                                array_push($elementData, $elementValues1);
+                                                array_push($elementData, $elementValues);
+                                            }
+                                        }
+
+                                        if($i == 4)
+                                        {
+                                            if($m == $i) {
+                                                array_push($elementData, $elementValues);
+                                            }
+                                            else
+                                            {
+                                                array_push($elementData, $elementValues1);
+                                                array_push($elementData, $elementValues1);
+                                                array_push($elementData, $elementValues1);
+                                                array_push($elementData, $elementValues1);
+                                                array_push($elementData, $elementValues);
+                                            }
+                                        }
+                                        $elementValues = [];
+                                    break;
+                                }
+                                if ($m > 0)
+                                {
+                                    array_push($elementRow, $elementData);
+                                    $elementData = [];
+                                }
+                            }
+                        }
+                        //var_dump($elementRow);
+
+                        //array_push($elementRow, $elementData);
+                        //$elementData = [];
+                        
+                    }
+                }
+                   
             $response = array(
                 "analyte"      => $analytes[0],
                 "qc_values"    => explode(",", $analytes[0]->getQcValues()),
@@ -914,6 +1138,7 @@ class ReportController extends BaseController
                 "elements"     => $properties,
                 "valuesCon"    => $concentration,
                 "valuesAcc"    => $accuracy,
+                "elementRow"    => $elementRow,
                 "filename"     => "between_run_accuracy_and_precision_of_quality_control_samples" . date("Ymd-Hi")
             );
 
