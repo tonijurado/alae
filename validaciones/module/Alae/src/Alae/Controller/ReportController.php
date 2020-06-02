@@ -15,7 +15,7 @@
    * r#action donde el número corresponde a cada uno de los reportes existentes.
    * Cada una de estas funciones enviará a formato excel o formato pdf el resultado.
  * @author Maria Quiroz
-   Fecha de creación: 19/05/2014
+   * Fecha de creación: 19/05/2014
  */
 
 namespace Alae\Controller;
@@ -1252,9 +1252,9 @@ class ReportController extends BaseController
      * $_GET['id'] = pkStudy
      * $_GET['an'] = pkAnalyte
      */
-    public function r10Action()
+    public function r4eAction()
     {
-        //REPORTE 4 EXCEL r10
+        //REPORTE 4 EXCEL 
         $request = $this->getRequest();
         if ($request->isGet())
         {
@@ -1321,8 +1321,10 @@ class ReportController extends BaseController
      * $_GET['id'] = pkStudy
      * $_GET['an'] = pkAnalyte
      */
-    public function r11Action()
+    public function r10Action()
     {
+        //Muestras reinyectadas R10
+
         $request = $this->getRequest();
         if ($request->isGet())
         {
@@ -1436,9 +1438,9 @@ class ReportController extends BaseController
         }
     }
 
-    public function rtxtAction()
+    public function r11Action()
     {
-        
+        //R11
         $request = $this->getRequest();
         $page    = "";
         $user = $this->_getSession()->getPkUser();

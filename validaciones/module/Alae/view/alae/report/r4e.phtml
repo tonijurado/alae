@@ -12,7 +12,7 @@ header('Content-Type: application/vnd.ms-excel;charset=utf-8');
         <table width="890" border="0" cellspacing="0" cellpadding="0"  style="background-color:#fff;padding:10px 0 0 0;">
             <tr>
                 <td width="238" colspan="2" align="left" height="20"  style="padding:10px 0 0 0;">
-                    <strong>LISTADO DE MUESTRAS CON INTEGRACIÓN MODIFICADA</strong>
+                    <strong>Listado de muestras a repetir</strong>
                 </td>
             </tr>
             <tr>
@@ -39,8 +39,8 @@ header('Content-Type: application/vnd.ms-excel;charset=utf-8');
             </tr>
             <tr>
                 <td  align="center"   style="color:#000; border: black 1px solid;font-size:11px;padding:10px">Identificación de la muestra</td>
-                <td  align="center"  style=" border: black 1px solid;font-size:11px;padding:10px">Analyte integration Type</td>
-                <td  align="center"   style=" border: black 1px solid;font-size:11px;padding:10px">IS integration Type</td>
+                <td  align="center"  style=" border: black 1px solid;font-size:11px;padding:10px">Código de error</td>
+                <td  align="center"   style=" border: black 1px solid;font-size:11px;padding:10px">Motivo</td>
                 <td align="center"   style="border: black 1px solid;font-size:11px;padding:10px"> Tabla de resultados del lote</td>
             </tr>
             <?php foreach ($list as $key => $value) : ?>
@@ -49,10 +49,10 @@ header('Content-Type: application/vnd.ms-excel;charset=utf-8');
                     <?php echo $value['sampleName']; ?>
                 </td>
                 <td  align="center" style=" border: black 1px solid;font-size:11px;padding:4px">
-                    <?php echo $value['analyteIntegrationType']; ?>
+                    <?php echo $value['codeError']; ?>
                 </td>
                 <td  align="center" style=" border: black 1px solid;font-size:11px;padding:4px">
-                    <?php echo $value['isIntegrationType']; ?>
+                    <?php echo htmlentities($value['messageError']); ?>
                 </td>
                 <td align="center" style="border: black 1px solid;font-size:11px;padding:4px">
                     
@@ -60,37 +60,7 @@ header('Content-Type: application/vnd.ms-excel;charset=utf-8');
                 </td>
             </tr>
             <?php $count++; endforeach; ?>
+            
         </table>
-
-        <table width="890" border="0" cellspacing="0" cellpadding="0"  style="background-color:#fff;padding:10px 0 0 0;">
-            <tr>
-                <td  colspan="4" align="center"></td>
-            </tr>
-            <tr>
-                <td width="238" align="left" height="20">
-                    N° total de muestras con integración modificada:
-                </td>
-                <td width="205" height="20" style="">
-                    <?php echo $recordModified1; ?>
-                </td>
-            </tr>
-            <tr>
-                <td width="238" align="left" height="20"  style="padding: 10px 0 0 0">
-                    N° total de muestras analizadas:
-                </td>
-                <td width="205" height="20" style="">
-                    <?php echo $countTot1; ?>
-                </td>
-            </tr>
-            <tr>
-                <td width="238" align="left" height="20"  style="padding: 10px 0 0 0">
-                    % Muestras con integración modificada:
-                </td>
-                <td width="205" height="20" style="">
-                    <?php echo number_format($recordModified1/$countTot1,4, '.', '')*100 . '%'; ?>  
-                </td>
-            </tr>
-        </table>
-
     </body>
 </html>
