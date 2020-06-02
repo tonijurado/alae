@@ -1433,7 +1433,7 @@ class VerificationController extends BaseController
         AND s.useRecord = 1
         AND s.fkBatch = " . $Batch->getPkBatch();
         //$this->error($where2, $parameters2[0], array(), false);
-        $this->errorCurve($where, $parameters2[0], $Batch->getPkBatch(), array(), false);
+        $this->errorCurve($where2, $parameters2[0], $Batch->getPkBatch(), array(), false);
     }
 
     /**
