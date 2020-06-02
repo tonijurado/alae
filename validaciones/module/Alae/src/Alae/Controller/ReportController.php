@@ -637,7 +637,7 @@ class ReportController extends BaseController
             $query = $this->getEntityManager()->createQuery("
                 SELECT b
                 FROM Alae\Entity\Batch b
-                WHERE b.validFlag = 1 AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id') . "
+                WHERE b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id') . "
                 ORDER BY b.fileName ASC");
             $batch = $query->getResult();
 
