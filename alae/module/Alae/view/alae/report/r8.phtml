@@ -117,25 +117,28 @@ xmlns="http://www.w3.org/TR/REC-html40">
 			<td  colspan="2" align="center"></td>
 		    </tr>
 		    <tr>
-			<td  align="center" colspan="2"  style="color:#000; border: black 1px solid;font-size:14px;padding:10px;font-style:bold;"><strong>Batch Results Table No.</strong></td>
-                        <?php for($i = 1; $i <= $analyte->getQcNumber(); $i++) : ?>
-                        <td  align="center"  colspan="4" style=" border: black 1px solid;padding:2px">QC<?php echo $i; ?></td>
-                        <?php endfor; ?>
-                        
+			<td  align="center" colspan="2"  style="color:#000; border: black 1px solid;font-size:14px;padding:10px;font-style:bold;"><strong>Batch Results Table No.</strong>
+            </td>
+           
+            <?php for($i = 1; $i <= $analyte->getQcNumber(); $i++) : ?>
+                <td  align="center"  colspan="4" style=" border: black 1px solid;padding:2px">QC<?php echo $i; ?></td>
+            <?php endfor; ?>
+            
 		    </tr>
 		    <tr>
 			<td  align="center"  colspan="2"  style="color:#000; border: black 1px solid;font-size:14px;padding:10px;font-style:bold;"></td>
-			<?php foreach ($qc_values as $key => $value) : ?>
-                        <td  style= "mso-number-format:'#,##0.00';" align="center"   colspan="4"  style=" border: black 1px solid;padding:2px">
-                            <?php echo number_format($value, 2, '.', ''); ?>
-                        </td>
-                        <?php endforeach; ?>
-                        
+            <?php foreach ($qc_values as $key => $value) : ?>
+                <td  style= "mso-number-format:'#,##0.00';" align="center"   colspan="4"  style=" border: black 1px solid;padding:2px">
+                    <?php echo number_format($value, 2, '.', ''); ?>
+                </td>
+            <?php endforeach; ?>
 		    </tr>
 		    <tr>
                 <td  align="center" colspan="2"  style="color:#000; border: black 1px solid;font-size:14px;padding:10px;font-style:bold;"></td>
+
             <?php foreach ($qc_values as $key => $value) : ?>
-                <td  align="center" colspan="2"  style=" border: black 1px solid;padding:2px">Conc Found</td>
+                <td  align="center" colspan="1"  style=" border: black 1px solid;padding:2px">Sample</td>
+                <td  align="center" colspan="1"  style=" border: black 1px solid;padding:2px">Conc Found</td>
                 <td  align="center" colspan="2"  style=" border: black 1px solid;padding:2px">% Nominal</td>
             <?php endforeach; ?>
             
@@ -158,7 +161,10 @@ xmlns="http://www.w3.org/TR/REC-html40">
                     }
                     $f++;
                     ?>
-                    <td style="mso-number-format:'#,##0.00';" align="center" colspan="2" style=" border: black 1px solid;padding:2px">
+                    <td  align="center"   colspan="1"  style="color:#000; border: black 1px solid;font-size:14px;padding:10px;font-style:bold;">
+                        <?php echo $row1["sampleName"]; ?>
+                    </td>
+                    <td style="mso-number-format:'#,##0.00';" align="center" colspan="1" style=" border: black 1px solid;padding:2px">
                         <?php echo $row1["calculatedConcentration"]; ?>
                     </td>
                     <?php if ($row1['error']) { ?>
@@ -184,62 +190,132 @@ xmlns="http://www.w3.org/TR/REC-html40">
                 <?php  } ?>
             </table>
 
-
-            
             <table>
-		    <tr>
-			<td  align="center"   colspan="2"  style="color:#000; border: black 1px solid;font-size:14px;padding:10px;font-style:bold;">
-                            <strong>N</strong>
-                        </td>
-                        <?php foreach ($valuesCon as $key => $value) : ?>
+                    <tr>
+                    <td  align="center"   colspan="2"  style="color:#000; border: black 1px solid;font-size:14px;padding:10px;font-style:bold;">
+                        <strong>N</strong>
+                    </td>
+                   
+                    <?php 
+                    $i=0;
+                    $values = [];
+                    $values2 = [];
+                    foreach ($qc_values as $key => $value) : 
+                    $i++;
+                    ?>
+                        <?php foreach ($elementRow as $row){
+                            foreach ($row as $row1){
+                                if (substr($row1["sampleName"],0, 3) == "QC".$i)
+                                {
+                                    $values[] = $row1["calculatedConcentration"];
+                                    $values2[] = $row1["accuracy"];
+                                }
+                            }
+                        } ?>
                         <td  align="center"   colspan="2" style=" border: black 1px solid;padding:2px;">
-                            =CONTAR(<?php echo implode(";",$value); ?>)
-                        </td>
-                        <td  align="center"   colspan="2" style=" border: black 1px solid;padding:2px;">
-                            =CONTAR(<?php echo implode(";",$valuesAcc[$key]); ?>)
-                        </td>
-                        <?php endforeach; ?>
-		    </tr>
-		    <tr>
-                        <td  align="center"   colspan="2"  style="color:#000; border: black 1px solid;font-size:14px;padding:10px;font-style:bold;">
-                            <strong>Mean</strong>
-                        </td>
-                        <?php foreach ($valuesCon as $key => $value) : ?>
-                        <td  align="center"   colspan="2" style=" border: black 1px solid;padding:2px;">
-                            =PROMEDIO(<?php echo implode(";",$value); ?>)
-                        </td>
-                        <td  align="center"   colspan="2" style=" border: black 1px solid;padding:2px;">
-                            =PROMEDIO(<?php echo implode(";",$valuesAcc[$key]); ?>)
-                        </td>
-                        <?php endforeach; ?>
-		    </tr>
-		    <tr>
-			<td  align="center"   colspan="2"  style="color:#000; border: black 1px solid;font-size:14px;padding:10px;font-style:bold;">
-                            <strong>SD (±) </strong>
-                        </td>
-                        <?php foreach ($valuesCon as $key => $value) : ?>
-                        <td  align="center"   colspan="2" style=" border: black 1px solid;padding:2px;">
-                            =REDONDEAR(DESVEST(<?php echo implode(";",$value); ?>);4)
+                            =CONTAR(<?php echo implode(";",$values); ?>)
                         </td>
                         <td  align="center"   colspan="2" style=" border: black 1px solid;padding:2px;">
+                            =CONTAR(<?php echo implode(";",$values2); ?>)
+                        </td>
+                    <?php endforeach; ?>
 
-                        </td>
-                        <?php endforeach; ?>
-		    </tr>
-		    <tr>
-			<td align="center"   colspan="2"  style="color:#000; border: black 1px solid;font-size:14px;padding:10px;font-style:bold;">
-                            <strong>CV (%)</strong>
-                        </td>
-                        <?php foreach ($valuesCon as $key => $value) : ?>
-                        <td style ="mso-number-format:'#,##0.00';"  align="center"   colspan="2" style=" border: black 1px solid;padding:2px;">
-                            =DESVEST(<?php echo implode(";",$value); ?>)/PROMEDIO(<?php echo implode(";",$value); ?>) * 100
+                    </tr>
+
+                    <tr>
+                    <td  align="center"   colspan="2"  style="color:#000; border: black 1px solid;font-size:14px;padding:10px;font-style:bold;">
+                        <strong>Mean</strong>
+                    </td>
+                    
+                    <?php 
+                    $i=0;
+                    $values = [];
+                    $values2 = [];
+                    foreach ($qc_values as $key => $value) : 
+                    $i++;
+                    ?>
+                        <?php foreach ($elementRow as $row){
+                            foreach ($row as $row1){
+                                if (substr($row1["sampleName"],0, 3) == "QC".$i)
+                                {
+                                    $values[] = $row1["calculatedConcentration"];
+                                    $values2[] = $row1["accuracy"];
+                                }
+                            }
+                        } ?>
+                        <td  align="center"   colspan="2" style=" border: black 1px solid;padding:2px;">
+                            =PROMEDIO(<?php echo implode(";",$values); ?>)
                         </td>
                         <td  align="center"   colspan="2" style=" border: black 1px solid;padding:2px;">
-
+                            =PROMEDIO(<?php echo implode(";",$values2); ?>)
                         </td>
-                        <?php endforeach; ?>
-		    </tr>
-		</table>
+                    <?php endforeach; ?>
+
+                    </tr>
+
+                    <tr>
+                    <td  align="center"   colspan="2"  style="color:#000; border: black 1px solid;font-size:14px;padding:10px;font-style:bold;">
+                        <strong>SD (±)</strong>
+                    </td>
+
+                    <?php 
+                    $i=0;
+                    $values = [];
+                    $values2 = [];
+                    foreach ($qc_values as $key => $value) : 
+                    $i++;
+                    ?>
+                        <?php foreach ($elementRow as $row){
+                            foreach ($row as $row1){
+                                if (substr($row1["sampleName"],0, 3) == "QC".$i)
+                                {
+                                    $values[] = $row1["calculatedConcentration"];
+                                    $values2[] = $row1["accuracy"];
+                                }
+                            }
+                        } ?>
+                        <td  align="center"   colspan="2" style=" border: black 1px solid;padding:2px;">
+                            =REDONDEAR(DESVEST(<?php echo implode(";",$values); ?>);4)
+                        </td>
+                        <td  align="center"   colspan="2" style=" border: black 1px solid;padding:2px;">
+                            =REDONDEAR(DESVEST(<?php echo implode(";",$values2); ?>);4)
+                        </td>
+                    <?php endforeach; ?>
+
+                    </tr>
+
+                    <tr>
+                    <td  align="center"   colspan="2"  style="color:#000; border: black 1px solid;font-size:14px;padding:10px;font-style:bold;">
+                        <strong>CV (%)</strong>
+                    </td>
+
+                    <?php 
+                    $i=0;
+                    $values = [];
+                    $values2 = [];
+                    foreach ($qc_values as $key => $value) : 
+                    $i++;
+                    ?>
+                        <?php foreach ($elementRow as $row){
+                            foreach ($row as $row1){
+                                if (substr($row1["sampleName"],0, 3) == "QC".$i)
+                                {
+                                    $values[] = $row1["calculatedConcentration"];
+                                    $values2[] = $row1["accuracy"];
+                                }
+                            }
+                        } ?>
+                        <td  align="center"   colspan="2" style=" border: black 1px solid;padding:2px;">
+                            =DESVEST(<?php echo implode(";",$values); ?>)/PROMEDIO(<?php echo implode(";",$values); ?>) * 100
+                        </td>
+                        <td  align="center"   colspan="2" style=" border: black 1px solid;padding:2px;">
+                            =DESVEST(<?php echo implode(";",$values2); ?>)/PROMEDIO(<?php echo implode(";",$values2); ?>) * 100
+                        </td>
+                    <?php endforeach; ?>
+
+                    </tr>
+            </table>
+
 		<table width="900" border="0" cellspacing="0" cellpadding="0"  style="margin-top:10px;text-aling:center;">
 		    <tr>
 			<td colspan="20" align="left" style="padding: 10px 0 2px 0;">Acceptance criteria: </td>

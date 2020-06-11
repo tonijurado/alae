@@ -917,18 +917,15 @@ class ReportController extends BaseController
                 ->leftJoin('Alae\Entity\Error', 'e', \Doctrine\ORM\Query\Expr\Join::WITH, 's.pkSampleBatch = e.fkSampleBatch')
                 ->leftJoin('Alae\Entity\Parameter', 'p', \Doctrine\ORM\Query\Expr\Join::WITH, 'e.fkParameter = p.pkParameter')
                 ->innerJoin('Alae\Entity\Batch', 'b', \Doctrine\ORM\Query\Expr\Join::WITH, 's.fkBatch = b.pkBatch')
-                ->where("(s.sampleName LIKE 'QC%' AND s.sampleName NOT LIKE '%DQC%') AND s.sampleName NOT LIKE '%*%' AND b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id'))
+                ->where("s.sampleName LIKE 'QC%' AND s.sampleName NOT LIKE '%DQC%' AND s.sampleName NOT LIKE '%*%' AND b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id'))
                 ->groupBy('b.pkBatch, s.pkSampleBatch')
                 ->orderBy('b.fileName, s.sampleName', 'ASC');
             $elements = $qb->getQuery()->getResult();
-            
-            
+
             $propertiesData = [];
             $concentration = $accuracy = $properties = array();
             foreach ($elements as $element)
             {
-                $propertiesValues = [];
-
                 $error = number_format((float)$element[0]->getCalculatedConcentration(), 2, '.', '');
                 $properties[$element[0]->getFkBatch()->getFileName()][] = array(
                     "sampleName"              => $element[0]->getSampleName(),
@@ -937,6 +934,7 @@ class ReportController extends BaseController
                     "error"                   => $element['codeError']
                 );
 
+                $propertiesValues = [];
                 $propertiesValues = [
                     "batchName"              => $element[0]->getFkBatch()->getFileName(),
                     "sampleName"              => $element[0]->getSampleName(),
@@ -950,7 +948,7 @@ class ReportController extends BaseController
                 if($element['codeError'] == '' || $element['codeError'] == 'O')
                 {
                     //VERIFICAR QUE NO VAYAN AL RESUMEN DEL PIE LOS INYECTADOS
-                    $cadena = $element[0]->getSampleName(); 
+                    /*$cadena = $element[0]->getSampleName(); 
                     $cadena1 = substr($cadena,-2);
                     
                     $digito1 = $cadena1[0];
@@ -961,19 +959,23 @@ class ReportController extends BaseController
                         $centi = "N";
                     }
                     else
-                    {
+                    { 
                         $centi = "S";
                     }
                     
-                    IF($centi == "S")
+                    $centi = "S";
+                    if($centi == "S")
                     {
                         $concentration[preg_replace('/-\d+/i', '', $element[0]->getSampleName())][] = $error;
-                    }
+                    }*/
+                    $concentration[preg_replace('/-\d+/i', '', $element[0]->getSampleName())][] = $error;
                 }
                 $accuracy[preg_replace('/-\d+/i', '', $element[0]->getSampleName())][] = number_format((float)$element[0]->getAccuracy(), 2, '.', '');
             }
-            
+
             $qcCount = count(explode(",", $analytes[0]->getQcValues()));
+
+            $totalCount = $qcCount;
             
             $key = "";
             
@@ -989,7 +991,7 @@ class ReportController extends BaseController
                 LEFT JOIN Alae\Entity\Error e WITH e.fkSampleBatch = s.pkSampleBatch
                 LEFT JOIN Alae\Entity\Parameter p WITH e.fkParameter = p.pkParameter
                 INNER JOIN Alae\Entity\Batch b WITH s.fkBatch = b.pkBatch
-                WHERE (s.sampleName LIKE 'QC%' AND s.sampleName NOT LIKE '%DQC%') AND s.sampleName NOT LIKE '%*%' AND b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id')."
+                WHERE s.sampleName LIKE 'QC%' AND s.sampleName NOT LIKE '%DQC%' AND s.sampleName NOT LIKE '%*%' AND b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id')."
                 ORDER BY b.fileName, s.sampleName ASC");
                 $results = $query->getResult();
 
@@ -1004,7 +1006,7 @@ class ReportController extends BaseController
                 LEFT JOIN Alae\Entity\Error e WITH e.fkSampleBatch = s.pkSampleBatch
                 LEFT JOIN Alae\Entity\Parameter p WITH e.fkParameter = p.pkParameter
                 INNER JOIN Alae\Entity\Batch b WITH s.fkBatch = b.pkBatch
-                WHERE (s.sampleName LIKE 'QC%' AND s.sampleName NOT LIKE '%DQC%') AND s.sampleName NOT LIKE '%*%' AND b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id')."
+                WHERE s.sampleName LIKE 'QC%' AND s.sampleName NOT LIKE '%DQC%' AND s.sampleName NOT LIKE '%*%' AND b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id')."
                 GROUP BY b.pkBatch, s.pkSampleBatch
                 ORDER BY b.fileName, s.sampleName ASC");
                 $results = $query->getResult();
@@ -1012,14 +1014,11 @@ class ReportController extends BaseController
                 foreach ($results as $row1) 
                 {
                     $fileName = $row1['fileName'];
-                
-
+                    $ll = 0;
                     for ($j = 1; $j <= $max; $j++) {
+
                         for ($i = 1; $i <= $qcCount; $i++) {
                             $key = "QC".$i."-".$j;
-                            
-                            $cnt = count($propertiesData);
-                            
                             foreach ($propertiesData as $data)
                                 if ($data['sampleName'] == $key AND $data['batchName'] == $fileName) {
                                     
@@ -1036,17 +1035,100 @@ class ReportController extends BaseController
                                     $l++;
                                 break;
                             }
-                            if($l == $max)
-                            {
-                                array_push($elementRow, $elementData);
+                        }
+
+                        array_push($elementRow, $elementData);
+                        $elementData = [];
+                        $m = 0;
+
+                        for ($i = 1; $i <= $qcCount; $i++) {
+                            for ($k = 1; $k <= 4; $k++) {
                                 
-                                $elementData = [];
-                                $l = 0;
+                                $key = "QC".$i."-".$j."R".$k;
+                                foreach ($propertiesData as $data)
+                                    if ($data['sampleName'] == $key AND $data['batchName'] == $fileName) {
+                                        $m++;
+                                        $elementValues = [
+                                            "batchName"              => $fileName,
+                                            "sampleName"              => $data['sampleName'],
+                                            "calculatedConcentration" => $data['calculatedConcentration'],
+                                            "accuracy"                => $data['accuracy'],
+                                            "error"                   => $data['error']
+                                        ];
+
+                                        $elementValues1 = [];
+                                        $elementValues1 = [
+                                            "batchName"              => "",
+                                            "sampleName"              => "",
+                                            "calculatedConcentration" => "",
+                                            "accuracy"                => "",
+                                            "error"                   => ""
+                                        ];
+                                        
+                                        if($i == 1)
+                                        {
+                                            array_push($elementData, $elementValues1);
+                                            array_push($elementData, $elementValues);
+                                        }
+
+                                        if($i == 2)
+                                        {
+                                            if($m == $i) {
+                                                array_push($elementData, $elementValues);
+                                            }
+                                            else
+                                            {
+                                                array_push($elementData, $elementValues1);
+                                                array_push($elementData, $elementValues1);
+                                                array_push($elementData, $elementValues);
+                                            }
+                                        }
+
+                                        if($i == 3)
+                                        {
+                                            if($m == $i) {
+                                                array_push($elementData, $elementValues);
+                                            }
+                                            else
+                                            {
+                                                array_push($elementData, $elementValues1);
+                                                array_push($elementData, $elementValues1);
+                                                array_push($elementData, $elementValues1);
+                                                array_push($elementData, $elementValues);
+                                            }
+                                        }
+
+                                        if($i == 4)
+                                        {
+                                            if($m == $i) {
+                                                array_push($elementData, $elementValues);
+                                            }
+                                            else
+                                            {
+                                                array_push($elementData, $elementValues1);
+                                                array_push($elementData, $elementValues1);
+                                                array_push($elementData, $elementValues1);
+                                                array_push($elementData, $elementValues1);
+                                                array_push($elementData, $elementValues);
+                                            }
+                                        }
+                                        $elementValues = [];
+                                    break;
+                                }
+                                if ($m > 0)
+                                {
+                                    array_push($elementRow, $elementData);
+                                    $elementData = [];
+                                }
                             }
                         }
+                        //var_dump($elementRow);
+
+                        //array_push($elementRow, $elementData);
+                        //$elementData = [];
+                        
                     }
                 }
-                
             $response = array(
                 "analyte"      => $analytes[0],
                 "qc_values"    => explode(",", $analytes[0]->getQcValues()),
