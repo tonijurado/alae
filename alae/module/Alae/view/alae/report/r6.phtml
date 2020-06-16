@@ -193,9 +193,10 @@ xmlns="http://www.w3.org/TR/REC-html40">
                     
                     <?php 
                     $i=0;
-                    $values = [];
+                    
                     foreach ($cs_values as $key => $value) : 
                     $i++;
+                    $values = [];
                     ?>
                         <?php foreach ($elementRow as $row){
                             foreach ($row as $row1){
@@ -208,7 +209,8 @@ xmlns="http://www.w3.org/TR/REC-html40">
                         <td  align="center"   colspan="3" style=" border: black 1px solid;padding:2px;">
                             =CONTAR(<?php echo implode(";",$values); ?>)
                         </td>
-                    <?php endforeach; ?>
+                    <?php 
+                    endforeach; ?>
 
                     </tr>
 
@@ -218,9 +220,9 @@ xmlns="http://www.w3.org/TR/REC-html40">
                     </td>
                     <?php 
                     $i=0;
-                    $values = [];
                     foreach ($cs_values as $key => $value) : 
                     $i++;
+                    $values = [];
                     ?>
                         <?php foreach ($elementRow as $row){
                             foreach ($row as $row1){
