@@ -1,4 +1,4 @@
--- Borrado de alae_error
+-- Borrado de alae_error 
 
  DELETE FROM alae_error 
  WHERE alae_error.fk_sample_batch IN 
