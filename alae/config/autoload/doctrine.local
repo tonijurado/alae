@@ -10,7 +10,7 @@ return array(
 		    'port' => '3306',
 		    'user' => 'alae',
 		    'password' => 'Alae1',
-		    'dbname' => 'alae2test',
+		    'dbname' => 'muestras',
 		    'charset' => 'utf8',
 		)
 	    )

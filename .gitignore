@@ -9,6 +9,16 @@ config/autoload/doctrine.local
 alae/module/Alae/config/vars.config.php
 validaciones/module/Alae/config/vars.config.php
 
+#Logos y pie de version
+alae/module/Alae/view/alae/index/logout.phtml
+alae/module/Alae/view/alae/user/newpassword.phtml
+#alae/module/Alae/view/alae/layout/layout.phtml
+alae/public/img/alae_logo.png
+alae/public/img/alae_logo.png.png
+alae/public/img/alaepeq.png
+#validaciones/public/img/alae_logo.png
+validaciones/public/img/alaepeq.png
+
 
 # Binary gettext files
 *.mo
