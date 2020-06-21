@@ -508,25 +508,17 @@ INSERT INTO muestras.alae_audit_transaction
 	(SELECT * FROM alae.alae_audit_transaction);
 
 
--- 4º Insertamos alae_error
-INSERT INTO muestras.alae_error
-	(SELECT * FROM alae.alae_error);
+-- TRASPASAMOS PARAMETERS DESDE ALAE2TEST porque es quien tiene correctamente los datos hasta ALAEFINAL
+-- Lo realizamos antes de alae_error para que no de problemas
 
--- 5º Insertamos alae_sample_batch
-INSERT INTO muestras.alae_sample_batch
-	(SELECT * FROM alae.alae_sample_batch);
+INSERT INTO muestras.alae_parameter
+	(SELECT * FROM alae2test.alae_parameter);
+
 	
 -- 6º Insertamos alae_analyte
 INSERT INTO muestras.alae_analyte
 	(SELECT * FROM alae.alae_analyte);
 
--- 7º Insertamos alae_analyte_study
-INSERT INTO muestras.alae_analyte_study (pk_analyte_study, cs_number, qc_number, cs_values,qc_values,internal_standard,`status`,is_used,updated_at,fk_study,fk_analyte,fk_analyte_is,fk_unit,fk_user,fk_user_approve,hdqc_values,ldqc_values)  
-	(SELECT pk_analyte_study, cs_number, qc_number , cs_values,qc_values,internal_standard,`status`,is_used,updated_at,fk_study,fk_analyte,fk_analyte_is,fk_unit,fk_user,fk_user_approve,hdqc_values,ldqc_values FROM alae.alae_analyte_study);
-
--- 8º Insertamos alae_batch
-INSERT INTO muestras.alae_batch (pk_batch,`serial`, file_name,created_at,updated_at,valid_flag,accepted_flag, curve_flag, justification,validation_date,code_error,intercept,slope,correlation_coefficient,cs_total,qc_total,ldqc_total,hdqc_total,cs_accepted_total,qc_accepted_total,ldqc_accepted_total,hdqc_accepted_total,is_cs_qc_accepted_avg,analyte_concentration_units,calculated_concentration_units,fk_parameter,fk_analyte,fk_user,fk_study)
-	(SELECT pk_batch,`serial`, file_name,created_at,updated_at,valid_flag,accepted_flag, 0,justification,validation_date,code_error,intercept,slope,correlation_coefficient,cs_total,qc_total,ldqc_total,hdqc_total,cs_accepted_total,qc_accepted_total,ldqc_accepted_total,hdqc_accepted_total,is_cs_qc_accepted_avg,analyte_concentration_units,calculated_concentration_units,fk_parameter,fk_analyte,fk_user,fk_study FROM alae.alae_batch);
 
 -- 9º Insertamos alae_study
 -- Colocamos como fecha en muestras de approved_at el valor de updated_at
@@ -534,18 +526,33 @@ INSERT INTO muestras.alae_batch (pk_batch,`serial`, file_name,created_at,updated
 INSERT INTO muestras.alae_study (pk_study,`code`,created_at,updated_at,approved_at, description,observation,close_flag,`status`,approve,`duplicate`,fk_user,fk_user_approve,fk_user_close,fk_dilution_tree)
 	(SELECT pk_study,`code`,created_at,updated_at, updated_at, description,observation,close_flag,`status`,approve,`duplicate`,fk_user,fk_user_approve,fk_user_close,fk_dilution_tree FROM alae.alae_study);
 	
+
+
+-- 8º Insertamos alae_batch
+INSERT INTO muestras.alae_batch (pk_batch,`serial`, file_name,created_at,updated_at,valid_flag,accepted_flag, curve_flag, justification,validation_date,code_error,intercept,slope,correlation_coefficient,cs_total,qc_total,ldqc_total,hdqc_total,cs_accepted_total,qc_accepted_total,ldqc_accepted_total,hdqc_accepted_total,is_cs_qc_accepted_avg,analyte_concentration_units,calculated_concentration_units,fk_parameter,fk_analyte,fk_user,fk_study)
+	(SELECT pk_batch,`serial`, file_name,created_at,updated_at,valid_flag,accepted_flag, 0,justification,validation_date,code_error,intercept,slope,correlation_coefficient,cs_total,qc_total,ldqc_total,hdqc_total,cs_accepted_total,qc_accepted_total,ldqc_accepted_total,hdqc_accepted_total,is_cs_qc_accepted_avg,analyte_concentration_units,calculated_concentration_units,fk_parameter,fk_analyte,fk_user,fk_study FROM alae.alae_batch);
+
+
+
+
+-- 5º Insertamos alae_sample_batch
+INSERT INTO muestras.alae_sample_batch
+	(SELECT * FROM alae.alae_sample_batch);
+
 -- 10º Insertamos alae_unit
 	
 INSERT INTO muestras.alae_unit
 	(SELECT * FROM alae.alae_unit);
+
+-- 7º Insertamos alae_analyte_study
+INSERT INTO muestras.alae_analyte_study (pk_analyte_study, cs_number, qc_number, cs_values,qc_values,internal_standard,`status`,is_used,updated_at,fk_study,fk_analyte,fk_analyte_is,fk_unit,fk_user,fk_user_approve,hdqc_values,ldqc_values)  
+	(SELECT pk_analyte_study, cs_number, qc_number , cs_values,qc_values,internal_standard,`status`,is_used,updated_at,fk_study,fk_analyte,fk_analyte_is,fk_unit,fk_user,fk_user_approve,hdqc_values,ldqc_values FROM alae.alae_analyte_study);
+
 	
+-- 4º Insertamos alae_error
+INSERT INTO muestras.alae_error
+	(SELECT * FROM alae.alae_error);
 	
--- 11º TRASPASAMOS PARAMETERS DESDE ALAE2TEST porque es quien tiene correctamente los datos hasta ALAEFINAL
-
-INSERT INTO muestras.alae_parameter
-	(SELECT * FROM alae2test.alae_parameter);
-
-
 -- AGREGRAMOS AHORA LOS TRIGGRES
 /*TRIGGERS*/
 
