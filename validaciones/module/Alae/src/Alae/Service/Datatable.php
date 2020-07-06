@@ -645,7 +645,10 @@ class Datatable
         break;
         case Datatable::DATATABLE_VERIFICATION_SAMPLE_BATCH_R:
             $elements = '';
-		break;
+        break;
+        case Datatable::DATATABLE_BATCH_NOMINAL:
+            $elements = '<input value="" type="submit"/>';
+        break;
         default :
             $elements = "";
             break;
@@ -690,7 +693,10 @@ class Datatable
 		break;
 	    case Datatable::DATATABLE_SAMPLE_BATCH:
                 $elements = '<input value="" type="submit"/>';
-		break;
+        break;
+        case Datatable::DATATABLE_BATCH_NOMINAL:
+            $elements = '<input value="" type="submit"/>';
+        break;
             default :
                 $elements = "";
                 break;
