@@ -100,40 +100,63 @@ class BatchController extends BaseController
                 {
                     foreach ($updateJustification as $key => $value)
                     {
-                        $Batch = $this->getRepository()->find($key);
+                        $just = true;
+                        if (strpos($updateJustification[$key], "'") !== false) {
+                            $just = false;
+                        }
 
-                        if ($Batch && $Batch->getPkBatch())
+                        if (strpos($updateJustification[$key], '*') !== false) {
+                            $just = false;
+                        }
+
+                        if (strpos($updateJustification[$key], '´') !== false) {
+                            $just = false;
+                        }
+
+                        if (strpos($updateJustification[$key], '`') !== false) {
+                            $just = false;
+                        }
+
+                        if ($just) {
+                            $Batch = $this->getRepository()->find($key);
+
+                            if ($Batch && $Batch->getPkBatch())
+                            {
+                                try
+                                {   
+                                    //APROBACIÓN MANUAL DE LOS LOTES
+                                    $Batch->setValidFlag((bool) $updateAcceptedFlag[$key]);
+                                    $Batch->setAcceptedFlag((bool) $updateAcceptedFlag[$key]);
+                                    $Batch->setJustification($updateJustification[$key]);
+                                    $Batch->setFkUser($this->_getSession());
+                                    $this->getEntityManager()->persist($Batch);
+                                    $this->getEntityManager()->flush();
+
+                                    $this->transaction(
+                                        ($updateAcceptedFlag[$key] ? "Aprobación manual de lotes" : "Rechazo manual de lotes"),
+                                        sprintf('El usuario %1$s ha %2$s el lote %3$s',
+                                            $this->_getSession()->getUsername(),
+                                            ($updateAcceptedFlag[$key] ? "aprobado" : "rechazado"),
+                                            $Batch->getFileName()
+                                        ),
+                                        false
+                                    );
+
+                                    return $this->redirect()->toRoute('batch', array(
+                                                'controller' => 'batch',
+                                                'action'     => 'list',
+                                                'id'         => $AnaStudy->getPkAnalyteStudy()
+                                    ));
+                                }
+                                catch (Exception $e)
+                                {
+                                    exit;
+                                }
+                            }
+                        }
+                        else
                         {
-                            try
-                            {
-                                //APROBACIÓN MANUAL DE LOS LOTES
-                                $Batch->setValidFlag((bool) $updateAcceptedFlag[$key]);
-                                $Batch->setAcceptedFlag((bool) $updateAcceptedFlag[$key]);
-                                $Batch->setJustification($updateJustification[$key]);
-                                $Batch->setFkUser($this->_getSession());
-                                $this->getEntityManager()->persist($Batch);
-                                $this->getEntityManager()->flush();
-
-                                $this->transaction(
-                                    ($updateAcceptedFlag[$key] ? "Aprobación manual de lotes" : "Rechazo manual de lotes"),
-                                    sprintf('El usuario %1$s ha %2$s el lote %3$s',
-                                        $this->_getSession()->getUsername(),
-                                        ($updateAcceptedFlag[$key] ? "aprobado" : "rechazado"),
-                                        $Batch->getFileName()
-                                    ),
-                                    false
-                                );
-
-                                return $this->redirect()->toRoute('batch', array(
-                                            'controller' => 'batch',
-                                            'action'     => 'list',
-                                            'id'         => $AnaStudy->getPkAnalyteStudy()
-                                ));
-                            }
-                            catch (Exception $e)
-                            {
-                                exit;
-                            }
+                            $error = "<li>HA UTILIZADO CARACTERES NO PERMITIDOS<li>";
                         }
                     }
                 }
