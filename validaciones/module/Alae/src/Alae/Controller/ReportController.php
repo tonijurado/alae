@@ -669,6 +669,7 @@ class ReportController extends BaseController
     public function r6Action()
     {
         //REPORTE 6 EXCEL
+        $request = $this->getRequest();
         if ($request->isGet())
         {
             //OBTIENE LOS DATOS DEL REPORTE
@@ -1233,7 +1234,7 @@ class ReportController extends BaseController
                 "valuesCon"    => $concentration,
                 "valuesAcc"    => $accuracy,
                 "elementRow"    => $elementRow,
-                "filename"     => "between_run_accuracy_and_precision_of_quality_control_samples" . date("Ymd-Hi")
+                "filename"     => "calculated_concentration_nominal_quality_control_samples" . date("Ymd-Hi")
             );
 
             $viewModel = new ViewModel($response);
@@ -1264,6 +1265,7 @@ class ReportController extends BaseController
         {
             //OBTIENE LOS DATOS DEL REPORTE
             $analytes = $this->getRepository('\\Alae\\Entity\\AnalyteStudy')->findBy(array("fkAnalyte" => $request->getQuery('an'), "fkStudy" => $request->getQuery('id')));
+            echo $request->getQuery('an')." ".$request->getQuery('id');die();
             $query    = $this->getEntityManager()->createQuery("
                 SELECT s.sampleName, GROUP_CONCAT(DISTINCT s.pkSampleBatch) as values
                 FROM Alae\Entity\Batch b, Alae\Entity\SampleBatch s
