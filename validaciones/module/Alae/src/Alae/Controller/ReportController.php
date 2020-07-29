@@ -1265,7 +1265,6 @@ class ReportController extends BaseController
         {
             //OBTIENE LOS DATOS DEL REPORTE
             $analytes = $this->getRepository('\\Alae\\Entity\\AnalyteStudy')->findBy(array("fkAnalyte" => $request->getQuery('an'), "fkStudy" => $request->getQuery('id')));
-            echo $request->getQuery('an')." ".$request->getQuery('id');die();
             $query    = $this->getEntityManager()->createQuery("
                 SELECT s.sampleName, GROUP_CONCAT(DISTINCT s.pkSampleBatch) as values
                 FROM Alae\Entity\Batch b, Alae\Entity\SampleBatch s
