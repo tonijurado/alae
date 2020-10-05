@@ -602,7 +602,7 @@ class VerificationController extends BaseController
             $where = "s.pkSampleBatch IN (" . implode(",", $pkSampleBatch) . ")";
             //$this->error($where, $parameters[0]);
 
-            $this->errorCurve($where, $parameter[0], $Batch->getPkBatch());
+            $this->errorCurve($where, $parameters[0], $Batch->getPkBatch());
         }
     }
 
