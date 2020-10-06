@@ -1680,7 +1680,8 @@ class ReportController extends BaseController
                         "tr1"    => $tr1,
                         "tr2"    => $tr2,
                         "errors" => implode(" // ", $message),
-                        "filename"     => "tabla_alae_de_cada_lote_analitico" . date("Ymd-Hi")
+                        "filename"     => "R11 - " . $Batch->getFkStudy()->getCode() ."-" .$Batch->getFkAnalyte()->getShortening()
+                        
                     );
                     $viewModel = new ViewModel($response);
                     $viewModel->setTerminal(true);

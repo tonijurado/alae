@@ -808,6 +808,7 @@ class ReportController extends BaseController
     public function r7Action()
     {
         //REPORTE 7 EXCEL
+        $request = $this->getRequest();
         if ($request->isGet())
         {
             //OBTIENE LOS DATOS DEL REPORTE
@@ -1666,7 +1667,7 @@ class ReportController extends BaseController
                         "tr1"    => $tr1,
                         "tr2"    => $tr2,
                         "errors" => implode(" // ", $message),
-                        "filename"     => "tabla_alae_de_cada_lote_analitico" . date("Ymd-Hi")
+                        "filename"     => "R11 - " . $Batch->getFkStudy()->getCode() ."-" .$Batch->getFkAnalyte()->getShortening()
                     );
                     $viewModel = new ViewModel($response);
                     $viewModel->setTerminal(true);

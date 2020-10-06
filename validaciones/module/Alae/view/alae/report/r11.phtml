@@ -31,7 +31,7 @@ $filecontent=$filecontent1.$tr1;
 //$downloadfile=$filename".txt";
 
 header("Content-Type: plain/text"); 
-header("Content-disposition: attachment; filename=$filename--$md5File--.txt"); 
+header("Content-disposition: attachment; filename=$filename.txt"); 
 header('charset=utf-8');
 header("Content-Transfer-Encoding: binary"); 
 header("Pragma: no-cache"); 
@@ -45,7 +45,8 @@ echo "Fecha de importación:"."\t".$batch->getCreatedAt()."\t"."r = ".$batch->ge
 echo "Resultado de la Evaluación:"."\t".($batch->getValidFlag() ? "ACEPTADO" : "RECHAZADO")."\t"."Motivo de Rechazo:"."\t".htmlentities($errors)."\r\n";
 echo "Usuario:"."\t".$batch->getFkUser()->getUsername()."\r\n";
 echo "Fecha de la Evaluación:"."\t".$batch->getValidationDate()."\r\n";
-echo "5% IS"."\t".$batch->getIsCsQcAcceptedAvg() * (5/100)."\r\n";
-echo "CheckSum"."\t".dechex(intval(($batch->getfileSize() / Alae\Service\Helper::getformatDecimal($batch->getSlope())) + $batch->getValidationDate()))."\r\n";
+echo "5% IS:"."\t".$batch->getIsCsQcAcceptedAvg() * (5/100)."\r\n";
+echo "CheckSum:"."\t".dechex(intval(($batch->getfileSize() / Alae\Service\Helper::getformatDecimal($batch->getSlope())) + $batch->getValidationDate()))."\r\n";
+echo "Hash:"."\t".$md5File."\r\n";
 echo $filecontent;
 ?>
