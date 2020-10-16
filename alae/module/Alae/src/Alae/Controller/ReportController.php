@@ -1680,7 +1680,7 @@ class ReportController extends BaseController
                         "tr1"    => $tr1,
                         "tr2"    => $tr2,
                         "errors" => implode(" // ", $message),
-                        "filename"     => "R11 - " . $Batch->getFkStudy()->getCode() ."-" .$Batch->getFkAnalyte()->getShortening()
+                        "filename"     => substr($Batch->getFileName(), 0 , -4)
                         
                     );
                     $viewModel = new ViewModel($response);
