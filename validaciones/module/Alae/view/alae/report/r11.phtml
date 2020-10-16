@@ -22,10 +22,11 @@ fwrite($myfile, $filecontentHash);
 fclose($myfile);
 $md5File = md5_file($newfile);
 
-unlink($newfile);
+unlink($newfile); // Borra el fichero newfile creado
 
 $filecontent1= "Sample Name". "\t" . "Sample ID". "\t" . "Analyte peak name" . "\t" . "Sample Type" . "\t" . "File name" . "\t" . "Analyte peak area" . "\t" . "IS peak area" . "\t" . "Area ratio" . "\t" . "Analyte concentration" . "\t" . "Calculated concentration" . "\t" . "Dilution factor" . "\t" . "Accuracy" . "\t" . "Use record" . "\t" . "Acquisition date" . "\t" . "Analyte integration type" . "\t" . "IS integration type" . "\t" . "Record modified" . "\t" . "Rejection Reason" . "\t" . "Message"."\r\n";
-$filecontent=$filecontent1.$tr1;
+$filecontent=$filecontent1.$tr1; //$tr1 contiene los datos que se van a mostrar en el informe
+
 //$filecontent1="prueba1" . "\t" . "prueba2"."\r\n";
 //$filecontent.=$filecontent1."prueba3" . "\t" . "prueba4"."\r\n";
 //$downloadfile=$filename".txt";
