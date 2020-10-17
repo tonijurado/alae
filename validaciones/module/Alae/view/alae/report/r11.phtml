@@ -2,7 +2,7 @@
 
 //Si se ejecuta en las instalaciones de ALAE, necesitamos una carpeta con permisos y usamos la de carga de lotes
 
-$newfile = "files/newfile".$user.".txt";
+$newfile = "files/".$filename.".txt";
     /*$miruta = \Alae\Service\Helper::getVarsConfig("base_url");
     if ($miruta == "http://www.test-alae.com/alae/validaciones/public") {
         $newfile = "D:\\LotesValidacionesTest\\newfile".$user.".txt";
@@ -11,21 +11,34 @@ $newfile = "files/newfile".$user.".txt";
     }*/
 
 $myfile = fopen($newfile, "w") or die("Error, no se puede crear el txt");
-$filecontentHash= "TABLA DE RESULTADOS ALAE"."\r\n"."Código del estudio:"."\t".$batch->getFkStudy()->getCode()."\t"."Parámetros de la Curva de Calibrado (Y= mX+b)"."\r\n"."Analito"."\t".$batch->getFkAnalyte()->getName()."\t"."m = ".Alae\Service\Helper::getformatDecimal($batch->getSlope())."\r\n"."Nombre del archivo exportado:"."\t".$batch->getFileName()."\t"."b = ".Alae\Service\Helper::getformatDecimal($batch->getIntercept())."\r\n"."Fecha de importación:"."\t".$batch->getCreatedAt()."\t"."r = ".$batch->getCorrelationCoefficient()."\r\n"."Resultado de la Evaluación:"."\t".($batch->getValidFlag() ? "ACEPTADO" : "RECHAZADO")."\t"."Motivo de Rechazo:"."\t".htmlentities($errors)."\r\n"."Usuario:"."\t".$batch->getFkUser()->getUsername()."\r\n"."Fecha de la Evaluación:"."\t".$batch->getValidationDate()."\r\n";
-$filecontentHash = $filecontentHash . "5% IS"."\t"."PonerValor5%IS"."\r\n"."CheckSum:"."\t".dechex(intval(($batch->getfileSize() / Alae\Service\Helper::getformatDecimal($batch->getSlope())) + $batch->getValidationDate()));
-fwrite($myfile, $filecontentHash);
+//$filecontentHash= "TABLA DE RESULTADOS ALAE"."\r\n"."Código del estudio:"."\t".$batch->getFkStudy()->getCode()."\t"."Parámetros de la Curva de Calibrado (Y= mX+b)"."\r\n"."Analito"."\t".$batch->getFkAnalyte()->getName()."\t"."m = ".Alae\Service\Helper::getformatDecimal($batch->getSlope())."\r\n"."Nombre del archivo exportado:"."\t".$batch->getFileName()."\t"."b = ".Alae\Service\Helper::getformatDecimal($batch->getIntercept())."\r\n"."Fecha de importación:"."\t".$batch->getCreatedAt()."\t"."r = ".$batch->getCorrelationCoefficient()."\r\n"."Resultado de la Evaluación:"."\t".($batch->getValidFlag() ? "ACEPTADO" : "RECHAZADO")."\t"."Motivo de Rechazo:"."\t".htmlentities($errors)."\r\n"."Usuario:"."\t".$batch->getFkUser()->getUsername()."\r\n"."Fecha de la Evaluación:"."\t".$batch->getValidationDate()."\r\n";
+//$filecontentHash = $filecontentHash . "5% IS"."\t"."PonerValor5%IS"."\r\n"."CheckSum:"."\t".dechex(intval(($batch->getfileSize() / Alae\Service\Helper::getformatDecimal($batch->getSlope())) + $batch->getValidationDate()));
+
+$filecontentHash = "TABLA DE RESULTADOS ALAE"."\r\n";
+$filecontentHash = $filecontentHash . "Código del estudio:"."\t".$batch->getFkStudy()->getCode()."\t"."Parámetros de la Curva de Calibrado (Y= mX+b)"."\r\n";
+$filecontentHash = $filecontentHash . "Analito"."\t".$batch->getFkAnalyte()->getName()."\t"."m = ".Alae\Service\Helper::getformatDecimal($batch->getSlope())."\r\n";
+$filecontentHash = $filecontentHash . "Nombre del archivo exportado:"."\t".$batch->getFileName()."\t"."b = ".Alae\Service\Helper::getformatDecimal($batch->getIntercept())."\r\n";
+$filecontentHash = $filecontentHash . "Fecha de importación:"."\t".$batch->getCreatedAt()."\t"."r = ".$batch->getCorrelationCoefficient()."\r\n";
+$filecontentHash = $filecontentHash . "Resultado de la Evaluación:"."\t".($batch->getValidFlag() ? "ACEPTADO" : "RECHAZADO")."\t"."Motivo de Rechazo:"."\t".htmlentities($errors)."\r\n";
+$filecontentHash = $filecontentHash . "Usuario:"."\t".$batch->getFkUser()->getUsername()."\r\n";
+$filecontentHash = $filecontentHash . "Fecha de la Evaluación:"."\t".$batch->getValidationDate()."\r\n";
+$filecontentHash = $filecontentHash . "5% IS:"."\t".$batch->getIsCsQcAcceptedAvg() * (5/100)."\r\n";
+$filecontentHash = $filecontentHash . "CheckSum:"."\t".dechex(intval(($batch->getfileSize() / Alae\Service\Helper::getformatDecimal($batch->getSlope())) + $batch->getValidationDate()))."\r\n";
+
+//fwrite($myfile, $filecontentHash);
 $filecontent= "Sample Name". "\t" . "Sample ID". "\t" . "Analyte peak name" . "\t" . "Sample Type" . "\t" . "File name" . "\t" . "Analyte peak area" . "\t" . "IS peak area" . "\t" . "Area ratio" . "\t" . "Analyte concentration" . "\t" . "Calculated concentration" . "\t" . "Dilution factor" . "\t" . "Accuracy" . "\t" . "Use record" . "\t" . "Acquisition date" . "\t" . "Analyte integration type" . "\t" . "IS integration type" . "\t" . "Record modified" . "\t" . "Rejection Reason" . "\t" . "Message"."\r\n";
-$filecontentHash=$filecontentHash.$tr1;
+$filecontentHash=$filecontentHash.$filecontent.$tr1;
 
 fwrite($myfile, $filecontentHash);
 
 fclose($myfile);
 $md5File = md5_file($newfile);
+//echo $md5File;
+//die();
 
 unlink($newfile); // Borra el fichero newfile creado
 
-$filecontent1= "Sample Name". "\t" . "Sample ID". "\t" . "Analyte peak name" . "\t" . "Sample Type" . "\t" . "File name" . "\t" . "Analyte peak area" . "\t" . "IS peak area" . "\t" . "Area ratio" . "\t" . "Analyte concentration" . "\t" . "Calculated concentration" . "\t" . "Dilution factor" . "\t" . "Accuracy" . "\t" . "Use record" . "\t" . "Acquisition date" . "\t" . "Analyte integration type" . "\t" . "IS integration type" . "\t" . "Record modified" . "\t" . "Rejection Reason" . "\t" . "Message"."\r\n";
-$filecontent=$filecontent1.$tr1; //$tr1 contiene los datos que se van a mostrar en el informe
+$filecontentFinal=$filecontent.$tr1; //$tr1 contiene los datos que se van a mostrar en el informe
 
 //$filecontent1="prueba1" . "\t" . "prueba2"."\r\n";
 //$filecontent.=$filecontent1."prueba3" . "\t" . "prueba4"."\r\n";
@@ -49,5 +62,5 @@ echo "Fecha de la Evaluación:"."\t".$batch->getValidationDate()."\r\n";
 echo "5% IS:"."\t".$batch->getIsCsQcAcceptedAvg() * (5/100)."\r\n";
 echo "CheckSum:"."\t".dechex(intval(($batch->getfileSize() / Alae\Service\Helper::getformatDecimal($batch->getSlope())) + $batch->getValidationDate()))."\r\n";
 echo "Hash:"."\t".$md5File."\r\n";
-echo $filecontent;
+echo $filecontentFinal;
 ?>
