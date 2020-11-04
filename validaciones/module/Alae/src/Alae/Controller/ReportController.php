@@ -669,6 +669,7 @@ class ReportController extends BaseController
     public function r6Action()
     {
         //REPORTE 6 EXCEL
+        $request = $this->getRequest();
         if ($request->isGet())
         {
             //OBTIENE LOS DATOS DEL REPORTE
@@ -807,6 +808,7 @@ class ReportController extends BaseController
     public function r7Action()
     {
         //REPORTE 7 EXCEL
+        $request = $this->getRequest();
         if ($request->isGet())
         {
             //OBTIENE LOS DATOS DEL REPORTE
@@ -1233,7 +1235,7 @@ class ReportController extends BaseController
                 "valuesCon"    => $concentration,
                 "valuesAcc"    => $accuracy,
                 "elementRow"    => $elementRow,
-                "filename"     => "between_run_accuracy_and_precision_of_quality_control_samples" . date("Ymd-Hi")
+                "filename"     => "calculated_concentration_nominal_quality_control_samples" . date("Ymd-Hi")
             );
 
             $viewModel = new ViewModel($response);
@@ -1665,7 +1667,7 @@ class ReportController extends BaseController
                         "tr1"    => $tr1,
                         "tr2"    => $tr2,
                         "errors" => implode(" // ", $message),
-                        "filename"     => "tabla_alae_de_cada_lote_analitico" . date("Ymd-Hi")
+                        "filename"     => substr($Batch->getFileName(), 0 , -4)
                     );
                     $viewModel = new ViewModel($response);
                     $viewModel->setTerminal(true);
