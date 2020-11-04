@@ -602,7 +602,7 @@ class VerificationController extends BaseController
             $where = "s.pkSampleBatch IN (" . implode(",", $pkSampleBatch) . ")";
             //$this->error($where, $parameters[0]);
 
-            $this->errorCurve($where, $parameter[0], $Batch->getPkBatch());
+            $this->errorCurve($where, $parameters[0], $Batch->getPkBatch());
         }
     }
 
@@ -1266,8 +1266,8 @@ class VerificationController extends BaseController
                 break;
             }
         }
-
-        if (!$isValid)
+        
+        if (!$isValid) 
         {
             $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V16"));
             $where = "s.pkSampleBatch in (" . implode(",", $pkSampleBatch) . ") AND s.fkBatch = " . $Batch->getPkBatch();
