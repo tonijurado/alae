@@ -612,6 +612,43 @@ class VerificationController extends BaseController
         $this->errorCurve($where, $fkParameter[0], $Batch->getPkBatch());
     }
 
+    protected function V6_NT_BC($sample, $pkBatch, $value)
+    {
+        $query = $this->getEntityManager()->createQuery("
+        SELECT bn.sampleName
+        FROM Alae\Entity\BatchNominal bn
+        WHERE bn.sampleName LIKE 'LLQC%' AND bn.fkBatch = " . $pkBatch);
+        $elements   = $query->getResult();
+
+        if (count($elements) > 0)
+            {
+                $sampleNames = array();
+                foreach ($elements as $temp)
+                {
+                    $sampleNames[] = "'".$temp["sampleName"]."%'";
+                }
+                
+                if(count($sampleNames) > 0)
+                {
+                    $where = "s.sampleName LIKE '$sample%' AND s.analyteConcentration <> " . $value . " 
+                    AND s.fkBatch = " . $pkBatch . "
+                    AND
+                    s.pkSampleBatch NOT IN 
+                    (SELECT sb.pkSampleBatch FROM Alae\Entity\SampleBatch sb 
+                    WHERE sb.fkBatch = ".$pkBatch."
+                    AND (sb.sampleName NOT IN (" . implode(",", $sampleNames) . ") 
+                    AND (sb.sampleType = 'Quality Control' OR sb.sampleType = 'Standard')))";
+                }
+                else
+                {   
+                    $where = "s.sampleName LIKE '$sample%' AND s.analyteConcentration <> " . $value . " 
+                    AND s.fkBatch = " . $pkBatch;
+                }
+            }
+
+            return $where;
+    }
+
     /**
      * V6: Concentración nominal de CS/QC - CONCENTRACIÓN NOMINAL ERRÓNEA
      * @param \Alae\Entity\Batch $Batch
@@ -637,17 +674,15 @@ class VerificationController extends BaseController
                         $Batch->getAnalyteConcentrationUnits(),
                         $cs_values[$i - 1]
 					);
-					
 
-                    $where = "s.sampleName LIKE 'CS" . $i . "%' AND s.analyteConcentration <> " . $value . " AND s.fkBatch = " . $Batch->getPkBatch();
-						/*
+                    	/* victor baca: Comentario hecho por Toni?
 						if ($i == 7) 
 						{
 							echo '1-' . $AnaStudy->getCsNumber() . ' 2-' .	$cs_values. ' 3-' . $value . ' 4-' . $where; die();
 						} //**
 						*/
+                    $where = $this->V6_NT_BC('CS'.$i, $Batch->getPkBatch(), $value);
                     $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V6"));
-                    //$this->error($where, $fkParameter[0]);
                     $this->errorCurve($where, $fkParameter[0], $Batch->getPkBatch());
                 }
             }
@@ -663,9 +698,8 @@ class VerificationController extends BaseController
                         $qc_values[$i - 1]
                     );
 
-                    $where = "s.sampleName LIKE 'QC" . $i . "%' AND s.analyteConcentration <> " . $value . " AND s.fkBatch = " . $Batch->getPkBatch();
+                    $where = $this->V6_NT_BC('QC'.$i, $Batch->getPkBatch(), $value);
                     $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V6"));
-                    //$this->error($where, $fkParameter[0]);
                     $this->errorCurve($where, $fkParameter[0], $Batch->getPkBatch());
                 }
             }
@@ -677,11 +711,9 @@ class VerificationController extends BaseController
                 $AnaStudy->getLdqcValues()
             );
 
-            $where = "s.sampleName LIKE 'LDQC%' AND s.analyteConcentration <> " . $valueLDQC . " AND s.fkBatch = " . $Batch->getPkBatch();
+            $where = $this->V6_NT_BC('LDQC', $Batch->getPkBatch(), $valueLDQC);
             $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V6"));
-            //$this->error($where, $fkParameter[0]);
             $this->errorCurve($where, $fkParameter[0], $Batch->getPkBatch());
-            //LDQC
 
             //HDQC
             $valueHDQC = \Alae\Service\Conversion::conversion(
@@ -690,11 +722,9 @@ class VerificationController extends BaseController
                 $AnaStudy->getHdqcValues()
             );
 
-            $where = "s.sampleName LIKE 'HDQC%' AND s.analyteConcentration <> " . $valueHDQC . " AND s.fkBatch = " . $Batch->getPkBatch();
+            $where = $this->V6_NT_BC('HDQC', $Batch->getPkBatch(), $valueHDQC);
             $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V6"));
-            //$this->error($where, $fkParameter[0]);
             $this->errorCurve($where, $fkParameter[0], $Batch->getPkBatch());
-            //HDQC
 
             //LLQC
             $valueLLQC = \Alae\Service\Conversion::conversion(
@@ -703,9 +733,8 @@ class VerificationController extends BaseController
                 $AnaStudy->getLlqcValues()
             );
 
-            $where = "s.sampleName LIKE 'LLQC%' AND s.analyteConcentration <> " . $valueLLQC . " AND s.fkBatch = " . $Batch->getPkBatch();
+            $where = $this->V6_NT_BC('LLQC', $Batch->getPkBatch(), $valueLLQC);
             $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V6"));
-            //$this->error($where, $fkParameter[0]);
             $this->errorCurve($where, $fkParameter[0], $Batch->getPkBatch());
             //LLQC
 
@@ -716,7 +745,7 @@ class VerificationController extends BaseController
                 $AnaStudy->getUlqcValues()
             );
 
-            $where = "s.sampleName LIKE 'ULQC%' AND s.analyteConcentration <> " . $valueULQC . " AND s.fkBatch = " . $Batch->getPkBatch();
+            $where = $this->V6_NT_BC('ULQC', $Batch->getPkBatch(), $valueULQC);
             $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V6"));
             //$this->error($where, $fkParameter[0]);
             $this->errorCurve($where, $fkParameter[0], $Batch->getPkBatch());
@@ -800,7 +829,6 @@ class VerificationController extends BaseController
             
             $where = "s.sampleName LIKE '$sample1%' AND s.sampleName NOT LIKE '%NT%' AND s.sampleName NOT LIKE '%BC%' AND s.analyteConcentration <> " . $value . " AND s.fkBatch = " . $Batch->getPkBatch();
                     $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V6"));
-                    //$this->error($where, $fkParameter[0]);
                     $this->errorCurve($where, $fkParameter[0], $Batch->getPkBatch());
         }
         //fin SampleVerificationStudy
@@ -809,13 +837,12 @@ class VerificationController extends BaseController
 
         foreach ($elements as $nominal)
         {
-            //$sample = $nominal->getSampleName()."-1";
             $sample = $nominal->getSampleName();
             $value = $nominal->getAnalyteConcentration();
-            //$where = "s.sampleName = '$sample' AND s.analyteConcentration <> " . $value . " AND s.fkBatch = " . $Batch->getPkBatch();
-            $where = "s.sampleName LIKE '$sample%' AND s.analyteConcentration <> " . $value . " AND s.fkBatch = " . $Batch->getPkBatch();
+            $where = "(s.sampleType = 'Quality Control' OR s.sampleType = 'Standard') 
+                      AND s.sampleName LIKE '$sample%' AND s.analyteConcentration <> " . $value . " 
+                      AND s.fkBatch = " . $Batch->getPkBatch();
                     $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V6"));
-                    //$this->error($where, $fkParameter[0]);
                     $this->errorCurve($where, $fkParameter[0], $Batch->getPkBatch());
         }
     }
