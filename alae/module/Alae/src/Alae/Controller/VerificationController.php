@@ -946,9 +946,15 @@ class VerificationController extends BaseController
 
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.3"));
         $where      = "(s.sampleType = 'Quality Control' AND 
-                        (s.sampleName LIKE 'ULQC%' OR
+                        (s.sampleName LIKE 'LLQC%' OR
+                        s.sampleName LIKE 'ULQC%' OR
+                        s.sampleName LIKE 'LDQC%' OR
+                        s.sampleName LIKE 'HDQC%' OR
+                        s.sampleName LIKE 'PID%' OR
                         s.sampleName LIKE 'AS%' OR
+                        s.sampleName LIKE 'LL_LLOQ%' OR
                         s.sampleName LIKE 'TZ%' OR
+                        s.sampleName LIKE 'ME%' OR
                         s.sampleName LIKE 'FT%' OR
                         s.sampleName LIKE 'ST%' OR
                         s.sampleName LIKE 'LT%' OR
@@ -962,9 +968,15 @@ class VerificationController extends BaseController
         //Si ese USE RECORD = 1, se debe identificar la muestra como error y se anula lote gracias al parámetro de la tblParameters 
             $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.3.1"));
             $where      = "(s.sampleType = 'Quality Control' AND 
-                            (s.sampleName LIKE 'ULQC%' OR
+                            (s.sampleName LIKE 'LLQC%' OR
+                            s.sampleName LIKE 'ULQC%' OR
+                            s.sampleName LIKE 'LDQC%' OR
+                            s.sampleName LIKE 'HDQC%' OR
+                            s.sampleName LIKE 'PID%' OR
                             s.sampleName LIKE 'AS%' OR
+                            s.sampleName LIKE 'LL_LLOQ%' OR
                             s.sampleName LIKE 'TZ%' OR
+                            s.sampleName LIKE 'ME%' OR
                             s.sampleName LIKE 'FT%' OR
                             s.sampleName LIKE 'ST%' OR
                             s.sampleName LIKE 'LT%' OR
