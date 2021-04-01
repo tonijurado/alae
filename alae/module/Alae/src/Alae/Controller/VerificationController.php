@@ -939,14 +939,15 @@ class VerificationController extends BaseController
         //Fin de la comprobación del USE RECORD = 1 para muestras que no cumplen Accuracy para la V10.2
 
 
-        $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.3"));
+        /*$parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.3"));
         $where      = "(REGEXP(s.sampleName, :regexp) = 1) AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.fkBatch = " . $Batch->getPkBatch();
         //$this->error($where, $parameters[0], array('regexp' => '^QC[0-9]+(-[0-9]+)?$'), false);
-        $this->error($where, $parameters[0], array('regexp' => '^QC[0-9]+(-[0-9]+(R[0-9]+)?)?$'), false);
+        $this->error($where, $parameters[0], array('regexp' => '^QC[0-9]+(-[0-9]+(R[0-9]+)?)?$'), false);*/
 
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.3"));
         $where      = "(s.sampleType = 'Quality Control' AND 
-                        (s.sampleName LIKE 'LLQC%' OR
+                        (s.sampleName LIKE 'QC%' OR
+                        s.sampleName LIKE 'LLQC%' OR
                         s.sampleName LIKE 'ULQC%' OR
                         s.sampleName LIKE 'LDQC%' OR
                         s.sampleName LIKE 'HDQC%' OR
@@ -968,7 +969,8 @@ class VerificationController extends BaseController
         //Si ese USE RECORD = 1, se debe identificar la muestra como error y se anula lote gracias al parámetro de la tblParameters 
             $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.3.1"));
             $where      = "(s.sampleType = 'Quality Control' AND 
-                            (s.sampleName LIKE 'LLQC%' OR
+                            (s.sampleName LIKE 'QC%' OR
+                            s.sampleName LIKE 'LLQC%' OR
                             s.sampleName LIKE 'ULQC%' OR
                             s.sampleName LIKE 'LDQC%' OR
                             s.sampleName LIKE 'HDQC%' OR
