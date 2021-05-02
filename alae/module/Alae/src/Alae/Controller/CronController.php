@@ -102,7 +102,7 @@ class CronController extends BaseController
             $query = $this->getEntityManager()->createQuery("
                     SELECT s
                     FROM Alae\Entity\Study s
-                    WHERE SUBSTRING(s.code,-5,5) =  '" . $response['study'] . "' AND s.closeFlag = 0 AND s.approve = 1
+                    WHERE SUBSTRING(s.code,-5,5) = '" . $response['study'] . "' AND s.closeFlag = 0 AND s.approve = 1
                     ORDER BY s.code DESC")
                 ->setMaxResults(1);
             $elements = $query->getResult();
