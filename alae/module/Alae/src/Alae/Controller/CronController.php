@@ -92,18 +92,32 @@ class CronController extends BaseController
      *      que no estén cerrados y que estén aprobados.
      *      2.- Buscamos el analito (abreviatura), que este asociado al estudio
      */
-    private function validateFile($fileName)
+    private function validateFile($fileName, $charSize)
     {
         $response = $this->explodeFile($fileName);
         $this->_Study   = $this->_Analyte = null;
 
-        $query = $this->getEntityManager()->createQuery("
-                SELECT s
-                FROM Alae\Entity\Study s
-                WHERE s.code LIKE  '%" . $response['study'] . "%' AND s.closeFlag = 0 AND s.approve = 1
-                ORDER BY s.code DESC")
-            ->setMaxResults(1);
-        $elements = $query->getResult();
+        if ($charSize == 5)
+        {
+            $query = $this->getEntityManager()->createQuery("
+                    SELECT s
+                    FROM Alae\Entity\Study s
+                    WHERE SUBSTRING(s.code,-5,5) =  '" . $response['study'] . "' AND s.closeFlag = 0 AND s.approve = 1
+                    ORDER BY s.code DESC")
+                ->setMaxResults(1);
+            $elements = $query->getResult();
+        }
+        else
+        {
+            $query = $this->getEntityManager()->createQuery("
+                    SELECT s
+                    FROM Alae\Entity\Study s
+                    WHERE SUBSTRING(s.code,-4,4) =  '" . $response['study'] . "' AND s.closeFlag = 0 AND s.approve = 1
+                    ORDER BY s.code DESC")
+                ->setMaxResults(1);
+            $elements = $query->getResult();
+        }
+
 
         if (count($elements) > 0)
         {
@@ -148,7 +162,12 @@ class CronController extends BaseController
                     {
                         if (preg_match("/^([a-zA-Z0-9]+-\d{4}(-[0-9]+)?)\+(M|O|R|X)[0-9]*\_(([a-zA-Z0-9](-|\.|,)?\s*)+|(\((\+|-)\)-[a-zA-Z0-9]+))\.txt$/i", $file))
                         {
-                            $this->validateFile($file);
+                            $this->validateFile($file, 4);
+                        }
+
+                        if (preg_match("/^([a-zA-Z0-9]+-\d{5}(-[0-9]+)?)\+(M|O|R|X)[0-9]*\_(([a-zA-Z0-9](-|\.|,)?\s*)+|(\((\+|-)\)-[a-zA-Z0-9]+))\.txt$/i", $file))
+                        {
+                            $this->validateFile($file, 5);
                         }
                     }
 
@@ -177,11 +196,13 @@ class CronController extends BaseController
         $string = substr($file, 0, -4);
         $studyBatch = preg_replace("/(\+(M|O|R|X)[0-9]*\_(([a-zA-Z0-9](-|\.|,)?\s*)+|(\((\+|-)\)-[a-zA-Z0-9]+)))/", "", $string);
         $array = explode("-", $studyBatch);
+        $arrayAna = explode("_", $string);
 
         return array(
             "batch"   => $array[0],
             "study"   => preg_replace("/(\+(M|O|R|X)[0-9]*\_)/", "", $array[1]),
-            "analyte" => preg_replace("/(([a-zA-Z0-9]+-\d{4}(-[0-9]+)?)\+(M|O|R|X)[0-9]*\_)/", "", $string)
+            "analyte" => $arrayAna[1]
+            //"analyte" => preg_replace("/(([a-zA-Z0-9]+-\d{5}(-[0-9]+)?)\+(M|O|R|X)[0-9]*\_)/", "", $string)
         );
     }
 
@@ -320,7 +341,6 @@ class CronController extends BaseController
     private function saveBatch($fileName, $fileSize)
     {
         $response = $this->explodeFile($fileName);
-
         $Batch = new \Alae\Entity\Batch();
         $Batch->setSerial((string) $response['batch']);
         $Batch->setFileName($fileName);
