@@ -112,23 +112,23 @@ class CronController extends BaseController
             $elements = $query->getResult();
         }
 
-        if ($charSize == 7)
-        {
-            $query = $this->getEntityManager()->createQuery("
-                    SELECT s
-                    FROM Alae\Entity\Study s
-                        WHERE SUBSTRING(s.code,-7,7) = '" . $response['study'] . "' AND s.closeFlag = 0 AND s.approve = 1
-                    ORDER BY s.code DESC")
-                ->setMaxResults(1);
-            $elements = $query->getResult();
-        }
-
         if ($charSize == 6)
         {
             $query = $this->getEntityManager()->createQuery("
                     SELECT s
                     FROM Alae\Entity\Study s
                         WHERE SUBSTRING(s.code,-6,6) = '" . $response['study'] . "' AND s.closeFlag = 0 AND s.approve = 1
+                    ORDER BY s.code DESC")
+                ->setMaxResults(1);
+            $elements = $query->getResult();
+        }
+
+        if ($charSize == 7)
+        {
+            $query = $this->getEntityManager()->createQuery("
+                    SELECT s
+                    FROM Alae\Entity\Study s
+                        WHERE SUBSTRING(s.code,-7,7) = '" . $response['study'] . "' AND s.closeFlag = 0 AND s.approve = 1
                     ORDER BY s.code DESC")
                 ->setMaxResults(1);
             $elements = $query->getResult();
@@ -144,10 +144,42 @@ class CronController extends BaseController
                 ->setMaxResults(1);
             $elements = $query->getResult();
         }
-        
+
+        if ($charSize == 9)
+        {
+            $query = $this->getEntityManager()->createQuery("
+                    SELECT s
+                    FROM Alae\Entity\Study s
+                        WHERE SUBSTRING(s.code,-9,9) = '" . $response['study'] . "' AND s.closeFlag = 0 AND s.approve = 1
+                    ORDER BY s.code DESC")
+                ->setMaxResults(1);
+            $elements = $query->getResult();
+        }
+
+        if ($charSize == 10)
+        {
+            $query = $this->getEntityManager()->createQuery("
+                    SELECT s
+                    FROM Alae\Entity\Study s
+                        WHERE SUBSTRING(s.code,-10,10) = '" . $response['study'] . "' AND s.closeFlag = 0 AND s.approve = 1
+                    ORDER BY s.code DESC")
+                ->setMaxResults(1);
+            $elements = $query->getResult();
+        }
+
+        if ($charSize == 11)
+        {
+            $query = $this->getEntityManager()->createQuery("
+                    SELECT s
+                    FROM Alae\Entity\Study s
+                        WHERE SUBSTRING(s.code,-11,11) = '" . $response['study'] . "' AND s.closeFlag = 0 AND s.approve = 1
+                    ORDER BY s.code DESC")
+                ->setMaxResults(1);
+            $elements = $query->getResult();
+        }
+
         if (count($elements) > 0)
         {
-            
             foreach ($elements as $Study)
             {
                 $qb = $this->getEntityManager()->createQueryBuilder()
@@ -208,9 +240,21 @@ class CronController extends BaseController
                             $this->validateFile($file, 5);
                         }
 
-                        if (preg_match("/^([a-zA-Z0-9]+\-\d{4}+)V([+\-0-9])([0-9])+([+\-]?)([MORX])([0-9]?)*\_([a-zA-Z0-9-])*\.txt$/i", $file))
+                        //duplicado
+                        if (preg_match("/^([a-zA-Z0-9]+\-\d{4}+)V-([0-9])([0-9])+([+\-]?)([MORX])([0-9]?)*\_([a-zA-Z0-9-])*\.txt$/i", $file))
+                        {
+                            $this->validateFile($file, 8);
+                        }
+
+                        if (preg_match("/^([a-zA-Z0-9]+\-\d{4}+)V([0-9])([0-9])+([+\-]?)([MORX])([0-9]?)*\_([a-zA-Z0-9-])*\.txt$/i", $file))
                         {
                             $this->validateFile($file, 7);
+                        }
+
+                        //duplicado
+                        if (preg_match("/^([a-zA-Z0-9]+\-\d{4}+)V([0-9])([0-9])-([0-9])([0-9])+([+\-]?)([MORX])([0-9]?)*\_([a-zA-Z0-9-])*\.txt$/i", $file))
+                        {
+                            $this->validateFile($file, 10);
                         }
 
                         if (preg_match("/^([a-zA-Z0-9]+\-\d{5}+)V+([+\-]?)([MORX])([0-9]?)*\_([a-zA-Z0-9-])*\.txt$/i", $file))
@@ -218,9 +262,23 @@ class CronController extends BaseController
                             $this->validateFile($file, 6);
                         }
 
-                        if (preg_match("/^([a-zA-Z0-9]+\-\d{5}+)V([+\-0-9])([0-9])+([+\-]?)([MORX])([0-9]?)*\_([a-zA-Z0-9-])*\.txt$/i", $file))
+                        //duplicado
+                        if (preg_match("/^([a-zA-Z0-9]+\-\d{5}+)V-([0-9])([0-9])+([+\-]?)([MORX])([0-9]?)*\_([a-zA-Z0-9-])*\.txt$/i", $file))
                         {
+                            $this->validateFile($file, 9);
+                        }
+
+                        if (preg_match("/^([a-zA-Z0-9]+\-\d{5}+)V([0-9])([0-9])+([+\-]?)([MORX])([0-9]?)*\_([a-zA-Z0-9-])*\.txt$/i", $file))
+                        {
+                            echo "rr";die();
                             $this->validateFile($file, 8);
+                        }
+
+                        //duplicado
+                        if (preg_match("/^([a-zA-Z0-9]+\-\d{5}+)V([0-9])([0-9])-([0-9])([0-9])+([+\-]?)([MORX])([0-9]?)*\_([a-zA-Z0-9-])*\.txt$/i", $file))
+                        {
+                            echo "ss";die();
+                            $this->validateFile($file, 11);
                         }
                     }
                     
@@ -286,11 +344,19 @@ class CronController extends BaseController
 
         $array4 = explode("+", $array3[1]);
 
-        //echo $array3[0]." ".$stringAna." ".$array4[0];die();
+        if(array_key_exists(2,$array3))
+        {
+            $stringDup = substr($array3[2], 0, 2);
+            $studyShort = $array4[0]."-".$stringDup;
+        }
+        else
+        {
+            $studyShort = $array4[0];
+        }
         
         return array(
             "batch"   => $array3[0],
-            "study"   => $array4[0],
+            "study"   => $studyShort,
             "analyte" => $stringAna
             //"study"   => preg_replace("/(\+*\_(([a-zA-Z0-9](-|\.|,)?\s*)+|(\((\+|-)\)-[a-zA-Z0-9]+)))/", "", $array[1]),
             //"analyte" => preg_replace("/(([a-zA-Z0-9]+)?)\+*(\_)/", "", $string)

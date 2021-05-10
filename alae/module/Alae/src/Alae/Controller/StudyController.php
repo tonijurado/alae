@@ -661,11 +661,28 @@ class StudyController extends BaseController
                 {
                     //DUPLICAR ESTUDIO
                     $User  = $this->_getSession();
-                    $code  = explode("-", $Study->getCode());
-                    $query = $this->getEntityManager()->createQuery("
+                    $code  = explode("-", $Study->getCode());  
+                    $lenCode = strlen($code[1]);
+                    
+                    if($lenCode == 4)
+                    {
+                        $query = $this->getEntityManager()->createQuery("
+                        SELECT COUNT(s.pkStudy)
+                        FROM Alae\Entity\Study s
+                        WHERE SUBSTRING(s.code,-4,4) = '" . $code[1] . "'");
+                    }
+
+                    if($lenCode == 5)
+                    {
+                        $query = $this->getEntityManager()->createQuery("
+                        SELECT COUNT(s.pkStudy)
+                        FROM Alae\Entity\Study s
+                        WHERE SUBSTRING(s.code,-5,5) = '" . $code[1] . "'");
+                    }
+                    /*$query = $this->getEntityManager()->createQuery("
                             SELECT COUNT(s.pkStudy)
                             FROM Alae\Entity\Study s
-                            WHERE s.code LIKE  '%" . ($code[0] . "-" . $code[1]) . "%'");
+                            WHERE s.code LIKE  '%" . ($code[0] . "-" . $code[1]) . "%'");*/
                     $counter = $query->getSingleScalarResult();
 
                     $newStudy = new \Alae\Entity\Study();

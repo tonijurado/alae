@@ -860,10 +860,41 @@ class StudyController extends BaseController
                     //DUPLICAR ESTUDIO
                     $User  = $this->_getSession();
                     $code  = explode("-", $Study->getCode());
-                    $query = $this->getEntityManager()->createQuery("
-                            SELECT COUNT(s.pkStudy)
-                            FROM Alae\Entity\Study s
-                            WHERE s.code LIKE  '%" . ($code[0] . "-" . $code[1]) . "%'");
+
+                    $lenCode = strlen($code[1]);
+                    
+                    if($lenCode == 5)
+                    {
+                        $query = $this->getEntityManager()->createQuery("
+                        SELECT COUNT(s.pkStudy)
+                        FROM Alae\Entity\Study s
+                        WHERE SUBSTRING(s.code,-5,5) = '" . $code[1] . "'");
+                    }
+
+                    if($lenCode == 7)
+                    {
+                        $query = $this->getEntityManager()->createQuery("
+                        SELECT COUNT(s.pkStudy)
+                        FROM Alae\Entity\Study s
+                        WHERE SUBSTRING(s.code,-7,7) = '" . $code[1] . "'");
+                    }
+
+                    if($lenCode == 6)
+                    {
+                        $query = $this->getEntityManager()->createQuery("
+                        SELECT COUNT(s.pkStudy)
+                        FROM Alae\Entity\Study s
+                        WHERE SUBSTRING(s.code,-6,6) = '" . $code[1] . "'");
+                    }
+
+                    if($lenCode == 8)
+                    {
+                        $query = $this->getEntityManager()->createQuery("
+                        SELECT COUNT(s.pkStudy)
+                        FROM Alae\Entity\Study s
+                        WHERE SUBSTRING(s.code,-8,8) = '" . $code[1] . "'");
+                    }
+                    
                     $counter = $query->getSingleScalarResult();
 
                     $newStudy = new \Alae\Entity\Study();
