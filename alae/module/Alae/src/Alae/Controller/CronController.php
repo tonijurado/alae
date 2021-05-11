@@ -150,6 +150,7 @@ class CronController extends BaseController
 
                 if (count($anaStudy) && $anaStudy[0]->getFkStudy()->getApprove())
                 {
+                    
                     $this->_Study   = $Study;
                     $this->_Analyte = $anaStudy[0]->getFkAnalyte();
                 }
@@ -185,7 +186,7 @@ class CronController extends BaseController
                         }
 
                 
-                        if (preg_match("/^([a-zA-Z0-9]+-\d{4}(-[0-9]+)?)\+(M|O|R|X)[0-9]*\_(([a-zA-Z0-9](-|\.|,)?\s*)+|(\((\+|-)\)-[a-zA-Z0-9]+))\.txt$/i", $file))
+                        if (preg_match("/^([a-zA-Z0-9]+-\d{4}(-[0-9][0-9]))\+(M|O|R|X)[0-9]*\_(([a-zA-Z0-9](-|\.|,)?\s*)+|(\((\+|-)\)-[a-zA-Z0-9]+))\.txt$/i", $file))
                         {
                             $this->validateFile($file, 7);
                         }
@@ -195,7 +196,7 @@ class CronController extends BaseController
                             $this->validateFile($file, 5);
                         }
 
-                        if (preg_match("/^([a-zA-Z0-9]+-\d{5}(-[0-9]+)?)\+(M|O|R|X)[0-9]*\_(([a-zA-Z0-9](-|\.|,)?\s*)+|(\((\+|-)\)-[a-zA-Z0-9]+))\.txt$/i", $file))
+                        if (preg_match("/^([a-zA-Z0-9]+-\d{5}(-[0-9][0-9]))\+(M|O|R|X)[0-9]*\_(([a-zA-Z0-9](-|\.|,)?\s*)+|(\((\+|-)\)-[a-zA-Z0-9]+))\.txt$/i", $file))
                         {
                             $this->validateFile($file, 8);
                         }
@@ -242,6 +243,7 @@ class CronController extends BaseController
         return array(
             "batch"   => $array[0],
             "study"   => $studyShort,
+            "studyParent"   => $array[1],
             "analyte" => $arrayAna[1]
             //"analyte" => preg_replace("/(([a-zA-Z0-9]+-\d{5}(-[0-9]+)?)\+(M|O|R|X)[0-9]*\_)/", "", $string)
         );
@@ -562,7 +564,7 @@ class CronController extends BaseController
         $this->errorCurve($where, $fkParameter[0], $Batch->getPkBatch(), array(), false);
 
         $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V3"));
-        $fileName = $response['batch'] . "-" . $response['study'];
+        $fileName = $response['batch'] . "-" . $response['studyParent'];
         $where = "s.fileName NOT LIKE '$fileName%' AND s.fkBatch = " . $Batch->getPkBatch();
         //$this->error($where, $fkParameter[0], array(), false);
         $this->errorCurve($where, $fkParameter[0], $Batch->getPkBatch(), array(), false);

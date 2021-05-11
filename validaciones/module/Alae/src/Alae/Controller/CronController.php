@@ -356,6 +356,7 @@ class CronController extends BaseController
         
         return array(
             "batch"   => $array3[0],
+            "studyParent"   => $array4[0],
             "study"   => $studyShort,
             "analyte" => $stringAna
             //"study"   => preg_replace("/(\+*\_(([a-zA-Z0-9](-|\.|,)?\s*)+|(\((\+|-)\)-[a-zA-Z0-9]+)))/", "", $array[1]),
