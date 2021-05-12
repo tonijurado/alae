@@ -861,40 +861,10 @@ class StudyController extends BaseController
                     $User  = $this->_getSession();
                     $code  = explode("-", $Study->getCode());
 
-                    $lenCode = strlen($code[1]);
-                    
-                    if($lenCode == 5)
-                    {
-                        $query = $this->getEntityManager()->createQuery("
+                    $query = $this->getEntityManager()->createQuery("
                         SELECT COUNT(s.pkStudy)
                         FROM Alae\Entity\Study s
-                        WHERE SUBSTRING(s.code,-5,5) = '" . $code[1] . "'");
-                    }
-
-                    if($lenCode == 7)
-                    {
-                        $query = $this->getEntityManager()->createQuery("
-                        SELECT COUNT(s.pkStudy)
-                        FROM Alae\Entity\Study s
-                        WHERE SUBSTRING(s.code,-7,7) = '" . $code[1] . "'");
-                    }
-
-                    if($lenCode == 6)
-                    {
-                        $query = $this->getEntityManager()->createQuery("
-                        SELECT COUNT(s.pkStudy)
-                        FROM Alae\Entity\Study s
-                        WHERE SUBSTRING(s.code,-6,6) = '" . $code[1] . "'");
-                    }
-
-                    if($lenCode == 8)
-                    {
-                        $query = $this->getEntityManager()->createQuery("
-                        SELECT COUNT(s.pkStudy)
-                        FROM Alae\Entity\Study s
-                        WHERE SUBSTRING(s.code,-8,8) = '" . $code[1] . "'");
-                    }
-                    
+                        WHERE s.code LIKE  '%" . $code[1] . "%'");
                     $counter = $query->getSingleScalarResult();
 
                     $newStudy = new \Alae\Entity\Study();
@@ -942,7 +912,6 @@ class StudyController extends BaseController
                         ),
                         false
                     );
-
                     return new JsonModel(array("status" => true));
                 }
                 catch (Exception $e)
