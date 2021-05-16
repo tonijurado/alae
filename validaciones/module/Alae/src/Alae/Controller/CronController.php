@@ -270,14 +270,12 @@ class CronController extends BaseController
 
                         if (preg_match("/^([a-zA-Z0-9]+\-\d{5}+)V([0-9])([0-9])+([+\-]?)([MORX])([0-9]?)*\_([a-zA-Z0-9-])*\.txt$/i", $file))
                         {
-                            echo "rr";die();
                             $this->validateFile($file, 8);
                         }
 
                         //duplicado
                         if (preg_match("/^([a-zA-Z0-9]+\-\d{5}+)V([0-9])([0-9])-([0-9])([0-9])+([+\-]?)([MORX])([0-9]?)*\_([a-zA-Z0-9-])*\.txt$/i", $file))
                         {
-                            echo "ss";die();
                             $this->validateFile($file, 11);
                         }
                     }

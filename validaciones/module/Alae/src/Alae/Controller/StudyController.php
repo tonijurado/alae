@@ -860,13 +860,63 @@ class StudyController extends BaseController
                     //DUPLICAR ESTUDIO
                     $User  = $this->_getSession();
                     $code  = explode("-", $Study->getCode());
+                    $counter = 0;
+                    //XXXXV
+                    if (preg_match("/^[A-Z0-9]+(\-[0-9]{4}?)+[V]+(\-[0-9]{2}?)?$/i", $Study->getCode()))
+                    {
+                        $query = $this->getEntityManager()->createQuery("
+                            SELECT COUNT(s.pkStudy)
+                            FROM Alae\Entity\Study s
+                            WHERE s.code LIKE  '%" . $code[0]. "-". $code[1] . "%' AND 
+                            (REGEXP(s.code, :regexp1) = 1 OR
+                            REGEXP(s.code, :regexp2) = 1)");
+                        $query->setParameter('regexp1', '^[A-Z0-9]+(\-[0-9]{4})+([V])$');
+                        $query->setParameter('regexp2', '^[A-Z0-9]+(\-[0-9]{4})+([V])+(\-[0-9]{2})$');
+                        $counter = $query->getSingleScalarResult();
+                    }
 
-                    $query = $this->getEntityManager()->createQuery("
-                        SELECT COUNT(s.pkStudy)
-                        FROM Alae\Entity\Study s
-                        WHERE s.code LIKE  '%" . $code[1] . "%'");
-                    $counter = $query->getSingleScalarResult();
+                    //XXXXV01
+                    if (preg_match("/^[A-Z0-9]+(\-[0-9]{4}?)+[V]+([0-9]{2}?)+(\-[0-9]{2}?)?$/i", $Study->getCode()))
+                    {
+                        $query = $this->getEntityManager()->createQuery("
+                            SELECT COUNT(s.pkStudy)
+                            FROM Alae\Entity\Study s
+                            WHERE s.code LIKE  '%" . $code[0]. "-". $code[1] . "%' AND 
+                            (REGEXP(s.code, :regexp1) = 1 OR
+                            REGEXP(s.code, :regexp2) = 1)");
+                            $query->setParameter('regexp1', '^[A-Z0-9]+(\-[0-9]{4})+([V][0-9]{2})$');
+                            $query->setParameter('regexp2', '^[A-Z0-9]+(\-[0-9]{4})+([V][0-9]{2})+(\-[0-9]{2})$');
+                        $counter = $query->getSingleScalarResult();
+                    }
 
+                    //XXXXXV
+                    if (preg_match("/^[A-Z0-9]+(\-[0-9]{5}?)+[V]+(\-[0-9]{2}?)?$/i", $Study->getCode()))
+                    {
+                        $query = $this->getEntityManager()->createQuery("
+                            SELECT COUNT(s.pkStudy)
+                            FROM Alae\Entity\Study s
+                            WHERE s.code LIKE  '%" . $code[0]. "-". $code[1] . "%' AND 
+                            (REGEXP(s.code, :regexp1) = 1 OR
+                            REGEXP(s.code, :regexp2) = 1)");
+                        $query->setParameter('regexp1', '^[A-Z0-9]+(\-[0-9]{5})+([V])$');
+                        $query->setParameter('regexp2', '^[A-Z0-9]+(\-[0-9]{5})+([V])+(\-[0-9]{2})$');
+                        $counter = $query->getSingleScalarResult();
+                    }
+
+                    //XXXXXV01
+                    if (preg_match("/^[A-Z0-9]+(\-[0-9]{5}?)+[V]+([0-9]{2}?)+(\-[0-9]{2}?)?$/i", $Study->getCode()))
+                    {
+                        $query = $this->getEntityManager()->createQuery("
+                            SELECT COUNT(s.pkStudy)
+                            FROM Alae\Entity\Study s
+                            WHERE s.code LIKE  '%" . $code[0]. "-". $code[1] . "%' AND 
+                            (REGEXP(s.code, :regexp1) = 1 OR
+                            REGEXP(s.code, :regexp2) = 1)");
+                            $query->setParameter('regexp1', '^[A-Z0-9]+(\-[0-9]{5})+([V][0-9]{2})$');
+                            $query->setParameter('regexp2', '^[A-Z0-9]+(\-[0-9]{5})+([V][0-9]{2})+(\-[0-9]{2})$');
+                        $counter = $query->getSingleScalarResult();
+                    }
+                    
                     $newStudy = new \Alae\Entity\Study();
                     $newStudy->setVerification($Study->getVerification());
                     $newStudy->setValidation($Study->getValidation());
