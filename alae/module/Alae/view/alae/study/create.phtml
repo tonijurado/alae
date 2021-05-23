@@ -14,7 +14,7 @@
             <form id="study-form" action="" method="POST">
                 <p>
                     <label>Código:</label>
-                    <input type="text" id="code" name="code" value="">
+                    <input type="text" id="code" name="code" value="" maxlength="11" size="11">
                     <label>Fecha creación:</label>
                     <input class="centro" type="date" name="create_at" value="<?php echo date("Y-m-d"); ?>">
                     <label>Arbol de Dilución:</label>
@@ -43,7 +43,7 @@
 </div>
 <script>
     jQuery.validator.addMethod("regex", function (value, element, params) {
-        return this.optional(element) || /^[A-Z0-9]+(\-[0-9]+)?$/.test(value);
+        return this.optional(element) || /^[A-Z0-9]+(\-[0-9]{4,5})?$/.test(value);
     }, "Please enter a valid Rule");
     jQuery.validator.addMethod("caracter1", function(value, element, params) {
         return this.optional(element) || /^(?!.*\*).*$/.test(value);
@@ -88,7 +88,7 @@
         messages: {
             code: {
                 required: "<strong>Código</strong> es requerido",
-                regex: "Por favor, introduzca un <strong>Código</strong> válido. Ejm: XXANE-YYYY",
+                regex: "Por favor, introduzca un <strong>Código</strong> válido. Ejm: XXANE-YYYYY",
                 caracter1: "HA UTILIZADO CARACTERES NO PERMITIDOS",
                 caracter2: "HA UTILIZADO CARACTERES NO PERMITIDOS",
                 caracter3: "HA UTILIZADO CARACTERES NO PERMITIDOS",
