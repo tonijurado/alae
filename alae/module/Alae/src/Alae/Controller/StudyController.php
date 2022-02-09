@@ -480,7 +480,7 @@ class StudyController extends BaseController
             elseif($this->_getSession()->isAdministrador() || $this->_getSession()->isDirectorEstudio() && !$anaStudy->getFkStudy()->getCloseFlag())
             {
                 $buttons .= '<span class="form-datatable-change" onclick="changeElement(this, ' . $anaStudy->getPkAnalyteStudy() . ');"></span>';
-                $buttons .= $this->_getSession()->isAdministrador() ? '<span class="form-datatable-delete" onclick="removeElement(this, ' . $anaStudy->getPkAnalyteStudy() . ');"></span>' : '';
+                $buttons .= '<span class="form-datatable-delete" onclick="removeElement(this, ' . $anaStudy->getPkAnalyteStudy() . ');"></span>';
             }
 
             if($anaStudy->getFkStudy()->getApprove() && $anaStudy->getStatus())
