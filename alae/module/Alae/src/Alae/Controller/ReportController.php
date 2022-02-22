@@ -724,6 +724,25 @@ class ReportController extends BaseController
                                     $l++;
                                 break;
                             }
+
+                            for ($r = 1; $r <= 5; $r++) {
+                                $key = "CS".$i."-".$j."R".$r;
+                                foreach ($propertiesData as $data)
+                                    if ($data['sampleName'] == $key AND $data['batchName'] == $fileName) {
+                                        
+                                        $elementValues = [
+                                            "batchName"              => $fileName,
+                                            "sampleName"              => $data['sampleName'],
+                                            "calculatedConcentration" => $data['calculatedConcentration'],
+                                            "error"                   => $data['error']
+                                        ];
+                                        
+                                        array_push($elementData, $elementValues);
+                                        $elementValues = [];
+                                        $l++;
+                                    break;
+                                }
+                            }                          
                         }
 
                         array_push($elementRow, $elementData);
@@ -863,6 +882,27 @@ class ReportController extends BaseController
                                     $elementValues = [];
                                     $l++;
                                 break;
+                            }
+
+                            for ($r = 1; $r <= 5; $r++) {
+                                $key = "CS".$i."-".$j."R".$r;
+
+                                foreach ($propertiesData as $data)
+                                    if ($data['sampleName'] == $key AND $data['batchName'] == $fileName) {
+                                        
+                                        $elementValues = [
+                                            "batchName"   => $fileName,
+                                            "sampleName"  => $data['sampleName'],
+                                            "accuracy"    => $data['accuracy'],
+                                            "error"       => $data['error']
+                                        ];
+                                        
+                                        array_push($elementData, $elementValues);
+                                        $elementValues = [];
+                                        $l++;
+                                    break;
+                                }    
+
                             }
                         }
 
