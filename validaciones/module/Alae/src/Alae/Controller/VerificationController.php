@@ -132,10 +132,15 @@ class VerificationController extends BaseController
         FROM Alae\Entity\SampleBatch s
         WHERE s.fkBatch = " . $Batch->getPkBatch() . " AND (s.sampleName NOT LIKE '%R%*') 
             AND (
-                ((s.sampleName LIKE 'CS1%' OR s.sampleName LIKE 'LLOQ%' OR s.sampleName LIKE 'LLQC%') AND s.accuracy BETWEEN " . $min1  . " AND " . $max1 . " AND s.useRecord = 0)
-                OR (s.sampleType LIKE 'Standard' AND s.sampleName NOT LIKE 'CS1%' AND s.accuracy BETWEEN " . $min2 . " AND " . $max2 . " AND s.useRecord = 0)
-                OR (s.sampleType LIKE 'Quality Control' AND s.sampleName NOT LIKE 'LLOQ%' AND s.sampleName NOT LIKE 'LLQC%' AND s.sampleName NOT LIKE 'TZ%' AND s.accuracy BETWEEN " . $min3 . " AND " . $max3 . " AND s.useRecord = 0)
-                OR (s.sampleName LIKE 'TZ%' AND s.accuracy BETWEEN " . $min4 . " AND " . $max4 . " AND s.useRecord = 0)
+                (((s.sampleName LIKE 'CS1%' AND s.sampleName NOT LIKE 'CS10%' AND s.sampleName NOT LIKE 'CS11%' AND s.sampleName NOT LIKE 'CS12%' AND s.sampleName NOT LIKE 'CS13%' AND s.sampleName NOT LIKE 'CS14%' AND s.sampleName NOT LIKE 'CS15%' ) OR s.sampleName LIKE 'LLOQ%' OR s.sampleName LIKE 'LLQC%') AND s.accuracy NOT BETWEEN " . $min1  . " AND " . $max1 . " AND s.useRecord = 1)
+                                OR ((s.sampleName NOT LIKE 'CS1%' AND s.sampleName LIKE 'CS10%' AND s.sampleName LIKE 'CS11%' AND s.sampleName LIKE 'CS12%' AND s.sampleName LIKE 'CS13%' AND s.sampleName LIKE 'CS14%' AND s.sampleName LIKE 'CS15%') AND s.sampleType LIKE 'Standard' AND s.accuracy NOT BETWEEN " . $min2 . " AND " . $max2 . " AND s.useRecord = 1)
+                                OR (s.sampleType LIKE 'Quality Control' AND s.sampleName NOT LIKE 'LLOQ%' AND s.sampleName NOT LIKE 'LLQC%' AND s.sampleName NOT LIKE 'TZ%' AND s.accuracy NOT BETWEEN " . $min3 . " AND " . $max3 . " AND s.useRecord = 1)
+                                OR (s.sampleName LIKE 'TZ%' AND s.accuracy NOT BETWEEN " . $min4 . " AND " . $max4 . " AND s.useRecord = 1)
+
+                                OR (((s.sampleName LIKE 'CS1%' AND s.sampleName NOT LIKE 'CS10%' AND s.sampleName NOT LIKE 'CS11%' AND s.sampleName NOT LIKE 'CS12%' AND s.sampleName NOT LIKE 'CS13%' AND s.sampleName NOT LIKE 'CS14%' AND s.sampleName NOT LIKE 'CS15%' ) OR s.sampleName LIKE 'LLOQ%' OR s.sampleName LIKE 'LLQC%') AND s.accuracy BETWEEN " . $min1  . " AND " . $max1 . " AND s.useRecord = 0)
+                                OR ((s.sampleName NOT LIKE 'CS1%' AND s.sampleName LIKE 'CS10%' AND s.sampleName LIKE 'CS11%' AND s.sampleName LIKE 'CS12%' AND s.sampleName LIKE 'CS13%' AND s.sampleName LIKE 'CS14%' AND s.sampleName LIKE 'CS15%' ) AND s.sampleType LIKE 'Standard' AND s.accuracy BETWEEN " . $min2 . " AND " . $max2 . " AND s.useRecord = 0)
+                                OR (s.sampleType LIKE 'Quality Control' AND s.sampleName NOT LIKE 'LLOQ%' AND s.sampleName NOT LIKE 'LLQC%' AND s.sampleName NOT LIKE 'TZ%' AND s.accuracy BETWEEN " . $min3 . " AND " . $max3 . " AND s.useRecord = 0)
+                                OR (s.sampleName LIKE 'TZ%' AND s.accuracy BETWEEN " . $min4 . " AND " . $max4 . " AND s.useRecord = 0)
             )");
         //$query->setParameter('regexp1', '^CS[0-9]+(-[0-9]+)?$');
         //$query->setParameter('regexp2', '^QC[0-9]+(-[0-9]+)?$');
@@ -195,13 +200,14 @@ class VerificationController extends BaseController
                         $where = "s.fkBatch = " . $Batch->getPkBatch() . "
                         AND s.pkSampleBatch = " . $pkSampleBatch . "
                         AND (
-                                ((s.sampleName LIKE 'CS1%' OR s.sampleName LIKE 'LLOQ%' OR s.sampleName LIKE 'LLQC%') AND s.accuracy NOT BETWEEN " . $min1  . " AND " . $max1 . " AND s.useRecord = 1)
-                                OR (s.sampleType LIKE 'Standard' AND s.sampleName NOT LIKE 'CS1%' AND s.accuracy NOT BETWEEN " . $min2 . " AND " . $max2 . " AND s.useRecord = 1)
+                                (((s.sampleName LIKE 'CS1%' AND s.sampleName NOT LIKE 'CS10%' AND s.sampleName NOT LIKE 'CS11%' AND s.sampleName NOT LIKE 'CS12%' AND s.sampleName NOT LIKE 'CS13%' AND s.sampleName NOT LIKE 'CS14%' AND s.sampleName NOT LIKE 'CS15%') 
+                                OR s.sampleName LIKE 'LLOQ%' OR s.sampleName LIKE 'LLQC%') AND s.accuracy NOT BETWEEN " . $min1  . " AND " . $max1 . " AND s.useRecord = 1)
+                                OR (s.sampleType LIKE 'Standard' AND (s.sampleName NOT LIKE 'CS1%' AND s.sampleName LIKE 'CS10%' AND s.sampleName LIKE 'CS11%' AND s.sampleName LIKE 'CS12%' AND s.sampleName LIKE 'CS13%' AND s.sampleName LIKE 'CS14%' AND s.sampleName LIKE 'CS15%') AND s.accuracy NOT BETWEEN " . $min2 . " AND " . $max2 . " AND s.useRecord = 1)
                                 OR (s.sampleType LIKE 'Quality Control' AND s.sampleName NOT LIKE 'LLOQ%' AND s.sampleName NOT LIKE 'LLQC%' AND s.sampleName NOT LIKE 'TZ%' AND s.accuracy NOT BETWEEN " . $min3 . " AND " . $max3 . " AND s.useRecord = 1)
                                 OR (s.sampleName LIKE 'TZ%' AND s.accuracy NOT BETWEEN " . $min4 . " AND " . $max4 . " AND s.useRecord = 1)
 
-                                OR ((s.sampleName LIKE 'CS1%' OR s.sampleName LIKE 'LLOQ%' OR s.sampleName LIKE 'LLQC%') AND s.accuracy BETWEEN " . $min1  . " AND " . $max1 . " AND s.useRecord = 0)
-                                OR (s.sampleType LIKE 'Standard' AND s.sampleName NOT LIKE 'CS1%' AND s.accuracy BETWEEN " . $min2 . " AND " . $max2 . " AND s.useRecord = 0)
+                                OR (((s.sampleName LIKE 'CS1%' AND s.sampleName NOT LIKE 'CS10%' AND s.sampleName NOT LIKE 'CS11%' AND s.sampleName NOT LIKE 'CS12%' AND s.sampleName NOT LIKE 'CS13%' AND s.sampleName NOT LIKE 'CS14%' AND s.sampleName NOT LIKE 'CS15%') OR s.sampleName LIKE 'LLOQ%' OR s.sampleName LIKE 'LLQC%') AND s.accuracy BETWEEN " . $min1  . " AND " . $max1 . " AND s.useRecord = 0)
+                                OR (s.sampleType LIKE 'Standard' AND (s.sampleName NOT LIKE 'CS1%' AND s.sampleName LIKE 'CS10%' AND s.sampleName LIKE 'CS11%' AND s.sampleName LIKE 'CS12%' AND s.sampleName LIKE 'CS13%' AND s.sampleName LIKE 'CS14%' AND s.sampleName LIKE 'CS15%') AND s.accuracy BETWEEN " . $min2 . " AND " . $max2 . " AND s.useRecord = 0)
                                 OR (s.sampleType LIKE 'Quality Control' AND s.sampleName NOT LIKE 'LLOQ%' AND s.sampleName NOT LIKE 'LLQC%' AND s.sampleName NOT LIKE 'TZ%' AND s.accuracy BETWEEN " . $min3 . " AND " . $max3 . " AND s.useRecord = 0)
                                 OR (s.sampleName LIKE 'TZ%' AND s.accuracy BETWEEN " . $min4 . " AND " . $max4 . " AND s.useRecord = 0)
                             )";
@@ -686,8 +692,11 @@ class VerificationController extends BaseController
 							echo '1-' . $AnaStudy->getCsNumber() . ' 2-' .	$cs_values. ' 3-' . $value . ' 4-' . $where; die();
 						} //**
 						*/
-                    $where = $this->V6_NT_BC('CS'.$i, $Batch->getPkBatch(), $value);
+                    $where = $this->V6_NT_BC('CS'. $i .'-', $Batch->getPkBatch(), $value);
                     $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V6"));
+                    // XXXXXXXXXXXX
+                            //echo $where; die();
+                    //xxxxxxxxxxxx 
                     $this->errorCurve($where, $fkParameter[0], $Batch->getPkBatch());
                 }
             }
@@ -999,27 +1008,27 @@ class VerificationController extends BaseController
     protected function V10(\Alae\Entity\Batch $Batch) //Se copia esta de validaciones que es correcta en Muestras, aunque no afecte a muestras TZ, LLQC ni PID
     {
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.1"));
-        $where      = "(s.sampleName LIKE 'CS1%' OR s.sampleName LIKE 'LLQC%' OR s.sampleName LIKE 'PID%' OR s.sampleName LIKE 'LL_LLOQ%') AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.fkBatch = " . $Batch->getPkBatch();
+        $where      = "((s.sampleName LIKE 'CS1%' AND s.sampleName NOT LIKE 'CS10%' AND s.sampleName NOT LIKE 'CS11%' AND s.sampleName NOT LIKE 'CS12%' AND s.sampleName NOT LIKE 'CS13%' AND s.sampleName NOT LIKE 'CS14%' AND s.sampleName NOT LIKE 'CS15%') OR s.sampleName LIKE 'LLQC%' OR s.sampleName LIKE 'PID%' OR s.sampleName LIKE 'LL_LLOQ%') AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.fkBatch = " . $Batch->getPkBatch();
         $this->error($where, $parameters[0], array(), false);
 
         //REPITO la consulta anterior pero ahora Verificamos el USE RECORD de las muestras que no cumple accuracy de V10.1
         //Si ese USE RECORD = 1, se debe identificar la muestra como error y se anula lote gracias al parámetro de la tblParameters 
             $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.1.1"));
-            $where      = "(s.sampleName LIKE 'CS1%' OR s.sampleName LIKE 'LLQC%' OR s.sampleName LIKE 'PID%' OR s.sampleName LIKE 'LL_LLOQ%') AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.useRecord = 1 AND s.fkBatch = " . $Batch->getPkBatch();
+            $where      = "((s.sampleName LIKE 'CS1%' AND s.sampleName NOT LIKE 'CS10%'  AND s.sampleName NOT LIKE 'CS11%' AND s.sampleName NOT LIKE 'CS12%' AND s.sampleName NOT LIKE 'CS13%' AND s.sampleName NOT LIKE 'CS14%' AND s.sampleName NOT LIKE 'CS15%') OR s.sampleName LIKE 'LLQC%' OR s.sampleName LIKE 'PID%' OR s.sampleName LIKE 'LL_LLOQ%') AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.useRecord = 1 AND s.fkBatch = " . $Batch->getPkBatch();
             //$this->error($where, $parameters[0], array(), false);
             $this->errorCurve($where, $parameters[0], $Batch->getPkBatch());
         //Fin de la comprobación del USE RECORD = 1 para muestras que no cumplen Accuracy para la V10.1
 
         
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.2"));
-        $where      = "REGEXP(s.sampleName, :regexp) = 1 AND s.sampleName NOT LIKE 'CS1%' AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.fkBatch = " . $Batch->getPkBatch();
+        $where      = "REGEXP(s.sampleName, :regexp) = 1 AND (s.sampleName NOT LIKE 'CS1%' AND s.sampleName LIKE 'CS10%'  AND s.sampleName LIKE 'CS11%' AND s.sampleName LIKE 'CS12%' AND s.sampleName LIKE 'CS13%' AND s.sampleName LIKE 'CS14%' AND s.sampleName LIKE 'CS15%') AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.fkBatch = " . $Batch->getPkBatch();
         //$this->error($where, $parameters[0], array('regexp' => '^CS[0-9]+(-[0-9]+)?$'), false);
         $this->error($where, $parameters[0], array('regexp' => '^CS[0-9]+(-[0-9]+(R[0-9]+)?)?$'), false);
 
         //REPITO la consulta anterior pero ahora Verificamos el USE RECORD de las muestras que no cumple accuracy de V10.2
         //Si ese USE RECORD = 1, se debe identificar la muestra como error y se anula lote gracias al parámetro de la tblParameters 
             $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.2.1"));
-            $where      = "REGEXP(s.sampleName, :regexp) = 1 AND s.sampleName NOT LIKE 'CS1%' AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.useRecord = 1 AND s.fkBatch = " . $Batch->getPkBatch();
+            $where      = "REGEXP(s.sampleName, :regexp) = 1 AND (s.sampleName NOT LIKE 'CS1%' AND s.sampleName LIKE 'CS10%' AND s.sampleName LIKE 'CS11%' AND s.sampleName LIKE 'CS12%' AND s.sampleName LIKE 'CS13%' AND s.sampleName LIKE 'CS14%' AND s.sampleName LIKE 'CS15%') AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.useRecord = 1 AND s.fkBatch = " . $Batch->getPkBatch();
             //$this->error($where, $parameters[0], array('regexp' => '^CS[0-9]+(-[0-9]+(R[0-9]+)?)?$'), false);
             $this->errorCurve($where, $parameters[0], $Batch->getPkBatch(), array('regexp' => '^CS[0-9]+(-[0-9]+(R[0-9]+)?)?$'), false);
         //Fin de la comprobación del USE RECORD = 1 para muestras que no cumplen Accuracy para la V10.2
@@ -1195,8 +1204,8 @@ class VerificationController extends BaseController
         FROM Alae\Entity\SampleBatch s
         WHERE s.fkBatch = " . $Batch->getPkBatch() . " AND (s.sampleName NOT LIKE '%R%*') 
             AND (
-                ((s.sampleName LIKE 'CS1%' OR s.sampleName LIKE 'LLOQ%' OR s.sampleName LIKE 'LLQC%') AND s.accuracy BETWEEN " . $min1  . " AND " . $max1 . " AND s.useRecord = 0)
-                OR (s.sampleType LIKE 'Standard' AND s.sampleName NOT LIKE 'CS1%' AND s.accuracy BETWEEN " . $min2 . " AND " . $max2 . " AND s.useRecord = 0)
+                (((s.sampleName LIKE 'CS1%' AND s.sampleName NOT LIKE 'CS10%' AND s.sampleName NOT LIKE 'CS11%' AND s.sampleName NOT LIKE 'CS12%' AND s.sampleName NOT LIKE 'CS13%' AND s.sampleName NOT LIKE 'CS14%' AND s.sampleName NOT LIKE 'CS15%') OR s.sampleName LIKE 'LLOQ%' OR s.sampleName LIKE 'LLQC%') AND s.accuracy BETWEEN " . $min1  . " AND " . $max1 . " AND s.useRecord = 0)
+                OR (s.sampleType LIKE 'Standard' AND (s.sampleName NOT LIKE 'CS1%' AND s.sampleName LIKE 'CS10%' AND s.sampleName LIKE 'CS11%' AND s.sampleName LIKE 'CS12%' AND s.sampleName LIKE 'CS13%' AND s.sampleName LIKE 'CS14%' AND s.sampleName LIKE 'CS15%') AND s.accuracy BETWEEN " . $min2 . " AND " . $max2 . " AND s.useRecord = 0)
                 OR (s.sampleType LIKE 'Quality Control' AND s.sampleName NOT LIKE 'LLOQ%' AND s.sampleName NOT LIKE 'LLQC%' AND s.sampleName NOT LIKE 'TZ%' AND s.accuracy BETWEEN " . $min3 . " AND " . $max3 . " AND s.useRecord = 0)
                 OR (s.sampleName LIKE 'TZ%' AND s.accuracy BETWEEN " . $min4 . " AND " . $max4 . " AND s.useRecord = 0)
             )");
@@ -1427,14 +1436,14 @@ class VerificationController extends BaseController
         $query = $this->getEntityManager()->createQuery("
             SELECT COUNT(s.pkSampleBatch)
             FROM Alae\Entity\SampleBatch s
-            WHERE s.sampleName LIKE 'CS1%' AND s.useRecord = 0 AND s.fkBatch = " . $Batch->getPkBatch());
+            WHERE (s.sampleName LIKE 'CS1%' AND s.sampleName NOT LIKE 'CS10%' AND s.sampleName NOT LIKE 'CS11%' AND s.sampleName NOT LIKE 'CS12%' AND s.sampleName NOT LIKE 'CS13%' AND s.sampleName NOT LIKE 'CS14%' AND s.sampleName NOT LIKE 'CS15%') AND s.useRecord = 0 AND s.fkBatch = " . $Batch->getPkBatch());
         $counter = $query->getSingleScalarResult();
 
         $i = ($counter == 2) ? 2 : 1;
         $query = $this->getEntityManager()->createQuery("
             SELECT AVG(s.analytePeakArea) as analyte_peak_area, AVG(s.isPeakArea) as is_peak_area
             FROM Alae\Entity\SampleBatch s
-            WHERE s.sampleName like 'CS1%' AND s.useRecord = 1 AND s.validFlag = 1 AND s.fkBatch = " . $Batch->getPkBatch());
+            WHERE (s.sampleName LIKE 'CS1%'  AND s.sampleName NOT LIKE 'CS10%' AND s.sampleName NOT LIKE 'CS11%' AND s.sampleName NOT LIKE 'CS12%' AND s.sampleName NOT LIKE 'CS13%' AND s.sampleName NOT LIKE 'CS14%' AND s.sampleName NOT LIKE 'CS15%') AND s.useRecord = 1 AND s.validFlag = 1 AND s.fkBatch = " . $Batch->getPkBatch());
         $elements = $query->getResult();
 
         $analytePeakArea = $isPeakArea      = 0;
@@ -1550,13 +1559,13 @@ class VerificationController extends BaseController
         $query = $this->getEntityManager()->createQuery("
             SELECT COUNT(s.pkSampleBatch)
             FROM Alae\Entity\SampleBatch s
-            WHERE s.sampleName LIKE 'CS1%' AND s.fkBatch = " . $Batch->getPkBatch());
+            WHERE (s.sampleName LIKE 'CS1%' AND s.sampleName NOT LIKE 'CS10%' AND s.sampleName NOT LIKE 'CS11%' AND s.sampleName NOT LIKE 'CS12%' AND s.sampleName NOT LIKE 'CS13%' AND s.sampleName NOT LIKE 'CS14%' AND s.sampleName NOT LIKE 'CS15%') AND s.fkBatch = " . $Batch->getPkBatch());
         $cs1Total = $query->getSingleScalarResult();
 
         $query = $this->getEntityManager()->createQuery("
             SELECT COUNT(s.pkSampleBatch)
             FROM Alae\Entity\SampleBatch s
-            WHERE s.sampleName LIKE 'CS1%'  AND s.useRecord = 1 AND s.fkBatch = " . $Batch->getPkBatch());
+            WHERE (s.sampleName LIKE 'CS1%' AND s.sampleName NOT LIKE 'CS10%' AND s.sampleName NOT LIKE 'CS11%' AND s.sampleName NOT LIKE 'CS12%' AND s.sampleName NOT LIKE 'CS13%' AND s.sampleName NOT LIKE 'CS14%' AND s.sampleName NOT LIKE 'CS15%')  AND s.useRecord = 1 AND s.fkBatch = " . $Batch->getPkBatch());
         $cs1AceptadosTotal = $query->getSingleScalarResult();
 
 		/* Cambio de TONI para controlar los DIV/0 en caso de que cs1AceptadosTotal sea 0*/
@@ -1574,7 +1583,7 @@ class VerificationController extends BaseController
 
             if ($value < $parameters[0]->getMinValue())
             {
-                $where = "s.sampleName LIKE 'CS1%' AND s.fkBatch = " . $Batch->getPkBatch();
+                $where = "(s.sampleName LIKE 'CS1%' AND s.sampleName NOT LIKE 'CS10%' AND s.sampleName NOT LIKE 'CS11%' AND s.sampleName NOT LIKE 'CS12%' AND s.sampleName NOT LIKE 'CS13%' AND s.sampleName NOT LIKE 'CS14%' AND s.sampleName NOT LIKE 'CS15%') AND s.fkBatch = " . $Batch->getPkBatch();
                 //$this->error($where, $parameters[0]);
                 $this->errorCurve($where, $parameters[0], $Batch->getPkBatch());
                 //$this->curve($Batch->getPkBatch());
