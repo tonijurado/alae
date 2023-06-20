@@ -500,8 +500,13 @@ class VerificationController extends BaseController
                         $Batch->getAnalyteConcentrationUnits(),
                         $cs_values[$i - 1]
                     );
-
-                    $where = "s.sampleName LIKE 'CS" . $i . "%' AND s.analyteConcentration <> " . $value . " AND s.fkBatch = " . $Batch->getPkBatch();
+/*
+** 20/06/2023 - Toni: Para que el sistema cargue hasta CS15 y no falle, cambiamos la siguiente LINEA ORIGINAL
+$where = "s.sampleName LIKE 'CS" . $i . "%' AND s.analyteConcentration <> " . $value . " AND s.fkBatch = " . $Batch->getPkBatch();
+por esta otra quitando el % del primer LIKE 'CS" . $i . "%' AND .... 
+$where = "s.sampleName LIKE 'CS" . $i . "' AND s.analyteConcentration <> " . $value . " AND s.fkBatch = " . $Batch->getPkBatch();
+*/
+                    $where = "s.sampleName LIKE 'CS" . $i . "' AND s.analyteConcentration <> " . $value . " AND s.fkBatch = " . $Batch->getPkBatch();
                     $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V5"));
                     //$this->error($where, $fkParameter[0]);
                     $this->errorCurve($where, $fkParameter[0], $Batch->getPkBatch());
