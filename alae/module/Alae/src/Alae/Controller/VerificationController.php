@@ -1657,7 +1657,7 @@ $where = "s.sampleName LIKE 'CS" . $i . "' AND s.analyteConcentration <> " . $va
                     AND ((s.analyteRetentionTime NOT BETWEEN $minTretAna AND $maxTretAna) OR (s.isRetentionTime NOT BETWEEN $minTretIS AND $maxTretIS))
                    AND s.useRecord = 1 AND s.fkBatch = " . $Batch->getPkBatch();
         
-        //$this->error($where, $parameters2[0], array(), false);
+        //$this->error($where, $parameters2[0], array(), false); *
         $this->errorCurve($where, $parameters2[0], $Batch->getPkBatch(), array(), false);
 
 /*
