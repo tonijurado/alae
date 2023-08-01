@@ -1254,6 +1254,16 @@ class VerificationController extends BaseController
             $min_is = $AnaStudy[0]->getRetentionIs() - ($AnaStudy[0]->getAcceptanceIs() * $AnaStudy[0]->getRetentionIs() / 100);
             $max_is = $AnaStudy[0]->getRetentionIs() + ($AnaStudy[0]->getAcceptanceIs() * $AnaStudy[0]->getRetentionIs() / 100);
 
+        /*Toni: 01/08/2023 - Redondeamos todas los resultados anteriores a 2 decimales según reunión con Natalia y Elba.
+        Este ajuste también se ha realizado en validaciones*/
+
+            $min    = round ($min, 2);
+            $max    = round ($max, 2);
+            $min_is = round ($min_is , 2);
+            $max_is = round ($max_is , 2);
+        
+        //Fin de los redondeos
+
             // Toni: Añado al condicional $where la condicion de que no evalue SampleName BLK según mail y nota de NATALIA del 8 de diciembre de 2019
             /*
             $where = " (s.sampleName <> 'BLK' AND s.sampleType != 'Solvent' AND s.analyteRetentionTime NOT BETWEEN $min AND $max OR 

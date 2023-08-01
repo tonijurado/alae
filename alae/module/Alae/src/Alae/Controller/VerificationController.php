@@ -1642,7 +1642,17 @@ $where = "s.sampleName LIKE 'CS" . $i . "' AND s.analyteConcentration <> " . $va
 
         $minTretIS = $AnaStudy[0]->getRetentionIS() - $AnaStudy[0]->getAcceptanceIs() / 100 * $AnaStudy[0]->getRetentionIS();
         $maxTretIS = $AnaStudy[0]->getRetentionIS() + $AnaStudy[0]->getAcceptanceIs() / 100 * $AnaStudy[0]->getRetentionIS();
-        
+
+        /*Toni: 01/08/2023 - Redondeamos todas los resultados anteriores a 2 decimales según reunión con Natalia y Elba.
+        Este ajuste también se ha realizado en validaciones*/
+
+        $minTretAna = round ($minTretAna, 2);
+        $maxTretAna = round ($maxTretAna, 2);
+        $minTretIS  = round ($minTretIS , 2);
+        $maxTretIS  = round ($maxTretIS , 2);
+
+        //Fin de los redondeos
+
         //$parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V26"));
         // Toni: Según mail de Natalia del día 08.12.2019, no se deberían evaluar para el control de tiempo de retención las muestras BLK
         // para conseguirlo, modificamos la primera parte del siguiente WHERE.
