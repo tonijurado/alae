@@ -447,6 +447,7 @@ class ReportController extends BaseController
                 SELECT b
                 FROM Alae\Entity\Batch b
                 WHERE b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id') . "
+                AND b.justification IS NULL
                 AND b.validationDate IS NOT NULL
                 ORDER BY b.fileName ASC");
             $elements = $query->getResult();
@@ -598,6 +599,7 @@ class ReportController extends BaseController
                 SELECT b
                 FROM Alae\Entity\Batch b
                 WHERE b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id') . "
+                AND b.justificantion IS NULL
                 ORDER BY b.fileName ASC");
             $batch = $query->getResult();
 
@@ -642,7 +644,7 @@ class ReportController extends BaseController
                 ->leftJoin('Alae\Entity\Error', 'e', \Doctrine\ORM\Query\Expr\Join::WITH, 's.pkSampleBatch = e.fkSampleBatch')
                 ->leftJoin('Alae\Entity\Parameter', 'p', \Doctrine\ORM\Query\Expr\Join::WITH, 'e.fkParameter = p.pkParameter')
                 ->innerJoin('Alae\Entity\Batch', 'b', \Doctrine\ORM\Query\Expr\Join::WITH, 's.fkBatch = b.pkBatch')
-                ->where("s.sampleName LIKE 'CS%' AND b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id'))
+                ->where("s.sampleName LIKE 'CS%' AND b.justification IS NULL AND b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id'))
                 ->groupBy('b.pkBatch, s.pkSampleBatch')
                 ->orderBy('b.fileName, s.sampleName', 'ASC');
             $elements = $qb->getQuery()->getResult();
@@ -687,7 +689,7 @@ class ReportController extends BaseController
                 LEFT JOIN Alae\Entity\Error e WITH e.fkSampleBatch = s.pkSampleBatch
                 LEFT JOIN Alae\Entity\Parameter p WITH e.fkParameter = p.pkParameter
                 INNER JOIN Alae\Entity\Batch b WITH s.fkBatch = b.pkBatch
-                WHERE s.sampleName LIKE 'CS%' AND b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id')."
+                WHERE s.sampleName LIKE 'CS%' AND b.justification  IS NULL AND b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id')."
                 ORDER BY b.fileName, s.sampleName ASC");
                 $results = $query->getResult();
 
@@ -702,7 +704,7 @@ class ReportController extends BaseController
                 LEFT JOIN Alae\Entity\Error e WITH e.fkSampleBatch = s.pkSampleBatch
                 LEFT JOIN Alae\Entity\Parameter p WITH e.fkParameter = p.pkParameter
                 INNER JOIN Alae\Entity\Batch b WITH s.fkBatch = b.pkBatch
-                WHERE s.sampleName LIKE 'CS%' AND b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id')."
+                WHERE s.sampleName LIKE 'CS%' AND b.justification IS NULL AND b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id')."
                 GROUP BY b.pkBatch, s.pkSampleBatch
                 ORDER BY b.fileName, s.sampleName ASC");
                 $results = $query->getResult();
@@ -801,7 +803,7 @@ class ReportController extends BaseController
                 ->leftJoin('Alae\Entity\Error', 'e', \Doctrine\ORM\Query\Expr\Join::WITH, 's.pkSampleBatch = e.fkSampleBatch')
                 ->leftJoin('Alae\Entity\Parameter', 'p', \Doctrine\ORM\Query\Expr\Join::WITH, 'e.fkParameter = p.pkParameter')
                 ->innerJoin('Alae\Entity\Batch', 'b', \Doctrine\ORM\Query\Expr\Join::WITH, 's.fkBatch = b.pkBatch')
-                ->where("s.sampleName LIKE 'CS%' AND b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id'))
+                ->where("s.sampleName LIKE 'CS%' AND b.justification AND b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id'))
                 ->groupBy('b.pkBatch, s.pkSampleBatch')
                 ->orderBy('b.fileName, s.sampleName', 'ASC');
             $elements = $qb->getQuery()->getResult();
@@ -846,7 +848,7 @@ class ReportController extends BaseController
                 LEFT JOIN Alae\Entity\Error e WITH e.fkSampleBatch = s.pkSampleBatch
                 LEFT JOIN Alae\Entity\Parameter p WITH e.fkParameter = p.pkParameter
                 INNER JOIN Alae\Entity\Batch b WITH s.fkBatch = b.pkBatch
-                WHERE s.sampleName LIKE 'CS%' AND b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id')."
+                WHERE s.sampleName LIKE 'CS%' AND b.justification IS NULL AND b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id')."
                 ORDER BY b.fileName, s.sampleName ASC");
                 $results = $query->getResult();
 
@@ -861,7 +863,7 @@ class ReportController extends BaseController
                 LEFT JOIN Alae\Entity\Error e WITH e.fkSampleBatch = s.pkSampleBatch
                 LEFT JOIN Alae\Entity\Parameter p WITH e.fkParameter = p.pkParameter
                 INNER JOIN Alae\Entity\Batch b WITH s.fkBatch = b.pkBatch
-                WHERE s.sampleName LIKE 'CS%' AND b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id')."
+                WHERE s.sampleName LIKE 'CS%' AND b.justification IS NULL AND b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id')."
                 GROUP BY b.pkBatch, s.pkSampleBatch
                 ORDER BY b.fileName, s.sampleName ASC");
                 $results = $query->getResult();
@@ -962,7 +964,7 @@ class ReportController extends BaseController
                 ->leftJoin('Alae\Entity\Error', 'e', \Doctrine\ORM\Query\Expr\Join::WITH, 's.pkSampleBatch = e.fkSampleBatch')
                 ->leftJoin('Alae\Entity\Parameter', 'p', \Doctrine\ORM\Query\Expr\Join::WITH, 'e.fkParameter = p.pkParameter')
                 ->innerJoin('Alae\Entity\Batch', 'b', \Doctrine\ORM\Query\Expr\Join::WITH, 's.fkBatch = b.pkBatch')
-                ->where("s.sampleName LIKE 'QC%' AND s.sampleName NOT LIKE '%DQC%' AND s.sampleName NOT LIKE '%*%' AND b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id'))
+                ->where("s.sampleName LIKE 'QC%' AND s.sampleName NOT LIKE '%DQC%' AND s.sampleName NOT LIKE '%*%' AND b.justification IS NULL AND b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id'))
                 ->groupBy('b.pkBatch, s.pkSampleBatch')
                 ->orderBy('b.fileName, s.sampleName', 'ASC');
             $elements = $qb->getQuery()->getResult();
@@ -1036,7 +1038,7 @@ class ReportController extends BaseController
                 LEFT JOIN Alae\Entity\Error e WITH e.fkSampleBatch = s.pkSampleBatch
                 LEFT JOIN Alae\Entity\Parameter p WITH e.fkParameter = p.pkParameter
                 INNER JOIN Alae\Entity\Batch b WITH s.fkBatch = b.pkBatch
-                WHERE s.sampleName LIKE 'QC%' AND s.sampleName NOT LIKE '%DQC%' AND s.sampleName NOT LIKE '%*%' AND b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id')."
+                WHERE s.sampleName LIKE 'QC%' AND s.sampleName NOT LIKE '%DQC%' AND s.sampleName NOT LIKE '%*%' AND b.justification IS NULL b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id')."
                 ORDER BY b.fileName, s.sampleName ASC");
                 $results = $query->getResult();
 
@@ -1051,7 +1053,7 @@ class ReportController extends BaseController
                 LEFT JOIN Alae\Entity\Error e WITH e.fkSampleBatch = s.pkSampleBatch
                 LEFT JOIN Alae\Entity\Parameter p WITH e.fkParameter = p.pkParameter
                 INNER JOIN Alae\Entity\Batch b WITH s.fkBatch = b.pkBatch
-                WHERE s.sampleName LIKE 'QC%' AND s.sampleName NOT LIKE '%DQC%' AND s.sampleName NOT LIKE '%*%' AND b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id')."
+                WHERE s.sampleName LIKE 'QC%' AND s.sampleName NOT LIKE '%DQC%' AND s.sampleName NOT LIKE '%*%' AND b.justification IS NULL AND b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id')."
                 GROUP BY b.pkBatch, s.pkSampleBatch
                 ORDER BY b.fileName, s.sampleName ASC");
                 $results = $query->getResult();
@@ -1307,7 +1309,7 @@ class ReportController extends BaseController
             $query    = $this->getEntityManager()->createQuery("
                 SELECT s.sampleName, GROUP_CONCAT(DISTINCT s.pkSampleBatch) as values
                 FROM Alae\Entity\Batch b, Alae\Entity\SampleBatch s
-                WHERE b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id') . "
+                WHERE b.justification IS NULL b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id') . "
                     AND s.fkBatch = b.pkBatch AND s.sampleName LIKE '%DQC%'
                 GROUP BY s.sampleName
                 ORDER BY s.sampleName ASC");
@@ -1331,7 +1333,7 @@ class ReportController extends BaseController
                         ->leftJoin('Alae\Entity\Error', 'e', \Doctrine\ORM\Query\Expr\Join::WITH, 's.pkSampleBatch = e.fkSampleBatch')
                         ->leftJoin('Alae\Entity\Parameter', 'p', \Doctrine\ORM\Query\Expr\Join::WITH, 'e.fkParameter = p.pkParameter')
                         ->innerJoin('Alae\Entity\Batch', 'b', \Doctrine\ORM\Query\Expr\Join::WITH, 's.fkBatch = b.pkBatch')
-                        ->where("s.sampleName LIKE '$key%' AND b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id'))
+                        ->where("s.sampleName LIKE '$key%' AND b.justification IS NULL b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id'))
                         ->groupBy('b.pkBatch, s.pkSampleBatch')
                         ->orderBy('b.fileName, s.sampleName', 'ASC');
                     $elements = $qb->getQuery()->getResult();
