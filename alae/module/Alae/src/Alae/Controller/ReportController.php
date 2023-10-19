@@ -270,11 +270,17 @@ class ReportController extends BaseController
                             switch ($key)
                             {
                                 case "sampleName":
-                                    $row1 .= sprintf('<td style="width:75px;text-align:left;border: black 1px solid;font-size:13px;padding:4px">%s</td>', $value);
+                                    $row1 .= sprintf('<td style="width:100px;text-align:left;border: black 1px solid;font-size:13px;padding:4px">%s</td>', $value);
                                     $row3 .= sprintf('<td style="width:100px;text-align:left;border: black 1px solid;font-size:13px;padding:4px">%s</td>', $value);
                                     break;
+                                case "sampleType":
+                                        $row1 .= sprintf('<td style="width:80px;text-align:left;border: black 1px solid;font-size:13px;padding:4px">%s</td>', $value);
+                                        break;
+                                case "analytePeakName":
+                                    $row1 .= sprintf('<td style="width:100px;text-align:left;border: black 1px solid;font-size:13px;padding:4px">%s</td>', $value);
+                                    break;
                                 case "fileName":
-                                    $row1 .= sprintf('<td style="width:110px;text-align:left;border: black 1px solid;font-size:13px;padding:4px">%s</td>', $value);
+                                    $row1 .= sprintf('<td style="width:130px;text-align:left;border: black 1px solid;font-size:13px;padding:4px">%s</td>', $value);
                                     break;
                                 case "analytePeakArea":
                                 case "isPeakArea":
