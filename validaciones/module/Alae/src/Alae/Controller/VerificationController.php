@@ -1708,7 +1708,7 @@ class VerificationController extends BaseController
         //echo 'QC TOTAL = ' . $qc_total . ' - QC Aceptados = ' . $qc_totalAccepted . ' - Valor = ' . $value;
         //die();
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V21"));
-        if ($value < $parameters[0]->getMinValue())
+        if ($value <= $parameters[0]->getMinValue())
         {
             $where = "((s.sampleName like 'QC%' OR s.sampleName like 'LLQC%' or s.sampleName like 'ULQC%') AND s.sampleName NOT LIKE '%*%') AND s.isUsed = 1 AND s.fkBatch = " . $Batch->getPkBatch();
             $this->error($where, $parameters[0]);
