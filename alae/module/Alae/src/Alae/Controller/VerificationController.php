@@ -1326,8 +1326,9 @@ $where = "s.sampleName LIKE 'CS" . $i . "' AND s.analyteConcentration <> " . $va
         {
             $value      = ($Batch->getQcAcceptedTotal() / $Batch->getQcTotal()) * 100;
             $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V18"));
-
-            if ($value <= $parameters[0]->getMinValue())
+            $value = number_format( $value, 2 , ".","");
+            
+            if ($value < 66.67 )//$parameters[0]->getMinValue())
             {
                 $where = "s.sampleName LIKE 'QC%' AND s.fkBatch = " . $Batch->getPkBatch();
                 $this->error($where, $parameters[0]);
