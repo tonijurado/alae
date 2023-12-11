@@ -599,7 +599,7 @@ class ReportController extends BaseController
                 SELECT b
                 FROM Alae\Entity\Batch b
                 WHERE b.curveFlag = 0 AND b.validationDate IS NOT NULL AND b.fkAnalyte = " . $request->getQuery('an') . " AND b.fkStudy = " . $request->getQuery('id') . "
-                AND b.justificantion IS NULL
+                AND b.justification IS NULL
                 ORDER BY b.fileName ASC");
             $batch = $query->getResult();
 
