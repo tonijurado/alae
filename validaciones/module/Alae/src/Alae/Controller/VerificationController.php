@@ -1707,7 +1707,7 @@ class VerificationController extends BaseController
         $value = number_format( $value, 2 , ".","");
 
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V21"));
-        if ($value <= 66.67 )//$parameters[0]->getMinValue())
+        if ($value < 66.67 )
         {
             $where = "((s.sampleName like 'QC%' OR s.sampleName like 'LLQC%' or s.sampleName like 'ULQC%') AND s.sampleName NOT LIKE '%*%') AND s.isUsed = 1 AND s.fkBatch = " . $Batch->getPkBatch();
             $this->error($where, $parameters[0]);
