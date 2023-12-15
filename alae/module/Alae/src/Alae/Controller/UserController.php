@@ -85,7 +85,7 @@ class UserController extends BaseController
                         'user' => $User->getUsername(),
                         'link' => \Alae\Service\Helper::getVarsConfig("base_url") . '/user/register?active_code=' . $User->getActiveCode() . '&email=' . $User->getEmail())), 'Solicitud de Acceso a ALAE');
 
-                    $Profile  = $this->getRepository("\\Alae\\Entity\Profile")->findBy(array("name" => "Administrador"));
+                    $Profile  = $this->getRepository("\\Alae\\Entity\Profile")->findBy(array("name" => "Administrador Usuarios"));
                     $elements = $this->getRepository()->findBy(array('fkProfile' => $Profile, 'activeFlag' => 1));
 		    foreach ($elements as $Admin)
 		    {
@@ -143,7 +143,7 @@ class UserController extends BaseController
 		"username" => utf8_encode($user->getUsername()),
 		"email" => utf8_encode($user->getEmail()),
 		"profile" => '<select class="form-datatable-profile" id="form-datatable-profile-' . $user->getPkUser() . '">' . $this->getProfileOptions($user->getFkProfile()->getPkProfile()) . '</select>',
-		"password" => ($user->isAdministrador() || $user->isDirectorEstudio()) ? '<button class="btn" type="button" onclick="sentpassword(' . $user->getPkUser() . ');"><span class="btn-mail"></span>enviar contraseña</button>' : '',
+		"password" => ($user->isAdminUsers() || $user->isDirectorEstudio()) ? '<button class="btn" type="button" onclick="sentpassword(' . $user->getPkUser() . ');"><span class="btn-mail"></span>enviar contraseña</button>' : '',
 		"status" => $user->getActiveFlag() ? "S" : "N",
 		"edit" => $user->getActiveFlag() ? '<span class="form-datatable-save" onclick="javascript:changeProfile(' . $user->getPkUser() . ');"></span><span class="form-datatable-reject" onclick="reject(' . $user->getPkUser() . ');"></span>': '<span class="form-datatable-approve" onclick="approve(' . $user->getPkUser() . ')"></span>'
 	    );

@@ -341,6 +341,9 @@ class Datatable
             case "Administrador":
                 $elements = $this->isAdministrador();
                 break;
+            case "Administrador Usuarios":
+                $elements = $this->isAdminUsers();
+                break;
             case "Director Estudio":
                 $elements = $this->isDirectorEstudio();
                 break;
@@ -420,40 +423,49 @@ class Datatable
     protected function isAdministrador()
     {
         switch ($this->_datatable)
-	{
-	    case Datatable::DATATABLE_ANALYTE:
-		$elements = '<span class="form-datatable-new"></span><span class="form-download-excel" onclick="excel(1);"></span><input value="" type="submit"/>';
+	    {
+    	    case Datatable::DATATABLE_ANALYTE:
+		        $elements = '<span class="form-datatable-new"></span><span class="form-download-excel" onclick="excel(1);"></span><input value="" type="submit"/>';
                 break;
-	    case Datatable::DATATABLE_STUDY:
-		$elements = '<a href="' . $this->_base_url . '/study/create" class="form-datatable-new"></a><span class="form-download-excel" onclick="excel(2);"></span>';
-		break;
-        case Datatable::DATATABLE_STUDY_CLOSE:
-        $elements = '<span class="form-download-excel" onclick="excel(8);"></span>';
-        break;
-	    case Datatable::DATATABLE_PARAMETER:
-		$elements = '<span class="form-download-excel" onclick="excel(3);"></span><input value="" type="submit"/>';
-		break;
-	    case Datatable::DATATABLE_REASON:
-		$elements = '<span class="form-datatable-new"></span><span class="form-download-excel" onclick="excel(4);"></span><input value="" type="submit"/>';
-		break;
-	    case Datatable::DATATABLE_UNFILLED:
-		$elements = '<span class="form-download-excel" onclick="excel(5);"></span>';
-		break;
-	    case Datatable::DATATABLE_ADMIN:
-		$elements = '<span class="form-download-excel" onclick="excel(6);"></span>';
-		break;
-        case Datatable::DATATABLE_ANASTUDY:
-            $elements = '<span class="form-datatable-new"></span>';
-            break;
-        case Datatable::DATATABLE_BATCH:
-            $elements = '<input value="" type="submit"/>';
-            break;
-        case Datatable::DATATABLE_AUDIT_TRAIL:
-            $elements = '<span class="form-download-excel" onclick="excel(7);"></span>';
-            break;
-	    case Datatable::DATATABLE_SAMPLE_BATCH:
+    	    case Datatable::DATATABLE_STUDY:
+        		$elements = '<a href="' . $this->_base_url . '/study/create" class="form-datatable-new"></a><span class="form-download-excel" onclick="excel(2);"></span>';
+        		break;
+            case Datatable::DATATABLE_STUDY_CLOSE:
+                $elements = '<span class="form-download-excel" onclick="excel(8);"></span>';
+                break;
+    	    case Datatable::DATATABLE_PARAMETER:
+        		$elements = '<span class="form-download-excel" onclick="excel(3);"></span><input value="" type="submit"/>';
+        		break;
+    	    case Datatable::DATATABLE_REASON:
+        		$elements = '<span class="form-datatable-new"></span><span class="form-download-excel" onclick="excel(4);"></span><input value="" type="submit"/>';
+        		break;
+    	    case Datatable::DATATABLE_UNFILLED:
+        		$elements = '<span class="form-download-excel" onclick="excel(5);"></span>';
+        		break;
+            case Datatable::DATATABLE_ANASTUDY:
+                $elements = '<span class="form-datatable-new"></span>';
+                break;
+            case Datatable::DATATABLE_BATCH:
                 $elements = '<input value="" type="submit"/>';
-		break;
+                break;
+    	    case Datatable::DATATABLE_SAMPLE_BATCH:
+                $elements = '<input value="" type="submit"/>';
+                break;
+        }
+
+        return $elements;
+    }
+
+    protected function isAdminUsers()
+    {
+        switch ($this->_datatable)
+        {
+            case Datatable::DATATABLE_ADMIN:
+                $elements = '<span class="form-download-excel" onclick="excel(6);"></span>';
+                break;
+            case Datatable::DATATABLE_AUDIT_TRAIL:
+                $elements = '<span class="form-download-excel" onclick="excel(7);"></span>';
+                break;
         }
 
         return $elements;

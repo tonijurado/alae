@@ -199,6 +199,11 @@ class User
         return (bool) ($this->getFkProfile()->getName() == "Administrador");
     }
 
+    public function isAdminUsers()
+    {
+        return (bool) ($this->getFkProfile()->getName() == "Administrador Usuarios");
+    }
+
     public function isCron()
     {
 	return (bool) ($this->getFkProfile()->getName() == "Cron");

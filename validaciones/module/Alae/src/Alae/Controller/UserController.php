@@ -143,7 +143,7 @@ class UserController extends BaseController
 		"username" => utf8_encode($user->getUsername()),
 		"email" => utf8_encode($user->getEmail()),
 		"profile" => '<select class="form-datatable-profile" id="form-datatable-profile-' . $user->getPkUser() . '">' . $this->getProfileOptions($user->getFkProfile()->getPkProfile()) . '</select>',
-		"password" => ($user->isAdministrador() || $user->isDirectorEstudio()) ? '<button class="btn" type="button" onclick="sentpassword(' . $user->getPkUser() . ');"><span class="btn-mail"></span>enviar contraseña</button>' : '',
+		"password" => ($user->isAdminUsers() || $user->isDirectorEstudio()) ? '<button class="btn" type="button" onclick="sentpassword(' . $user->getPkUser() . ');"><span class="btn-mail"></span>enviar contraseña</button>' : '',
 		"status" => $user->getActiveFlag() ? "S" : "N",
 		"edit" => $user->getActiveFlag() ? '<span class="form-datatable-save" onclick="javascript:changeProfile(' . $user->getPkUser() . ');"></span><span class="form-datatable-reject" onclick="reject(' . $user->getPkUser() . ');"></span>': '<span class="form-datatable-approve" onclick="approve(' . $user->getPkUser() . ')"></span>'
 	    );

@@ -12,7 +12,6 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class User
 {
-
     const USER_INACTIVE_FLAG = 0;
     const USER_ACTIVE_FLAG = 1;
 
@@ -199,9 +198,13 @@ class User
         return (bool) ($this->getFkProfile()->getName() == "Administrador");
     }
 
+    public function isAdminUsers()
+    {
+        return (bool) ($this->getFkProfile()->getName() == "Administrador Usuarios");
+    }
+
     public function isCron()
     {
 	return (bool) ($this->getFkProfile()->getName() == "Cron");
     }
-
 }
