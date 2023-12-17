@@ -590,7 +590,6 @@ class VerificationController extends BaseController
                                             s.sampleName LIKE 'REC%' OR 
                                             s.sampleName LIKE 'FM%' OR 
                                             s.sampleName LIKE 'EGC%' OR
-                                            s.sampleName LIKE 'ES%' OR
                                             s.sampleName LIKE 'QC%' OR
                                             s.sampleName LIKE 'LLQC%' OR
                                             s.sampleName LIKE 'ULQC%' OR
