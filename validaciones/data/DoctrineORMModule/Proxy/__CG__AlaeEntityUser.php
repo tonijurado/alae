@@ -433,6 +433,17 @@ class User extends \Alae\Entity\User implements \Doctrine\ORM\Proxy\Proxy
     /**
      * {@inheritDoc}
      */
+    public function isAdminUsers()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'isAdminUsers', array());
+
+        return parent::isAdminUsers();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function isCron()
     {
 
