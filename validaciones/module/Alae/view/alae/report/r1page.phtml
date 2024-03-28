@@ -438,7 +438,7 @@
                     <strong><?php echo $verification["associated"]; ?></strong>
                 </td>
                 <td align="right" width ="100"  style="color:#000000;border: black 1px solid;font-size:11px;">
-                    <strong><?php echo $verification["value"]; ?></strong>
+                    <strong><?php echo number_format($verification["value"], 2, '.', ''); ?></strong>
                 </td>
             </tr>
         <?php endforeach; ?>
