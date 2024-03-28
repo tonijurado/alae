@@ -18,7 +18,7 @@ $content = ob_get_clean();
 require_once dirname(__FILE__) . "/html2pdf/html2pdf.class.php";
 try
 {
-    $html2pdf = new HTML2PDF('P', array(432, 240), 'en', true, 'UTF-8', array(0, 0, 0, 0));
+    $html2pdf = new HTML2PDF('P', array(432, 240), 'es', true, 'UTF-8', array(0, 0, 0, 0));
     $html2pdf->setDefaultFont('Arial');
     $html2pdf->pdf->SetProtection(array('print'), '', '');
     $html2pdf->writeHTML($content);
