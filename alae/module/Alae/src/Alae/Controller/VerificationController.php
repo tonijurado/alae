@@ -1456,9 +1456,20 @@ $where = "s.sampleName LIKE 'CS" . $i . "' AND s.analyteConcentration <> " . $va
                 ORDER BY s.sampleName DESC")
                 ->setMaxResults(1);
             $analyteConcentration = $query->getSingleScalarResult();
+            
+/* Después de seleccionar la concentración del analito (query superior), ahora saco el factor de dilución (query abajo)*/
+
+            $queryFactorDilucion = $this->getEntityManager()->createQuery("
+            SELECT s.dilutionFactor
+            FROM Alae\Entity\SampleBatch s
+            WHERE s.sampleName LIKE 'CS%' AND s.fkBatch = " . $Batch->getPkBatch() . "
+            ORDER BY s.sampleName DESC")
+            ->setMaxResults(1);
+            $dilutionFactor = $queryFactorDilucion->getSingleScalarResult();
+
 
             $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V21"));
-            $where = "s.sampleType = 'Unknown' AND s.calculatedConcentration > $analyteConcentration AND s.fkBatch = " . $Batch->getPkBatch();
+            $where = "s.sampleType = 'Unknown' AND s.calculatedConcentration > (" . $analyteConcentration / $dilutionFactor . ") AND s.fkBatch = " . $Batch->getPkBatch();
             $this->error($where, $parameters[0], array(), false);
         }
     }
