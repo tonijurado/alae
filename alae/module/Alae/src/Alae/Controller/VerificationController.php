@@ -1443,6 +1443,7 @@ $where = "s.sampleName LIKE 'CS" . $i . "' AND s.analyteConcentration <> " . $va
 
     /**
      * V21: Conc. (unknown) > ULOQ ( E ) - CONC. SUPERIOR AL ULOQ
+     * ULOQ: Es el VALOR del CS más alto
      * @param \Alae\Entity\Batch $Batch
      */
     protected function V21(\Alae\Entity\Batch $Batch)
@@ -1450,7 +1451,7 @@ $where = "s.sampleName LIKE 'CS" . $i . "' AND s.analyteConcentration <> " . $va
         if($Batch->getCsTotal() != 0)
         {
             $query = $this->getEntityManager()->createQuery("
-                SELECT s.analyteConcentration
+                SELECT s.calculatedConcentration
                 FROM Alae\Entity\SampleBatch s
                 WHERE s.sampleName LIKE 'CS%' AND s.fkBatch = " . $Batch->getPkBatch() . "
                 ORDER BY s.sampleName DESC")
@@ -1469,7 +1470,7 @@ $where = "s.sampleName LIKE 'CS" . $i . "' AND s.analyteConcentration <> " . $va
 
 
             $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V21"));
-            $where = "s.sampleType = 'Unknown' AND s.calculatedConcentration < (" . $analyteConcentration / $dilutionFactor . ") AND s.fkBatch = " . $Batch->getPkBatch();
+            $where = "s.sampleType = 'Unknown' AND " . $analyteConcentration . " < ( s.calculatedConcentration / " . $dilutionFactor . ") AND s.fkBatch = " . $Batch->getPkBatch();
             $this->error($where, $parameters[0], array(), false);
         }
     }
