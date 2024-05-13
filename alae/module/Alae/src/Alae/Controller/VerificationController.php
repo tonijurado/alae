@@ -1469,7 +1469,7 @@ $where = "s.sampleName LIKE 'CS" . $i . "' AND s.analyteConcentration <> " . $va
 
 
             $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V21"));
-            $where = "s.sampleType = 'Unknown' AND s.calculatedConcentration > (" . $analyteConcentration / $dilutionFactor . ") AND s.fkBatch = " . $Batch->getPkBatch();
+            $where = "s.sampleType = 'Unknown' AND s.calculatedConcentration < (" . $analyteConcentration / $dilutionFactor . ") AND s.fkBatch = " . $Batch->getPkBatch();
             $this->error($where, $parameters[0], array(), false);
         }
     }
