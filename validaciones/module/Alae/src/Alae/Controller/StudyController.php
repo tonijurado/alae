@@ -1034,10 +1034,14 @@ class StudyController extends BaseController
                                 $value = $qc_values[$last - 1];
                             }
 
+                            if($sample->getAssociated() == 'HDQC')
+                            {
+                                $value = $AnaStudy->getHdqcValues();
+                            }
+
                             if($sample->getAssociated() == 'LLQC')
                             {
                                 $value = $AnaStudy->getLlqcValues();
-                               
                             }
                             $studyVerification->setValue($value);
                             $studyVerification->setFkAnalyteStudy($AnaStudy);
