@@ -281,6 +281,7 @@ class VerificationController extends BaseController
             {
                 $function = 'V' . $i;
                 $this->$function($Batch);
+                //die();
             }
         }
 
@@ -1450,16 +1451,17 @@ $where = "s.sampleName LIKE 'CS" . $i . "' AND s.analyteConcentration <> " . $va
     {
         if($Batch->getCsTotal() != 0)
         {
+    /*
             $query = $this->getEntityManager()->createQuery("
-                SELECT s.calculatedConcentration
+                SELECT s.analyteConcentration
                 FROM Alae\Entity\SampleBatch s
                 WHERE s.sampleName LIKE 'CS%' AND s.fkBatch = " . $Batch->getPkBatch() . "
                 ORDER BY s.sampleName DESC")
                 ->setMaxResults(1);
             $analyteConcentration = $query->getSingleScalarResult();
-            
+    */        
 /* Después de seleccionar la concentración del analito (query superior), ahora saco el factor de dilución (query abajo)*/
-
+    /*
             $queryFactorDilucion = $this->getEntityManager()->createQuery("
             SELECT s.dilutionFactor
             FROM Alae\Entity\SampleBatch s
@@ -1467,10 +1469,21 @@ $where = "s.sampleName LIKE 'CS" . $i . "' AND s.analyteConcentration <> " . $va
             ORDER BY s.sampleName DESC")
             ->setMaxResults(1);
             $dilutionFactor = $queryFactorDilucion->getSingleScalarResult();
+    */
 
+/*------------------- OBTENEMOS ULQC que es el valor último de los CS */
 
+            $elements = $this->getRepository("\\Alae\\Entity\\AnalyteStudy")->findBy(array("fkStudy" => $Batch->getFkStudy(), "fkAnalyte" => $Batch->getFkAnalyte()));
+            foreach ($elements as $AnaStudy)
+            {
+                $cs_values = explode(",", $AnaStudy->getCsValues()); // explode pasa el string a array
+                $ULQC = end($cs_values); // end obtiene el último valor del array
+            }             
+ /*------------------*/           
+            
             $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V21"));
-            $where = "s.sampleType = 'Unknown' AND " . $analyteConcentration . " < ( s.calculatedConcentration / " . $dilutionFactor . ") AND s.fkBatch = " . $Batch->getPkBatch();
+            //$where = "s.sampleType = 'Unknown' AND " . $ULQC . " < ( s.calculatedConcentration / s.dilutionFactor ) AND s.fkBatch = " . $Batch->getPkBatch();
+            $where = "s.sampleType = 'Unknown' AND (s.calculatedConcentration / s.dilutionFactor) > " . $ULQC . " AND s.fkBatch = " . $Batch->getPkBatch(); 
             $this->error($where, $parameters[0], array(), false);
         }
     }
