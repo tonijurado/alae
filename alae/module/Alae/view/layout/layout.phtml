@@ -25,11 +25,16 @@
 
 	<?php
 	echo $this->headScript()
-		->prependFile($this->basePath() . '/js/script.js')
-		->prependFile($this->basePath() . '/js/additional-methods.min.js')
-		->prependFile($this->basePath() . '/js/jquery.validate.min.js')
-		->prependFile($this->basePath() . '/js/jquery.js')
-		->prependFile($this->basePath() . '/js/yui.min.js')
+    ->prependFile($this->basePath() . '/js/script.js')
+    ->prependFile($this->basePath() . '/js/additional-methods.min.js')
+    ->prependFile($this->basePath() . '/js/jquery.validate.min.js')
+    ->prependFile($this->basePath() . '/js/jquery.js')
+    ->prependFile($this->basePath() . '/js/yui.min.js')
+    ->prependFile($this->basePath() . '/js/jquery-1.10.2.min.js')
+    ->prependFile($this->basePath() . '/js/jquery.form.min.js')
+    ->prependFile($this->basePath() . '/js/jquery-ui.js')
+    ->prependFile($this->basePath() . '/js/bootstrap-select.min.js')
+    ->prependFile($this->basePath() . '/js/bootstrap.min.js')
 		//->prependFile($this->basePath() . '/public/css/style.css');
 	?>
 	<script>
@@ -39,14 +44,14 @@
         <script src="/alae/alae/public/js/bootstrap.min.js"></script> 
 
         <script src="/alae/alae/public/js/bootstrap-select.min.js"></script>
-        <script src="/alae/validaciones/public/js/yui-min.js"></script>
+        <!--<script src="/alae/alae/public/js/yui-min.js"></script>
 
-        <script src="/alae/validaciones/public/js/jquery-1.10.2.min.js"></script>
+        <script src="/alae/alae/public/js/jquery-1.10.2.min.js"></script>-->
 
-        <script src="/alae/validaciones/public/js/jquery.validate.js"></script>
-        <script src="/alae/validaciones/public/js/jquery-ui.js"></script>
-        <script src="/alae/validaciones/public/js/jquery.form.js"></script>
-        <script src="/alae/validaciones/public/js/jquery.form.min.js"></script>
+        <script src="/alae/alae/public/js/jquery.validate.min.js"></script>
+        <script src="/alae/alae/public/js/jquery-ui.js"></script>
+        <script src="/alae/alae/public/js/jquery.form.js"></script>
+        <script src="/alae/alae/public/js/jquery.form.min.js"></script>
 
 
         <!--<script src="http://yui.yahooapis.com/3.14.0/build/yui/yui-min.js"></script>
