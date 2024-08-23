@@ -318,7 +318,7 @@ class VerificationController extends BaseController
      */
     protected function V13_23(\Alae\Entity\Batch $Batch)
     {
-        for ($i = 13; $i <= 23; $i++) //Cambio el segundo $i de 20 a 23 para que llegue hasta el final de las verificaciones.
+        for ($i = 13; $i <= 19; $i++) //Validamos hasta 19 ya que v20 debe hacerse DESPUES del resto de verificaciones
         {
             $function = 'V' . $i;
             $this->$function($Batch);
@@ -333,6 +333,10 @@ class VerificationController extends BaseController
                 $function = 'V' . $i;
                 $this->$function($Batch);
             }
+            // 23/08/2024. Ahora ejecutamos v20 que debe ejecutarse después del resto de verificaciones. 
+                $function = 'V20';
+                $this->$function($Batch);
+
         }
 
         $AnaStudy = $this->getRepository("\\Alae\\Entity\\AnalyteStudy")->findBy(array(
