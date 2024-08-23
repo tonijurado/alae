@@ -260,7 +260,7 @@ class VerificationController extends BaseController
     protected function V13_25(\Alae\Entity\Batch $Batch)
     {
         
-        for ($i = 13; $i <= 20; $i++)
+        for ($i = 13; $i <= 19; $i++)
         {
             $function = 'V' . $i;
             $this->$function($Batch);
@@ -284,6 +284,10 @@ class VerificationController extends BaseController
                 //die();
             }
         }
+        // 23/08/2024 ejecutamos V20 después de V23 y v26 para que controle los ZS
+        
+        $function = 'V20';
+        $this->$function($Batch);
 
         $AnaStudy = $this->getRepository("\\Alae\\Entity\\AnalyteStudy")->findBy(array(
             "fkAnalyte" => $Batch->getFkAnalyte(),
@@ -1432,6 +1436,7 @@ $where = "s.sampleName LIKE 'CS" . $i . "' AND s.analyteConcentration <> " . $va
 		else {
 			$value				= 0;
 		}
+
         $parameters        = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V20.2"));
         if ($value < $parameters[0]->getMinValue())
         {
@@ -1440,6 +1445,8 @@ $where = "s.sampleName LIKE 'CS" . $i . "' AND s.analyteConcentration <> " . $va
             $this->errorCurve($where, $parameters[0], $Batch->getPkBatch());
             //$this->curve($Batch->getPkBatch());
         }
+       /* echo 'Final de v20' . $value . ' - ' . $zs_total . ' -- ' . $zs_accepted_total;
+        die(); */
     }
 
     /**
@@ -1546,7 +1553,7 @@ $where = "s.sampleName LIKE 'CS" . $i . "' AND s.analyteConcentration <> " . $va
         $where = "s.sampleName LIKE '%QC%' AND s.sampleType = 'Quality Control' AND s.isPeakArea < $value AND s.useRecord = 1 AND s.fkBatch = " . $Batch->getPkBatch();
         //$this->error($where, $parameters1[0], array(), false);
         $this->errorCurve($where, $parameters1[0], $Batch->getPkBatch(), array(), false);
-
+        //echo 'Fin de V23' ; die();
     }
 
     protected function V24(\Alae\Entity\Batch $Batch)
