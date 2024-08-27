@@ -289,6 +289,8 @@ class VerificationController extends BaseController
         $function = 'V20';
         $this->$function($Batch);
 
+        $continue = $this->evaluation($Batch);
+
         $AnaStudy = $this->getRepository("\\Alae\\Entity\\AnalyteStudy")->findBy(array(
             "fkAnalyte" => $Batch->getFkAnalyte(),
             "fkStudy" => $Batch->getFkStudy()
