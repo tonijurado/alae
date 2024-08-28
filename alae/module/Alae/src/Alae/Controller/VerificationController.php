@@ -512,7 +512,7 @@ $where = "s.sampleName LIKE 'CS" . $i . "%' AND s.analyteConcentration <> " . $v
 por esta otra quitando el % del primer LIKE 'CS" . $i . "%' AND .... 
 $where = "s.sampleName LIKE 'CS" . $i . "' AND s.analyteConcentration <> " . $value . " AND s.fkBatch = " . $Batch->getPkBatch();
 */
-                    $where = "s.sampleName LIKE 'CS" . $i . "' AND s.analyteConcentration <> " . $value . " AND s.fkBatch = " . $Batch->getPkBatch();
+                    $where = "s.sampleName LIKE 'CS" . $i . "%' AND s.analyteConcentration <> " . $value . " AND s.fkBatch = " . $Batch->getPkBatch();
                     $fkParameter = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V5"));
                     //$this->error($where, $fkParameter[0]);
                     $this->errorCurve($where, $fkParameter[0], $Batch->getPkBatch());
