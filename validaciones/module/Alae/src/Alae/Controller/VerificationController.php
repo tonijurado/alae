@@ -135,12 +135,12 @@ class VerificationController extends BaseController
                 (((s.sampleName LIKE 'CS1%' AND s.sampleName NOT LIKE 'CS10%' AND s.sampleName NOT LIKE 'CS11%' AND s.sampleName NOT LIKE 'CS12%' AND s.sampleName NOT LIKE 'CS13%' AND s.sampleName NOT LIKE 'CS14%' AND s.sampleName NOT LIKE 'CS15%' ) OR s.sampleName LIKE 'LLOQ%' OR s.sampleName LIKE 'LLQC%') AND s.accuracy NOT BETWEEN " . $min1  . " AND " . $max1 . " AND s.useRecord = 1)
                                 OR ((s.sampleName NOT LIKE 'CS1%' AND s.sampleName LIKE 'CS10%' AND s.sampleName LIKE 'CS11%' AND s.sampleName LIKE 'CS12%' AND s.sampleName LIKE 'CS13%' AND s.sampleName LIKE 'CS14%' AND s.sampleName LIKE 'CS15%') AND s.sampleType LIKE 'Standard' AND s.accuracy NOT BETWEEN " . $min2 . " AND " . $max2 . " AND s.useRecord = 1)
                                 OR (s.sampleType LIKE 'Quality Control' AND s.sampleName NOT LIKE 'LLOQ%' AND s.sampleName NOT LIKE 'LLQC%' AND s.sampleName NOT LIKE 'TZ%' AND s.accuracy NOT BETWEEN " . $min3 . " AND " . $max3 . " AND s.useRecord = 1)
-                                OR (s.sampleName LIKE 'TZ%' AND s.accuracy NOT BETWEEN " . $min4 . " AND " . $max4 . " AND s.useRecord = 1)
+                OR (s.sampleName LIKE 'TZ%' AND s.accuracy NOT BETWEEN " . $min4 . " AND " . $max4 . " AND s.useRecord = 1)
 
                                 OR (((s.sampleName LIKE 'CS1%' AND s.sampleName NOT LIKE 'CS10%' AND s.sampleName NOT LIKE 'CS11%' AND s.sampleName NOT LIKE 'CS12%' AND s.sampleName NOT LIKE 'CS13%' AND s.sampleName NOT LIKE 'CS14%' AND s.sampleName NOT LIKE 'CS15%' ) OR s.sampleName LIKE 'LLOQ%' OR s.sampleName LIKE 'LLQC%') AND s.accuracy BETWEEN " . $min1  . " AND " . $max1 . " AND s.useRecord = 0)
-                                OR ((s.sampleName NOT LIKE 'CS1%' AND s.sampleName LIKE 'CS10%' AND s.sampleName LIKE 'CS11%' AND s.sampleName LIKE 'CS12%' AND s.sampleName LIKE 'CS13%' AND s.sampleName LIKE 'CS14%' AND s.sampleName LIKE 'CS15%' ) AND s.sampleType LIKE 'Standard' AND s.accuracy BETWEEN " . $min2 . " AND " . $max2 . " AND s.useRecord = 0)
+                OR ((s.sampleName NOT LIKE 'CS1%' AND s.sampleName LIKE 'CS10%' AND s.sampleName LIKE 'CS11%' AND s.sampleName LIKE 'CS12%' AND s.sampleName LIKE 'CS13%' AND s.sampleName LIKE 'CS14%' AND s.sampleName LIKE 'CS15%' ) AND s.sampleType LIKE 'Standard' AND s.accuracy BETWEEN " . $min2 . " AND " . $max2 . " AND s.useRecord = 0)
                                 OR (s.sampleType LIKE 'Quality Control' AND s.sampleName NOT LIKE 'LLOQ%' AND s.sampleName NOT LIKE 'LLQC%' AND s.sampleName NOT LIKE 'TZ%' AND s.accuracy BETWEEN " . $min3 . " AND " . $max3 . " AND s.useRecord = 0)
-                                OR (s.sampleName LIKE 'TZ%' AND s.accuracy BETWEEN " . $min4 . " AND " . $max4 . " AND s.useRecord = 0)
+                OR (s.sampleName LIKE 'TZ%' AND s.accuracy BETWEEN " . $min4 . " AND " . $max4 . " AND s.useRecord = 0)
             )");
         //$query->setParameter('regexp1', '^CS[0-9]+(-[0-9]+)?$');
         //$query->setParameter('regexp2', '^QC[0-9]+(-[0-9]+)?$');
@@ -324,9 +324,13 @@ class VerificationController extends BaseController
             $this->$function($Batch);
         }
         
-        $continue = $this->evaluation($Batch);
+        //01/09/2024 - Toni - Quito las 2 instrucciones siguientes porque V21-V23 y V20 se han de ejecutar siempre
+        //excepto si el lote se ha rechazado con el menú desplegable que aparece al evaluar el lote.
+        //$continue = $this->evaluation($Batch);
+        //if ($continue && is_null($Batch->getFkParameter()))
         
-        if ($continue && is_null($Batch->getFkParameter()))
+        // Toni: 01/09/2024 - Comprueba que no se ha rechazado el lote en el menú desplegable
+        if (is_null($Batch->getFkParameter())) 
         {
             for ($i = 21; $i <= 23; $i++)
             {
