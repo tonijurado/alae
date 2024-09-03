@@ -1377,7 +1377,7 @@ $where = "s.sampleName LIKE 'CS" . $i . "' AND s.analyteConcentration <> " . $va
 
             if ($value < $parameters[0]->getMinValue())
             {
-                $where = "s.sampleName LIKE '" . $qc['sample_name'] . "%' AND s.sampleName NOT LIKE '%R%' AND s.fkBatch = " . $Batch->getPkBatch();
+                $where = "s.sampleName LIKE '" . $qc['sample_name'] . "%' AND s.sampleName NOT LIKE '%*%' AND s.fkBatch = " . $Batch->getPkBatch();
                 $this->error($where, $parameters[0]);
             }
         }
