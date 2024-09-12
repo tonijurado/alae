@@ -1062,10 +1062,32 @@ class VerificationController extends BaseController
         $where      = "(REGEXP(s.sampleName, :regexp) = 1) AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.fkBatch = " . $Batch->getPkBatch();
         //$this->error($where, $parameters[0], array('regexp' => '^QC[0-9]+(-[0-9]+)?$'), false);
         $this->error($where, $parameters[0], array('regexp' => '^QC[0-9]+(-[0-9]+(R[0-9]+)?)?$'), false);*/
+        /*
+            12/09/2024 - A la 10.3 y 10.3.1 hemos agregado varias condiciones de sampleName LIKE 'xx%' debido a que en caso de que la muestra haya sido identificada previamente
+            en la V5 como SampleTypeError, no debería evaluarse aquí. La duda sale porque tenemos una muestra en los test llamada SCA3_BC-4-1 que tiene SampleType = 'Quality Control'
+            Esta muestra SALTA como V5 porque NO PUEDE SER de tipo QC y es OK. Pero el tema es que al llegar a la 10.3 antes solamente evaluavamos que fuera sampleType=QC y que el 
+            nombre NO fuera LDQC%, HDQC%, LL_LLOQ%, LLQC%, TZ% o PID% (que son las restricciones de la 10.1). Claro, al ser una muestra SCA3_BC% TAMBIEN se identificaba como 
+            10.3 y Elba comenta que si ya ha saltado la V5 no debería saltar la V10.3 
+        */
 
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.3"));
-        $where      = "(s.sampleType = 'Quality Control' AND 
-                        (s.sampleName NOT LIKE 'LL_LLOQ%' AND s.sampleName NOT LIKE 'LLQC' AND s.sampleName NOT LIKE 'TZ%' AND s.sampleName NOT LIKE 'PID%'))
+        $where      = "(s.sampleType = 'Quality Control' AND (s.sampleName LIKE 'QC%' OR
+                                                  s.sampleName LIKE 'LLQC%' OR
+                                                  s.sampleName LIKE 'ULQC%' OR
+                                                  s.sampleName LIKE 'LDQC%' OR
+                                                  s.sampleName LIKE 'HDQC%' OR
+                                                  s.sampleName LIKE 'PID%' OR
+                                                  s.sampleName LIKE 'AS%' OR
+                                                  s.sampleName LIKE 'LL_LLOQ%' OR
+                                                  s.sampleName LIKE 'TZ%' OR
+                                                  s.sampleName LIKE 'ME%' OR
+                                                  s.sampleName LIKE 'FT%' OR
+                                                  s.sampleName LIKE 'ST%' OR
+                                                  s.sampleName LIKE 'LT%' OR
+                                                  s.sampleName LIKE 'PP%' OR
+                                                  s.sampleName LIKE 'SLP%'
+                                                  ) AND 
+                        (s.sampleName NOT LIKE 'LDQC%' AND s.sampleName NOT LIKE 'HDQC%' AND s.sampleName NOT LIKE 'LL_LLOQ%' AND s.sampleName NOT LIKE 'LLQC%' AND s.sampleName NOT LIKE 'TZ%' AND s.sampleName NOT LIKE 'PID%'))
                         AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.fkBatch = " . $Batch->getPkBatch();
         //$this->error($where, $parameters[0], array('regexp' => '^QC[0-9]+(-[0-9]+)?$'), false);
         $this->error($where, $parameters[0], array(), false);
@@ -1073,8 +1095,23 @@ class VerificationController extends BaseController
         //REPITO la consulta anterior pero ahora Verificamos el USE RECORD de las muestras que no cumple accuracy de V10.3
         //Si ese USE RECORD = 1, se debe identificar la muestra como error y se anula lote gracias al parámetro de la tblParameters 
             $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V10.3.1"));
-            $where      = "(s.sampleType = 'Quality Control' AND 
-                            (s.sampleName NOT LIKE 'LL_LLOQ%' AND s.sampleName NOT LIKE 'LLQC' AND s.sampleName NOT LIKE 'TZ%'  AND s.sampleName NOT LIKE 'PID%'))
+            $where      = "(s.sampleType = 'Quality Control' AND (s.sampleName LIKE 'QC%' OR
+                                                  s.sampleName LIKE 'LLQC%' OR
+                                                  s.sampleName LIKE 'ULQC%' OR
+                                                  s.sampleName LIKE 'LDQC%' OR
+                                                  s.sampleName LIKE 'HDQC%' OR
+                                                  s.sampleName LIKE 'PID%' OR
+                                                  s.sampleName LIKE 'AS%' OR
+                                                  s.sampleName LIKE 'LL_LLOQ%' OR
+                                                  s.sampleName LIKE 'TZ%' OR
+                                                  s.sampleName LIKE 'ME%' OR
+                                                  s.sampleName LIKE 'FT%' OR
+                                                  s.sampleName LIKE 'ST%' OR
+                                                  s.sampleName LIKE 'LT%' OR
+                                                  s.sampleName LIKE 'PP%' OR
+                                                  s.sampleName LIKE 'SLP%'
+                                                  ) AND
+                            (s.sampleName NOT LIKE 'LDQC%' AND s.sampleName NOT LIKE 'HDQC%' AND s.sampleName NOT LIKE 'LL_LLOQ%' AND s.sampleName NOT LIKE 'LLQC%' AND s.sampleName NOT LIKE 'TZ%'  AND s.sampleName NOT LIKE 'PID%'))
                             AND s.accuracy NOT BETWEEN " . $parameters[0]->getMinValue() . " AND " . $parameters[0]->getMaxValue() . " AND s.useRecord = 1 AND s.fkBatch = " . $Batch->getPkBatch();
             //$this->error($where, $parameters[0], array('regexp' => '^QC[0-9]+(-[0-9]+)?$'), false);
             //$this->error($where, $parameters[0], array(), false);
