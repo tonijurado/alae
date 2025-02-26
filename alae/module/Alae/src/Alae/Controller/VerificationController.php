@@ -1128,36 +1128,67 @@ $where = "s.sampleName LIKE 'CS" . $i . "' AND s.analyteConcentration <> " . $va
      */
     protected function V13(\Alae\Entity\Batch $Batch)
     {
+        /*
+            Comenzaremos verificando si tenemos que trabajar con los CS1 o los CS2. Para esto, contamos primero cuantos CS1
+            son válidos, si el valor es >0 entonces usamos los CS1 si no, repetimos la operación con los CS2. En caso de que
+            los CS1 y CS2 no sean válidos, no continuamos con la V13 porque será lote rechazado por CSs consecutivos
+        */
+
+        //Recuentos de CS1 válidos
         $query = $this->getEntityManager()->createQuery("
             SELECT COUNT(s.pkSampleBatch)
             FROM Alae\Entity\SampleBatch s
-            WHERE s.sampleName LIKE 'CS1%' AND s.useRecord = 0 AND s.fkBatch = " . $Batch->getPkBatch());
-        $counter = $query->getSingleScalarResult();
+            WHERE s.sampleName LIKE 'CS1-%' AND s.useRecord = 1 AND s.fkBatch = " . $Batch->getPkBatch());
+        $counterCS1 = $query->getSingleScalarResult();
+        //Recuentos de CS2 válidos
+        $query = $this->getEntityManager()->createQuery("
+            SELECT COUNT(s.pkSampleBatch)
+            FROM Alae\Entity\SampleBatch s
+            WHERE s.sampleName LIKE 'CS2-%' AND s.useRecord = 1 AND s.fkBatch = " . $Batch->getPkBatch());
+        $counterCS2 = $query->getSingleScalarResult();
+
+        //Evaluamos si usamos como parámetro del promedio los CS1 o CS2
+
+            if ( $counterCS1 + 0 > 0) 
+            {
+                $usaCS = "CS1-%";
+            }
+            elseif ( $counterCS2 + 0 > 0)
+            {
+                $usaCS = "CS2-%";
+            }
+            else 
+            { 
+                $usaCS = "CS1-99";
+            }
+            // Fin de la evaluación para ver que CS se escoge
 
         $i = ($counter == 2) ? 2 : 1;
         $query = $this->getEntityManager()->createQuery("
             SELECT AVG(s.analytePeakArea) as analyte_peak_area, AVG(s.isPeakArea) as is_peak_area
             FROM Alae\Entity\SampleBatch s
-            WHERE s.sampleName like 'CS" . $i . "%' AND s.validFlag = 1 AND s.fkBatch = " . $Batch->getPkBatch());
+            WHERE s.sampleName LIKE '". $usaCS . "' AND s.useRecord = 1 AND s.validFlag = 1 AND s.fkBatch = " . $Batch->getPkBatch());
         $elements = $query->getResult();
 
         $analytePeakArea = $isPeakArea      = 0;
         foreach ($elements as $temp)
         {
-            $analytePeakArea = $temp["analyte_peak_area"];
-            $isPeakArea      = $temp["is_peak_area"];
+            $analytePeakArea = $temp["analyte_peak_area"]+0;
+            $isPeakArea      = $temp["is_peak_area"]+0;
         }
 
+        echo 'Dato: ' . $analytePeakArea ; //die();
+
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V13.2"));
-        $where      = "s.sampleName LIKE 'BLK%' AND s.analytePeakArea > " . ($analytePeakArea * ($parameters[0]->getMinValue() / 100)) . " AND s.fkBatch = " . $Batch->getPkBatch();
+        $where      = "s.sampleName LIKE 'BLK%' AND s.analytePeakArea >= " . ($analytePeakArea * ($parameters[0]->getMinValue() / 100)) . " AND s.fkBatch = " . $Batch->getPkBatch();
         $this->error($where, $parameters[0], array(), false);
 
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V13.3"));
-        $where      = "s.sampleName LIKE 'BLK%' AND s.isPeakArea > " . ($isPeakArea * ($parameters[0]->getMinValue() / 100)) . " AND s.fkBatch = " . $Batch->getPkBatch();
+        $where      = "s.sampleName LIKE 'BLK%' AND s.isPeakArea >= " . ($isPeakArea * ($parameters[0]->getMinValue() / 100)) . " AND s.fkBatch = " . $Batch->getPkBatch();
         $this->error($where, $parameters[0], array(), false);
 
         $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V13.4"));
-        $where      = "s.sampleName LIKE 'ZS%' AND s.analytePeakArea > " . ($analytePeakArea * ($parameters[0]->getMinValue() / 100)) . " AND s.fkBatch = " . $Batch->getPkBatch();
+        $where      = "s.sampleName LIKE 'ZS%' AND s.sampleName NOT LIKE 'ZS_NT%' AND s.sampleName NOT LIKE 'ZS_BC%' AND s.analytePeakArea >= " . ($analytePeakArea * ($parameters[0]->getMinValue() / 100)) . " AND s.fkBatch = " . $Batch->getPkBatch();
         $this->error($where, $parameters[0], array(), false);
     }
 
