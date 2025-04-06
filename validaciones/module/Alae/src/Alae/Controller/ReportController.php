@@ -1686,10 +1686,12 @@ class ReportController extends BaseController
 
                     //AND ((p.pkParameter BETWEEN 1 AND 8) OR (p.pkParameter BETWEEN 23 AND 29))
                     //GENERA LOS ERRORES
+                    // el AND (p.status = 1) es para mostrar solo los errores que dan MOTIVO DE RECHAZO del lotes
                     $query  = $this->getEntityManager()->createQuery("
                         SELECT DISTINCT(p.pkParameter) as pkParameter, p.messageError
                         FROM Alae\Entity\Error e, Alae\Entity\SampleBatch s, Alae\Entity\Parameter p
                         WHERE s.pkSampleBatch = e.fkSampleBatch
+                            AND (p.status = 1)
                             AND e.fkParameter = p.pkParameter
                             AND s.fkBatch = " . $Batch->getPkBatch() . "
                         ORDER BY p.pkParameter");
