@@ -1706,6 +1706,7 @@ class ReportController extends BaseController
                         FROM Alae\Entity\Error e, Alae\Entity\SampleBatch s, Alae\Entity\Parameter p
                         WHERE s.pkSampleBatch = e.fkSampleBatch
                             AND e.fkParameter = p.pkParameter
+                            AND (p.status = 1) 
                             AND s.fkBatch = " . $Batch->getPkBatch() . "
                         ORDER BY p.pkParameter");
                     $errors = $query->getResult();
