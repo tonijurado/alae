@@ -1032,33 +1032,91 @@ $where = "s.sampleName LIKE 'CS" . $i . "' AND s.analyteConcentration <> " . $va
      * V11: Revisión del dilution factor en HDQC / LDQC - FACTOR DILUCIÓN ERRÓNEO
      * @param \Alae\Entity\Batch $Batch
      */
-    protected function V11(\Alae\Entity\Batch $Batch)
-    {
-        $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V11"));
-        $query      = $this->getEntityManager()->createQuery("
-            SELECT s.pkSampleBatch, s.sampleName, s.dilutionFactor
-            FROM Alae\Entity\SampleBatch s
-            WHERE s.sampleName LIKE '%DQC%' AND s.fkBatch = " . $Batch->getPkBatch());
-        $elements = $query->getResult();
+protected function V11(\Alae\Entity\Batch $Batch)
+{
+    $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V11"));
+    $parameters1 = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V11.1"));
+    $parameters2 = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V11.2"));
 
-        $pkSampleBatch = array();
-        foreach($elements as $SampleBatch)
+    $query      = $this->getEntityManager()->createQuery("
+        SELECT s.pkSampleBatch, s.sampleName, s.dilutionFactor, s.validFlag, s.sampleType, s.accuracy 
+        FROM Alae\Entity\SampleBatch s
+        WHERE s.sampleName LIKE '%DQC%' AND s.fkBatch = " . $Batch->getPkBatch());
+    $elements = $query->getResult();
+
+    $pkSampleBatch = array();
+
+    /*Nueva*/ $ldqcFactor = null;
+    /*Nueva*/ $ldqcInvalidCount = 0;
+    /*Nueva*/ $ldqcAccuracy = []; // guardará accuracy de las LDQC para calcular promedio
+    /*Nueva*/ $ldqcSamples = [];  // guardará pkSampleBatch de LDQC para invalidarlas si hace falta
+
+
+    foreach($elements as $SampleBatch)
+    {
+        //$factor = preg_replace('/LDQC|HDQC|-\d+/i', '', $SampleBatch['sampleName']);
+        if (preg_match('/(?:LDQC|HDQC)(\d+)/i', $SampleBatch['sampleName'], $matches)) {
+            $factor = (float)$matches[1]; // Captura el número dentro del paréntesis
+        }
+        
+        if((float)$factor <> (float)$SampleBatch['dilutionFactor'])
         {
-            $factor = preg_replace('/LDQC|HDQC|-\d+/i', '', $SampleBatch['sampleName']);
-            if((float)$factor <> (float)$SampleBatch['dilutionFactor'])
-            {
-                $pkSampleBatch[] = $SampleBatch['pkSampleBatch'];
+            $pkSampleBatch[] = $SampleBatch['pkSampleBatch'];
+        }
+
+        /*Nueva*/
+        if (preg_match('/LDQC(\d+)/i', $SampleBatch['sampleName'], $matches)) {
+            $ldqcFactor = (float)$matches[1];
+            $ldqcSamples[] = $SampleBatch['pkSampleBatch'];         /*Nueva*/
+            $ldqcAccuracy[] = (float)$SampleBatch['accuracy'];      /*Nueva*/
+            if ($SampleBatch['validFlag'] == 0) {
+                $ldqcInvalidCount++;
             }
         }
-
-        if(count($pkSampleBatch) > 0)
-        {
-            $ids = implode(",", $pkSampleBatch);
-            $where = "s.pkSampleBatch in ($ids) AND s.fkBatch = " . $Batch->getPkBatch();
-            //$this->error($where, $parameters[0], array(), false);
-            $this->errorCurve($where, $parameters[0], $Batch->getPkBatch(), array(), false);
-        }
     }
+
+    if(count($pkSampleBatch) > 0)
+    {
+        $ids = implode(",", $pkSampleBatch);
+        $where = "s.pkSampleBatch in ($ids) AND s.fkBatch = " . $Batch->getPkBatch();
+        //$this->error($where, $parameters[0], array(), false);
+        $this->errorCurve($where, $parameters[0], $Batch->getPkBatch(), array(), false);
+    }
+
+
+        // Recogemos los valores de los parámetros mínimo y máximo de V11.1
+        $paramMinMax = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V11.1"));
+        $min1 = $paramMinMax[0]->getMinValue();
+        $max1 = $paramMinMax[0]->getMaxValue();
+
+        //Calculamos el promedio del Accuracy del LDQC
+        if ( count($ldqcAccuracy)>0 ) {
+            $avgAccuracy = array_sum( $ldqcAccuracy ) / count ( $ldqcAccuracy );
+        }
+
+
+    /*Nueva*/ 
+    // Si hay al menos 2 LDQC? inválidas → usamos errorCurve sobre Unknown con mismo dilutionFactor
+    // O si el Promedio de las 3 muestras LDQC está fuera de los parámetros de V11. Esto también ejecuta el errorCurve
+     if ( $ldqcInvalidCount >= 2 && $ldqcFactor !== null ) {
+         $where = "s.fkBatch = " . $Batch->getPkBatch() . 
+                  " AND s.sampleType = 'Unknown' " .
+                  " AND s.dilutionFactor = " . $ldqcFactor;
+    // Pasamos false para que además marque validFlag=0
+         $this->errorCurve($where, $parameters1[0], $Batch->getPkBatch(), array(), false);
+    }
+
+    //Comprobamos V11.2 - Que el promedio esté dentro del márgen
+         if ( $avgAccuracy <= $min1 || $avgAccuracy >= $max1 ){
+         $where = "s.fkBatch = " . $Batch->getPkBatch() . 
+                  " AND s.sampleType = 'Unknown' " .
+                  " AND s.dilutionFactor = " . $ldqcFactor;
+    // Pasamos false para que además marque validFlag=0
+         $this->errorCurve($where, $parameters2[0], $Batch->getPkBatch(), array(), false);
+    }
+
+}
+
 
     /**
      * V12: Use record (CS/QC/DQC)
