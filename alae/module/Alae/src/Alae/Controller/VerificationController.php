@@ -1093,6 +1093,11 @@ protected function V11(\Alae\Entity\Batch $Batch)
         if ( count($ldqcAccuracy)>0 ) {
             $avgAccuracy = array_sum( $ldqcAccuracy ) / count ( $ldqcAccuracy );
         }
+        else 
+        {
+            $avgAccuracy = 0;
+        }
+
 
 
     /*Nueva*/ 
@@ -1106,11 +1111,12 @@ protected function V11(\Alae\Entity\Batch $Batch)
          $this->errorCurve($where, $parameters1[0], $Batch->getPkBatch(), array(), false);
     }
 
-    //Comprobamos V11.2 - Que el promedio esté dentro del márgen
-         if ( $avgAccuracy <= $min1 || $avgAccuracy >= $max1 ){
+    //Comprobamos V11.2 - Que el promedio esté dentro del márgen y que el promedio NO SEA cero que indicaría que NO hay LDQC
+
+         if ( ( $avgAccuracy <= $min1 || $avgAccuracy >= $max1 ) && $avgAccuracy != 0 ) {
          $where = "s.fkBatch = " . $Batch->getPkBatch() . 
                   " AND s.sampleType = 'Unknown' " .
-                  " AND s.dilutionFactor = " . $ldqcFactor;
+                  " AND s.dilutionFactor1 = " . $ldqcFactor;
     // Pasamos false para que además marque validFlag=0
          $this->errorCurve($where, $parameters2[0], $Batch->getPkBatch(), array(), false);
     }
