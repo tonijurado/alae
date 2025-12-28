@@ -1034,94 +1034,178 @@ $where = "s.sampleName LIKE 'CS" . $i . "' AND s.analyteConcentration <> " . $va
      */
 protected function V11(\Alae\Entity\Batch $Batch)
 {
-    $parameters = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V11"));
+    // [11/12/2025 - Toni Jurado]
+    // Recuperamos los parámetros de configuración de las reglas V11, V11.1 y V11.2 desde la entidad Parameter.
+    // Estos parámetros contienen la definición de los criterios de aceptación, mensajes de error, etc.
+    $parameters  = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V11"));
     $parameters1 = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V11.1"));
     $parameters2 = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V11.2"));
 
-    $query      = $this->getEntityManager()->createQuery("
+    // [11/12/2025 - Toni Jurado]
+    // Obtenemos todas las muestras de tipo DQC (cuyo nombre contiene 'DQC') correspondientes al batch actual.
+    // De cada registro de SampleBatch seleccionamos:
+    //  - pkSampleBatch: identificador de la muestra dentro del batch
+    //  - sampleName: nombre de la muestra (donde vienen LDQC/HDQC y el posible factor codificado)
+    //  - dilutionFactor: factor de dilución registrado en base de datos
+    //  - validFlag: indicador de validez (0=inválida, 1=válida)
+    //  - sampleType: tipo de muestra (Unknown, QC, etc.)
+    //  - accuracy: valor de exactitud que se utilizará para calcular promedios
+    $query = $this->getEntityManager()->createQuery("
         SELECT s.pkSampleBatch, s.sampleName, s.dilutionFactor, s.validFlag, s.sampleType, s.accuracy 
         FROM Alae\Entity\SampleBatch s
-        WHERE s.sampleName LIKE '%DQC%' AND s.fkBatch = " . $Batch->getPkBatch());
+        WHERE s.sampleName LIKE '%DQC%' AND s.fkBatch = " . $Batch->getPkBatch()
+    );
     $elements = $query->getResult();
 
-    $pkSampleBatch = array();
+    // [11/12/2025 - Toni Jurado]
+    // Si no hay elementos DQC, no tiene sentido seguir evaluando la regla V11, por lo que salimos de la función.
+    if (count($elements) === 0) {
+        return;
+    }
 
-    /*Nueva*/ $ldqcFactor = null;
-    /*Nueva*/ $ldqcInvalidCount = 0;
-    /*Nueva*/ $ldqcAccuracy = []; // guardará accuracy de las LDQC para calcular promedio
-    /*Nueva*/ $ldqcSamples = [];  // guardará pkSampleBatch de LDQC para invalidarlas si hace falta
+    // [11/12/2025 - Toni Jurado]
+    // Agrupamos todas las muestras DQC obtenidas por su valor de dilutionFactor.
+    // El objetivo es que TODA la lógica de V11, V11.1 y V11.2 se aplique de forma independiente
+    // para cada grupo de dilutionFactor distinto.
+    $groupsByDilution = array();
+    foreach ($elements as $SampleBatch) {
+        // Normalizamos la clave de agrupación a string para evitar problemas de índices numéricos flotantes.
+        $dilutionKey = (string)(float)$SampleBatch['dilutionFactor'];
 
-
-    foreach($elements as $SampleBatch)
-    {
-        //$factor = preg_replace('/LDQC|HDQC|-\d+/i', '', $SampleBatch['sampleName']);
-        if (preg_match('/(?:LDQC|HDQC)(\d+)/i', $SampleBatch['sampleName'], $matches)) {
-            $factor = (float)$matches[1]; // Captura el número dentro del paréntesis
+        if (!isset($groupsByDilution[$dilutionKey])) {
+            $groupsByDilution[$dilutionKey] = array();
         }
-        
-        if((float)$factor <> (float)$SampleBatch['dilutionFactor'])
-        {
-            $pkSampleBatch[] = $SampleBatch['pkSampleBatch'];
-        }
 
-        /*Nueva*/
-        if (preg_match('/LDQC(\d+)/i', $SampleBatch['sampleName'], $matches)) {
-            $ldqcFactor = (float)$matches[1];
-            $ldqcSamples[] = $SampleBatch['pkSampleBatch'];         /*Nueva*/
-            $ldqcAccuracy[] = (float)$SampleBatch['accuracy'];      /*Nueva*/
-            if ($SampleBatch['validFlag'] == 0) {
-                $ldqcInvalidCount++;
+        $groupsByDilution[$dilutionKey][] = $SampleBatch;
+    }
+
+    // [11/12/2025 - Toni Jurado]
+    // Obtenemos los valores mínimo y máximo configurados para V11.1 (se utilizan también en V11.2)
+    // para poder evaluar si el promedio de accuracy de las LDQC se encuentra dentro del margen permitido.
+    $paramMinMax = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V11.1"));
+    $min1        = $paramMinMax[0]->getMinValue();
+    $max1        = $paramMinMax[0]->getMaxValue();
+
+    // [11/12/2025 - Toni Jurado]
+    // Recorremos cada grupo de muestras DQC agrupadas por dilutionFactor.
+    // Para cada dilutionFactor:
+    //  - comprobamos la coherencia entre el nombre de la QC (LDQC/HDQC + número) y el dilutionFactor (regla V11).
+    //  - contamos el número de LDQC inválidas en ese grupo (regla V11.1).
+    //  - calculamos el promedio de accuracy de las LDQC de ese grupo (regla V11.2).
+    foreach ($groupsByDilution as $dilutionKey => $groupSamples) {
+
+        // [11/12/2025 - Toni Jurado]
+        // Array para almacenar los identificadores de las muestras DQC de este grupo
+        // cuyo factor derivado del nombre no coincide con el dilutionFactor de la tabla (candidatas a error V11).
+        $pkSampleBatchMismatch = array();
+
+        // [11/12/2025 - Toni Jurado]
+        // Variables específicas del grupo:
+        //  - $ldqcInvalidCount: número de LDQC inválidas en este dilutionFactor.
+        //  - $ldqcAccuracy: lista de valores de accuracy de las LDQC para calcular su promedio.
+        //  - $ldqcFactor: último factor numérico extraído del nombre de las LDQC (se asume homogéneo en el grupo).
+        $ldqcInvalidCount = 0;
+        $ldqcAccuracy     = array();
+        $ldqcFactor       = null;
+
+        // [11/12/2025 - Toni Jurado]
+        // Recorremos todas las muestras DQC pertenecientes a este dilutionFactor.
+        foreach ($groupSamples as $SampleBatch) {
+
+            // [11/12/2025 - Toni Jurado]
+            // Inicializamos el factor extraído del nombre a null para cada iteración.
+            // Solo tendrá valor cuando el nombre coincida con el patrón LDQCxx o HDQCxx.
+            $factor = null;
+
+            // [11/12/2025 - Toni Jurado]
+            // Buscamos en el nombre de la muestra un patrón del tipo:
+            //   LDQC<número> o HDQC<número>
+            // Ejemplos válidos: LDQC6-1, HDQC20-2, LDQC10, etc.
+            if (preg_match('/(?:LDQC|HDQC)(\d+)/i', $SampleBatch['sampleName'], $matches)) {
+                $factor = (float)$matches[1];
+            }
+
+            // [11/12/2025 - Toni Jurado]
+            // Si se ha podido extraer un factor del nombre y este NO coincide con el dilutionFactor
+            // registrado en la base de datos para esta muestra, la marcamos para error de regla V11.
+            if ($factor !== null && (float)$factor !== (float)$SampleBatch['dilutionFactor']) {
+                $pkSampleBatchMismatch[] = $SampleBatch['pkSampleBatch'];
+            }
+
+            // [11/12/2025 - Toni Jurado]
+            // Ahora filtramos únicamente las muestras cuyo nombre empiece por LDQC<número>.
+            // Estas son las muestras de baja concentración de control de calidad (LDQC)
+            // sobre las que calcularemos el promedio de accuracy y contaremos cuántas son inválidas.
+            if (preg_match('/LDQC(\d+)/i', $SampleBatch['sampleName'], $matchesLdqc)) {
+                // Extraemos el número posterior a LDQC y lo guardamos como referencia de factor para las LDQC del grupo.
+                $ldqcFactor = (float)$matchesLdqc[1];
+
+                // Guardamos el valor de accuracy en el array de accuracies de las LDQC de este dilutionFactor.
+                $ldqcAccuracy[] = (float)$SampleBatch['accuracy'];
+
+                // Si la muestra LDQC tiene validFlag = 0, la consideramos inválida y aumentamos el contador del grupo.
+                if ((int)$SampleBatch['validFlag'] === 0) {
+                    $ldqcInvalidCount++;
+                }
             }
         }
-    }
 
-    if(count($pkSampleBatch) > 0)
-    {
-        $ids = implode(",", $pkSampleBatch);
-        $where = "s.pkSampleBatch in ($ids) AND s.fkBatch = " . $Batch->getPkBatch();
-        //$this->error($where, $parameters[0], array(), false);
-        $this->errorCurve($where, $parameters[0], $Batch->getPkBatch(), array(), false);
-    }
+        // [11/12/2025 - Toni Jurado]
+        // REGLA V11 (por grupo de dilutionFactor):
+        // Si existen muestras DQC dentro de este dilutionFactor cuyo factor extraído del nombre
+        // (LDQCxx/HDQCxx) no coincide con el dilutionFactor de la tabla, construimos un WHERE
+        // específico para estas muestras y aplicamos errorCurve con la regla V11.
+        if (count($pkSampleBatchMismatch) > 0) {
+            $ids   = implode(",", $pkSampleBatchMismatch);
+            $where = "s.pkSampleBatch in ($ids) AND s.fkBatch = " . $Batch->getPkBatch();
 
-
-        // Recogemos los valores de los parámetros mínimo y máximo de V11.1
-        $paramMinMax = $this->getRepository("\\Alae\\Entity\\Parameter")->findBy(array("rule" => "V11.1"));
-        $min1 = $paramMinMax[0]->getMinValue();
-        $max1 = $paramMinMax[0]->getMaxValue();
-
-        //Calculamos el promedio del Accuracy del LDQC
-        if ( count($ldqcAccuracy)>0 ) {
-            $avgAccuracy = array_sum( $ldqcAccuracy ) / count ( $ldqcAccuracy );
+            // [11/12/2025 - Toni Jurado]
+            // Se marca el error de calibración/curva sobre estas muestras concretas (regla V11).
+            $this->errorCurve($where, $parameters[0], $Batch->getPkBatch(), array(), false);
         }
-        else 
-        {
+
+        // [11/12/2025 - Toni Jurado]
+        // Calculamos el promedio de accuracy de las LDQC de este grupo de dilutionFactor.
+        // Si no hay LDQC en el grupo, usamos 0 como valor sentinela para indicar ausencia de datos.
+        if (count($ldqcAccuracy) > 0) {
+            $avgAccuracy = array_sum($ldqcAccuracy) / count($ldqcAccuracy);
+        } else {
             $avgAccuracy = 0;
         }
 
+        // [11/12/2025 - Toni Jurado]
+        // REGLA V11.1 (por grupo de dilutionFactor):
+        // Si en este dilutionFactor hay 2 o más LDQC inválidas, se invalida también el conjunto
+        // de muestras de tipo 'Unknown' que comparten este mismo dilutionFactor en el batch.
+        // Mantenemos la lógica original basada en el factor extraído de LDQC,
+        // asumiendo que las LDQC de este grupo representan ese nivel de dilución.
+        if ($ldqcInvalidCount >= 2 && $ldqcFactor !== null) {
+            $where = "s.fkBatch = " . $Batch->getPkBatch() .
+                     " AND s.sampleType = 'Unknown' " .
+                     " AND s.dilutionFactor = " . $ldqcFactor;
 
+            // Aplicamos la regla V11.1 sobre las muestras Unknown del grupo.
+            // El último parámetro en false suele implicar que se marcarán como inválidas (validFlag=0).
+            $this->errorCurve($where, $parameters1[0], $Batch->getPkBatch(), array(), false);
+        }
 
-    /*Nueva*/ 
-    // Si hay al menos 2 LDQC? inválidas → usamos errorCurve sobre Unknown con mismo dilutionFactor
-    // O si el Promedio de las 3 muestras LDQC está fuera de los parámetros de V11. Esto también ejecuta el errorCurve
-     if ( $ldqcInvalidCount >= 2 && $ldqcFactor !== null ) {
-         $where = "s.fkBatch = " . $Batch->getPkBatch() . 
-                  " AND s.sampleType = 'Unknown' " .
-                  " AND s.dilutionFactor = " . $ldqcFactor;
-    // Pasamos false para que además marque validFlag=0
-         $this->errorCurve($where, $parameters1[0], $Batch->getPkBatch(), array(), false);
+        // [11/12/2025 - Toni Jurado]
+        // REGLA V11.2 (por grupo de dilutionFactor):
+        // Evaluamos si el promedio de accuracy de las LDQC de este grupo está FUERA del rango permitido
+        // definido por min1 y max1.
+        // Además comprobamos que avgAccuracy != 0 para garantizar que había LDQC en este grupo.
+        if (($avgAccuracy <= $min1 || $avgAccuracy >= $max1) && $avgAccuracy != 0) {
+            $where = "s.fkBatch = " . $Batch->getPkBatch() .
+                     " AND s.sampleType = 'Unknown' " .
+                     " AND s.dilutionFactor = " . $ldqcFactor;
+
+            // Aplicamos la regla V11.2 sobre las muestras Unknown de este dilutionFactor,
+            // propagando el fallo de los controles LDQC al resto de muestras asociadas.
+            $this->errorCurve($where, $parameters2[0], $Batch->getPkBatch(), array(), false);
+        }
     }
-
-    //Comprobamos V11.2 - Que el promedio esté dentro del márgen y que el promedio NO SEA cero que indicaría que NO hay LDQC
-
-         if ( ( $avgAccuracy <= $min1 || $avgAccuracy >= $max1 ) && $avgAccuracy != 0 ) {
-         $where = "s.fkBatch = " . $Batch->getPkBatch() . 
-                  " AND s.sampleType = 'Unknown' " .
-                  " AND s.dilutionFactor1 = " . $ldqcFactor;
-    // Pasamos false para que además marque validFlag=0
-         $this->errorCurve($where, $parameters2[0], $Batch->getPkBatch(), array(), false);
-    }
-
 }
+
 
 
     /**
