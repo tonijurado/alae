@@ -1872,11 +1872,17 @@ protected function V11(\Alae\Entity\Batch $Batch)
         
         $where = " (s.sampleName NOT LIKE 'BLK%' AND s.sampleType <> 'Solvent' AND s.isPeakArea <> 0 AND s.analytePeakArea <> 0) 
                     AND ((s.analyteRetentionTime NOT BETWEEN $minTretAna AND $maxTretAna) OR (s.isRetentionTime NOT BETWEEN $minTretIS AND $maxTretIS))
-                   AND s.useRecord <> 1 AND s.fkBatch = " . $Batch->getPkBatch();
-        
+                   AND s.useRecord <> 1 AND s.fkBatch = " . $Batch->getPkBatch();     
         $this->error($where, $parameters[0], array(), false);
+
+        // Segun mail de Natalia del 04.06.2026, las muestras de tipo Unknown que no cumplan el criterio de tiempo de retención, 
+        // se rechazan pero no anulan el lote. Para conseguirlo, modificamos la primera parte del siguiente WHERE.
+        $where = " (s.sampleType = 'Unknown' AND ((s.analyteRetentionTime NOT BETWEEN $minTretAna AND $maxTretAna) OR (s.isRetentionTime NOT BETWEEN $minTretIS AND $maxTretIS)))
+                   AND s.useRecord = 1 AND s.fkBatch = " . $Batch->getPkBatch();
+        $this->error($where, $parameters[0], array(), false);
+
         //Repetimos la condición con UseRecord=1 para en este caso SI ANULAR LOTE
-        $where = " (s.sampleName NOT LIKE 'BLK%' AND s.sampleType <> 'Solvent' AND s.isPeakArea <> 0 AND s.analytePeakArea <> 0) 
+        $where = " (s.sampleName NOT LIKE 'BLK%' AND s.sampleType <> 'Solvent' AND s.sampleType <> 'Unknown' AND s.isPeakArea <> 0 AND s.analytePeakArea <> 0) 
                     AND ((s.analyteRetentionTime NOT BETWEEN $minTretAna AND $maxTretAna) OR (s.isRetentionTime NOT BETWEEN $minTretIS AND $maxTretIS))
                    AND s.useRecord = 1 AND s.fkBatch = " . $Batch->getPkBatch();
         
