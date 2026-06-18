@@ -45,12 +45,6 @@ class VerificationController extends BaseController
                 }
             }
             
-            $response = $this->V12($Batch);
-            if ($response)
-            {
-                $this->V26($Batch);
-            }
-
             $this->V13_25($Batch);
 
             $response = $this->V12($Batch);
@@ -272,24 +266,17 @@ class VerificationController extends BaseController
         $function = 'V25';
         $this->$function($Batch);
 
-        $continue = $this->evaluation($Batch);
-        
-        if ($continue && is_null($Batch->getFkParameter()))
+        $individualVerifications = array('V21', 'V22', 'V24', 'V26');
+        foreach ($individualVerifications as $function)
         {
             $this->$function($Batch);
-            for ($i = 21; $i <= 26; $i++)
-            {
-                $function = 'V' . $i;
-                $this->$function($Batch);
-                //die();
-            }
         }
         // 23/08/2024 ejecutamos V20 después de V23 y v26 para que controle los ZS
         
         $function = 'V20';
         $this->$function($Batch);
 
-        $continue = $this->evaluation($Batch);
+        $this->evaluation($Batch);
 
         $AnaStudy = $this->getRepository("\\Alae\\Entity\\AnalyteStudy")->findBy(array(
             "fkAnalyte" => $Batch->getFkAnalyte(),
